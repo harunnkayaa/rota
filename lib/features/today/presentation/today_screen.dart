@@ -49,12 +49,6 @@ class TodayScreen extends StatelessWidget {
                     const SizedBox(height: AppSpacing.m),
                     GoalCard(view: goal),
                   ],
-                  const SizedBox(height: AppSpacing.l),
-                  Text(
-                    l.inMemoryNotice,
-                    textAlign: TextAlign.center,
-                    style: Theme.of(context).textTheme.bodySmall,
-                  ),
                 ],
               ),
             ),

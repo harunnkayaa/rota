@@ -13,3 +13,4 @@ the code location that depends on it is listed.
 | 6 | Which timezone defines "today"? | **Device timezone** in Phase 1. The profile timezone (IANA, default `Europe/Istanbul`) takes over in Phase 2. | `SystemClock` |
 | 7 | Min/max length of a custom period | No limit beyond `start < end`. | `PeriodRange` |
 | 8 | Does redistribution include today? | **No by default**; the user can switch it on in the sheet. | `remainingDays` |
+| 9 | Local storage | **`shared_preferences`**, whole state as one versioned JSON document (`schema_version`). Unreadable data is never overwritten; the app shows an error with retry. Not encrypted — revisit before syncing sensitive categories. `drift` is the candidate if data grows or the offline queue needs queries. | `planning/data/` |

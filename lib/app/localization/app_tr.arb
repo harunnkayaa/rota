@@ -8,7 +8,6 @@
   "emptyBody": "Haftalık bir hedef oluştur ve günlere dağıt. Rota, her gün yaptığın çalışmanın haftalık hedefine nasıl yansıdığını gösterir.",
   "createGoalCta": "Hedef oluştur",
   "loadSampleCta": "Örnek haftayı yükle",
-  "inMemoryNotice": "Veriler şimdilik yalnızca bu oturumda tutulur; sayfa yenilenince silinir.",
   "summaryPlanned": "Planlanan",
   "summaryDone": "Gerçekleşen",
   "summaryCapacityLeft": "Boş kapasite",
@@ -244,5 +243,10 @@
   "categoryWorship": "Namaz / ibadet",
   "categoryPersonal": "Kişisel",
   "sampleProjectGoal": "Rota MVP geliştirme",
-  "sampleLanguageGoal": "PTE hazırlık"
+  "sampleLanguageGoal": "PTE hazırlık",
+  "loadingLabel": "Veriler yükleniyor",
+  "loadFailedTitle": "Kayıtlı verilerin okunamadı",
+  "loadFailedBody": "Verilerin silinmedi ve üzerine yazılmadı. Tekrar deneyebilirsin; sorun sürerse uygulamanın güncellenmesi gerekebilir.",
+  "retry": "Tekrar dene",
+  "saveFailed": "Son değişiklik bu cihaza kaydedilemedi."
 }

@@ -27,7 +27,25 @@ class LocalDate implements Comparable<LocalDate> {
   LocalDate.fromDateTime(DateTime dateTime)
     : this._(dateTime.year, dateTime.month, dateTime.day);
 
+  /// Parses the ISO-8601 form written by [toString] ("2026-09-28").
+  /// Throws [FormatException] for anything else, including impossible dates.
+  factory LocalDate.parse(String value) {
+    final match = _isoPattern.firstMatch(value);
+    if (match == null) throw FormatException('Not a yyyy-MM-dd date', value);
+    try {
+      return LocalDate(
+        int.parse(match[1]!),
+        int.parse(match[2]!),
+        int.parse(match[3]!),
+      );
+    } on ArgumentError {
+      throw FormatException('Not a real calendar date', value);
+    }
+  }
+
   const LocalDate._(this.year, this.month, this.day);
+
+  static final _isoPattern = RegExp(r'^(\d{4})-(\d{2})-(\d{2})$');
 
   final int year;
   final int month;

@@ -34,10 +34,6 @@ class AppLocalizationsTr extends AppLocalizations {
   String get loadSampleCta => 'Örnek haftayı yükle';
 
   @override
-  String get inMemoryNotice =>
-      'Veriler şimdilik yalnızca bu oturumda tutulur; sayfa yenilenince silinir.';
-
-  @override
   String get summaryPlanned => 'Planlanan';
 
   @override
@@ -328,4 +324,20 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get sampleLanguageGoal => 'PTE hazırlık';
+
+  @override
+  String get loadingLabel => 'Veriler yükleniyor';
+
+  @override
+  String get loadFailedTitle => 'Kayıtlı verilerin okunamadı';
+
+  @override
+  String get loadFailedBody =>
+      'Verilerin silinmedi ve üzerine yazılmadı. Tekrar deneyebilirsin; sorun sürerse uygulamanın güncellenmesi gerekebilir.';
+
+  @override
+  String get retry => 'Tekrar dene';
+
+  @override
+  String get saveFailed => 'Son değişiklik bu cihaza kaydedilemedi.';
 }

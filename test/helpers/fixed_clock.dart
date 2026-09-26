@@ -3,6 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:rota/app/app.dart';
 import 'package:rota/core/time/clock.dart';
 import 'package:rota/core/time/local_date.dart';
+import 'package:rota/features/planning/data/planner_storage.dart';
 import 'package:rota/features/planning/presentation/planner_controller.dart';
 
 /// A clock frozen on [day] at noon UTC.
@@ -23,12 +24,17 @@ Future<PlannerController> pumpRota(
   WidgetTester tester, {
   required LocalDate today,
   Size size = const Size(390, 844),
+  PlannerStorage? storage,
 }) async {
   tester.view.physicalSize = size;
   tester.view.devicePixelRatio = 1;
   addTearDown(tester.view.reset);
 
-  final controller = PlannerController(clock: FixedClock(today));
+  final controller = PlannerController(
+    clock: FixedClock(today),
+    storage: storage,
+  );
+  await controller.load();
   await tester.pumpWidget(RotaApp(controller: controller));
   await tester.pumpAndSettle();
   return controller;

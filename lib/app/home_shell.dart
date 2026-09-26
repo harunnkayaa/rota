@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../features/goals/presentation/create_goal_screen.dart';
+import '../features/planning/presentation/planner_controller.dart';
 import '../features/planning/presentation/week_screen.dart';
 import '../features/today/presentation/today_screen.dart';
 import 'localization/app_localizations.dart';
@@ -23,7 +24,13 @@ class _HomeShellState extends State<HomeShell> {
   Widget build(BuildContext context) {
     final l = AppLocalizations.of(context);
     final isWide = MediaQuery.sizeOf(context).width >= AppLayout.wideBreakpoint;
-    final page = _pages[_index];
+    final saveFailed = PlannerScope.of(context).saveStatus == SaveStatus.failed;
+    final page = Column(
+      children: [
+        if (saveFailed) const _SaveFailedBanner(),
+        Expanded(child: _pages[_index]),
+      ],
+    );
 
     if (isWide) {
       return Scaffold(
@@ -83,6 +90,43 @@ class _HomeShellState extends State<HomeShell> {
             label: l.navWeek,
           ),
         ],
+      ),
+    );
+  }
+}
+
+/// Data the user just entered is still on screen but not on disk; say so
+/// and offer a retry instead of failing silently.
+class _SaveFailedBanner extends StatelessWidget {
+  const _SaveFailedBanner();
+
+  @override
+  Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context);
+    final scheme = Theme.of(context).colorScheme;
+    return SafeArea(
+      bottom: false,
+      child: Material(
+        color: scheme.errorContainer,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.m),
+          child: Row(
+            children: [
+              Icon(Icons.sync_problem, color: scheme.onErrorContainer),
+              const SizedBox(width: AppSpacing.s),
+              Expanded(
+                child: Text(
+                  l.saveFailed,
+                  style: TextStyle(color: scheme.onErrorContainer),
+                ),
+              ),
+              TextButton(
+                onPressed: PlannerScope.of(context).retrySave,
+                child: Text(l.retry),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }

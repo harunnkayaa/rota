@@ -82,4 +82,17 @@ void main() {
       expect(LocalDate(2026, 3, 5).toString(), '2026-03-05');
     });
   });
+
+  group('parse', () {
+    test('reads what toString writes', () {
+      final date = LocalDate(2026, 3, 5);
+      expect(LocalDate.parse(date.toString()), date);
+    });
+
+    test('rejects other formats and impossible dates', () {
+      for (final bad in ['2026-3-5', '05.03.2026', '2026-02-30', '', 'x']) {
+        expect(() => LocalDate.parse(bad), throwsFormatException, reason: bad);
+      }
+    });
+  });
 }

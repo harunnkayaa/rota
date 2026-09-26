@@ -9,6 +9,9 @@ import '../../goals/domain/daily_allocation.dart';
 import '../../goals/domain/goal.dart';
 import '../../goals/domain/goal_period.dart';
 import '../../goals/domain/progress_entry.dart';
+import '../data/planner_data.dart';
+import '../data/planner_json.dart';
+import '../data/planner_storage.dart';
 import '../domain/capacity.dart';
 import '../domain/progress_calculator.dart';
 import '../domain/redistribution.dart';
@@ -16,24 +19,113 @@ import '../domain/redistribution.dart';
 /// Until settings exist, every day offers 4 hours of plannable time.
 const defaultDailyCapacityMinutes = 240;
 
+enum LoadStatus { loading, ready, failed }
+
+enum SaveStatus { saved, saving, failed }
+
 /// Holds the planner state for the UI and turns user actions into domain
 /// operations.
 ///
-/// Phase 1: data lives in memory only. In Phase 2 the lists below are
-/// replaced by a local store + Supabase sync; the public methods stay the
-/// same, so screens don't change.
+/// Every change is saved to [storage] in the background, in order. Phase 2
+/// adds Supabase sync behind the same public methods, so screens don't
+/// change.
 class PlannerController extends ChangeNotifier {
   PlannerController({
     required this.clock,
+    PlannerStorage? storage,
     CapacityModel? capacity,
     this.weekStartDay = DateTime.monday,
-  }) : capacity =
+  }) : storage = storage ?? InMemoryPlannerStorage(),
+       capacity =
            capacity ??
            CapacityModel(defaultDailyMinutes: defaultDailyCapacityMinutes);
 
   final Clock clock;
+  final PlannerStorage storage;
   final CapacityModel capacity;
   final int weekStartDay;
+
+  LoadStatus _loadStatus = LoadStatus.ready;
+  SaveStatus _saveStatus = SaveStatus.saved;
+  Future<void> _saveChain = Future.value();
+
+  LoadStatus get loadStatus => _loadStatus;
+  SaveStatus get saveStatus => _saveStatus;
+
+  /// Reads saved data. If it can't be read, the app stops in an error state
+  /// and never writes, so unreadable data is not overwritten and lost.
+  Future<void> load() async {
+    _loadStatus = LoadStatus.loading;
+    notifyListeners();
+    try {
+      final raw = await storage.read();
+      final data = raw == null ? const PlannerData() : decodePlannerData(raw);
+      _categories
+        ..clear()
+        ..addAll(data.categories);
+      _goals
+        ..clear()
+        ..addAll(data.goals);
+      _periods
+        ..clear()
+        ..addAll(data.periods);
+      _allocations
+        ..clear()
+        ..addAll(data.allocations);
+      _entries
+        ..clear()
+        ..addAll(data.entries);
+      _loadStatus = LoadStatus.ready;
+    } on Object catch (e) {
+      // Type only: the saved content may contain personal goal titles.
+      debugPrint('Planner load failed: ${e.runtimeType}');
+      _loadStatus = LoadStatus.failed;
+    }
+    notifyListeners();
+  }
+
+  /// Completes when every change made so far has been written.
+  Future<void> flush() => _saveChain;
+
+  /// Writes the full current state again after a failed save.
+  void retrySave() => _commit();
+
+  bool _disposed = false;
+
+  @override
+  void dispose() {
+    _disposed = true;
+    super.dispose();
+  }
+
+  void _commit() {
+    notifyListeners();
+    if (_loadStatus != LoadStatus.ready) return;
+    // Encode now, so the saved snapshot matches this exact change even if
+    // more changes happen before the write runs.
+    final snapshot = encodePlannerData(
+      PlannerData(
+        categories: List.of(_categories),
+        goals: List.of(_goals),
+        periods: List.of(_periods),
+        allocations: List.of(_allocations),
+        entries: List.of(_entries),
+      ),
+    );
+    _saveChain = _saveChain.then((_) => _write(snapshot));
+  }
+
+  Future<void> _write(String snapshot) async {
+    _saveStatus = SaveStatus.saving;
+    try {
+      await storage.write(snapshot);
+      _saveStatus = SaveStatus.saved;
+    } on Object catch (e) {
+      debugPrint('Planner save failed: ${e.runtimeType}');
+      _saveStatus = SaveStatus.failed;
+    }
+    if (!_disposed) notifyListeners();
+  }
 
   final _categories = <GoalCategory>[];
   final _goals = <Goal>[];
@@ -65,7 +157,7 @@ class PlannerController extends ChangeNotifier {
       isSensitive: preset?.isSensitive ?? false,
     );
     _categories.add(category);
-    notifyListeners();
+    _commit();
     return category;
   }
 
@@ -110,7 +202,7 @@ class PlannerController extends ChangeNotifier {
         ),
       );
     }
-    notifyListeners();
+    _commit();
     return period;
   }
 
@@ -129,7 +221,7 @@ class PlannerController extends ChangeNotifier {
     );
     validateNewEntry(period, entry, _entries);
     _entries.add(entry);
-    notifyListeners();
+    _commit();
   }
 
   /// Open periods that include today, in creation order.
@@ -194,7 +286,7 @@ class PlannerController extends ChangeNotifier {
         _allocations[index] = current.withValue(current.allocatedValue + extra);
       }
     }
-    notifyListeners();
+    _commit();
   }
 
   /// Fills the current week with two example goals and some past progress,
@@ -236,7 +328,7 @@ class PlannerController extends ChangeNotifier {
         _addPastEntry(languagePeriod.id, days[i], minutes);
       }
     }
-    notifyListeners();
+    _commit();
   }
 
   void _addPastEntry(String periodId, LocalDate date, int minutes) {

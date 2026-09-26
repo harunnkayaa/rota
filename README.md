@@ -9,9 +9,10 @@ Defaults for undecided product questions: [docs/product/open-decisions.md](docs/
 
 ## Status
 
-Phase 0 (domain + planning engine) and the Phase 1 local slice are done.
-Data is **in memory only** — it disappears on reload. Supabase sync,
-focus timer and notifications are next.
+Phase 0 (domain + planning engine) and Phase 1 (local vertical slice) are
+done. Data is saved on the device (iOS: NSUserDefaults, web: localStorage)
+via `shared_preferences`; it is not synced between devices yet. Supabase
+sync, focus timer and notifications are next.
 
 ## Run
 

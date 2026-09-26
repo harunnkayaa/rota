@@ -21,7 +21,82 @@ class RotaApp extends StatelessWidget {
         darkTheme: AppTheme.dark(),
         localizationsDelegates: AppLocalizations.localizationsDelegates,
         supportedLocales: AppLocalizations.supportedLocales,
-        home: const HomeShell(),
+        home: const _StartupGate(),
+      ),
+    );
+  }
+}
+
+/// Shows the app only once saved data is loaded; otherwise a spinner or a
+/// recoverable error.
+class _StartupGate extends StatelessWidget {
+  const _StartupGate();
+
+  @override
+  Widget build(BuildContext context) {
+    final controller = PlannerScope.of(context);
+    return switch (controller.loadStatus) {
+      LoadStatus.ready => const HomeShell(),
+      LoadStatus.loading => const _LoadingScreen(),
+      LoadStatus.failed => _LoadFailedScreen(onRetry: controller.load),
+    };
+  }
+}
+
+class _LoadingScreen extends StatelessWidget {
+  const _LoadingScreen();
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Center(
+        child: CircularProgressIndicator(
+          semanticsLabel: AppLocalizations.of(context).loadingLabel,
+        ),
+      ),
+    );
+  }
+}
+
+class _LoadFailedScreen extends StatelessWidget {
+  const _LoadFailedScreen({required this.onRetry});
+
+  final VoidCallback onRetry;
+
+  @override
+  Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context);
+    final theme = Theme.of(context);
+    return Scaffold(
+      body: Center(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(AppSpacing.l),
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(
+              maxWidth: AppLayout.maxContentWidth,
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(
+                  Icons.folder_off_outlined,
+                  size: AppSpacing.xl * 2,
+                  color: theme.colorScheme.tertiary,
+                ),
+                const SizedBox(height: AppSpacing.m),
+                Text(
+                  l.loadFailedTitle,
+                  style: theme.textTheme.headlineSmall,
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: AppSpacing.s),
+                Text(l.loadFailedBody, textAlign: TextAlign.center),
+                const SizedBox(height: AppSpacing.l),
+                FilledButton(onPressed: onRetry, child: Text(l.retry)),
+              ],
+            ),
+          ),
+        ),
       ),
     );
   }

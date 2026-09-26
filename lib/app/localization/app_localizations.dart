@@ -142,12 +142,6 @@ abstract class AppLocalizations {
   /// **'Örnek haftayı yükle'**
   String get loadSampleCta;
 
-  /// No description provided for @inMemoryNotice.
-  ///
-  /// In tr, this message translates to:
-  /// **'Veriler şimdilik yalnızca bu oturumda tutulur; sayfa yenilenince silinir.'**
-  String get inMemoryNotice;
-
   /// No description provided for @summaryPlanned.
   ///
   /// In tr, this message translates to:
@@ -643,6 +637,36 @@ abstract class AppLocalizations {
   /// In tr, this message translates to:
   /// **'PTE hazırlık'**
   String get sampleLanguageGoal;
+
+  /// No description provided for @loadingLabel.
+  ///
+  /// In tr, this message translates to:
+  /// **'Veriler yükleniyor'**
+  String get loadingLabel;
+
+  /// No description provided for @loadFailedTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kayıtlı verilerin okunamadı'**
+  String get loadFailedTitle;
+
+  /// No description provided for @loadFailedBody.
+  ///
+  /// In tr, this message translates to:
+  /// **'Verilerin silinmedi ve üzerine yazılmadı. Tekrar deneyebilirsin; sorun sürerse uygulamanın güncellenmesi gerekebilir.'**
+  String get loadFailedBody;
+
+  /// No description provided for @retry.
+  ///
+  /// In tr, this message translates to:
+  /// **'Tekrar dene'**
+  String get retry;
+
+  /// No description provided for @saveFailed.
+  ///
+  /// In tr, this message translates to:
+  /// **'Son değişiklik bu cihaza kaydedilemedi.'**
+  String get saveFailed;
 }
 
 class _AppLocalizationsDelegate
