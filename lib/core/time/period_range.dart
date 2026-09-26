@@ -8,8 +8,13 @@ import 'local_date.dart';
 class PeriodRange {
   /// Throws [ArgumentError] unless [start] is strictly before [endExclusive].
   factory PeriodRange(LocalDate start, LocalDate endExclusive) {
-    // TODO(harun): validate and return PeriodRange._(start, endExclusive).
-    throw UnimplementedError();
+    if (!start.isBefore(endExclusive)) {
+      throw ArgumentError(
+        'Period start ($start) must be before end '
+        '($endExclusive).',
+      );
+    }
+    return PeriodRange._(start, endExclusive);
   }
 
   /// The calendar week that contains [date].
@@ -20,15 +25,19 @@ class PeriodRange {
     LocalDate date, {
     required int weekStartDay,
   }) {
-    // TODO(harun): implement. Key question: how many days back from [date]
-    // is the most recent [weekStartDay]? (Hint: modulo 7.)
-    throw UnimplementedError();
+    if (weekStartDay < DateTime.monday || weekStartDay > DateTime.sunday) {
+      throw ArgumentError.value(weekStartDay, 'weekStartDay', 'Must be 1..7');
+    }
+    // Days since the most recent week start. Adding 7 before modulo keeps
+    // the value non-negative (e.g. Wed=3, start Sun=7 -> (3-7+7)%7 = 3).
+    final daysBack = (date.weekday - weekStartDay + daysPerWeek) % daysPerWeek;
+    final start = date.addDays(-daysBack);
+    return PeriodRange(start, start.addDays(daysPerWeek));
   }
 
   /// Seven days starting on [start], whatever weekday that is.
   factory PeriodRange.rolling7Days(LocalDate start) {
-    // TODO(harun): implement.
-    throw UnimplementedError();
+    return PeriodRange(start, start.addDays(daysPerWeek));
   }
 
   const PeriodRange._(this.start, this.endExclusive);
@@ -41,21 +50,15 @@ class PeriodRange {
   /// Last day that belongs to the range; for user-facing display only.
   LocalDate get endInclusive => endExclusive.addDays(-1);
 
-  int get lengthInDays {
-    // TODO(harun): implement.
-    throw UnimplementedError();
-  }
+  int get lengthInDays => start.daysUntil(endExclusive);
 
-  bool contains(LocalDate date) {
-    // TODO(harun): implement. start is included, endExclusive is not.
-    throw UnimplementedError();
-  }
+  /// [start] is included, [endExclusive] is not.
+  bool contains(LocalDate date) =>
+      !date.isBefore(start) && date.isBefore(endExclusive);
 
   /// Every day in the range, in order.
-  Iterable<LocalDate> get days {
-    // TODO(harun): implement.
-    throw UnimplementedError();
-  }
+  Iterable<LocalDate> get days =>
+      Iterable.generate(lengthInDays, start.addDays);
 
   @override
   bool operator ==(Object other) =>

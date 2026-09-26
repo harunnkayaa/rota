@@ -11,10 +11,13 @@ class LocalDate implements Comparable<LocalDate> {
   /// Throws [ArgumentError] for impossible dates such as 2026-02-30 or
   /// month 13.
   factory LocalDate(int year, int month, int day) {
-    // TODO(harun): validate and return LocalDate._(year, month, day).
-    // Hint: DateTime.utc normalizes overflow (Feb 30 -> Mar 2). If the
-    // normalized parts differ from the input, the input was invalid.
-    throw UnimplementedError();
+    // DateTime.utc normalizes overflow (Feb 30 -> Mar 2). If the normalized
+    // parts differ from the input, the input was not a real calendar day.
+    final utc = DateTime.utc(year, month, day);
+    if (utc.year != year || utc.month != month || utc.day != day) {
+      throw ArgumentError('Invalid calendar date: $year-$month-$day');
+    }
+    return LocalDate._(year, month, day);
   }
 
   const LocalDate._(this.year, this.month, this.day);
@@ -24,23 +27,20 @@ class LocalDate implements Comparable<LocalDate> {
   final int day;
 
   /// ISO weekday: 1 = Monday ... 7 = Sunday (same as [DateTime.monday] etc.).
-  int get weekday {
-    // TODO(harun): implement.
-    throw UnimplementedError();
-  }
+  int get weekday => _toUtc().weekday;
 
   /// Returns the date [days] calendar days later (negative goes back).
   LocalDate addDays(int days) {
-    // TODO(harun): implement. Do the arithmetic in UTC so DST can't interfere.
-    throw UnimplementedError();
+    // UTC has no DST, so every day is exactly 24 hours here.
+    final result = _toUtc().add(Duration(days: days));
+    return LocalDate._(result.year, result.month, result.day);
   }
 
   /// Number of calendar days from this date to [other].
   /// Negative when [other] is earlier.
-  int daysUntil(LocalDate other) {
-    // TODO(harun): implement.
-    throw UnimplementedError();
-  }
+  int daysUntil(LocalDate other) => other._toUtc().difference(_toUtc()).inDays;
+
+  DateTime _toUtc() => DateTime.utc(year, month, day);
 
   bool isBefore(LocalDate other) => compareTo(other) < 0;
 
