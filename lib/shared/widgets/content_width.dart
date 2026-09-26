@@ -14,7 +14,9 @@ class ContentWidth extends StatelessWidget {
       alignment: Alignment.topCenter,
       child: ConstrainedBox(
         constraints: const BoxConstraints(maxWidth: AppLayout.maxContentWidth),
-        child: child,
+        // Full available width (up to the max), so content is left-aligned
+        // instead of shrink-wrapped in the middle.
+        child: SizedBox(width: double.infinity, child: child),
       ),
     );
   }

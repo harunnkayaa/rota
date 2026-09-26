@@ -32,6 +32,19 @@ extension AppFormatters on AppLocalizations {
   };
 }
 
+/// Short form for tight spaces (week grid): 45 -> "45 dk", 90 -> "1,5 sa".
+/// Rounded to one decimal; full precision is shown everywhere else.
+String formatCompactMinutes(BuildContext context, int minutes) {
+  final l = AppLocalizations.of(context);
+  if (minutes < Duration.minutesPerHour) return l.durationMinutes('$minutes');
+  final hours = NumberFormat('#0.#', _locale(context));
+  return l.hoursCompact(hours.format(minutes / Duration.minutesPerHour));
+}
+
+/// "Pzt"
+String formatWeekdayShort(BuildContext context, LocalDate date) =>
+    DateFormat('EEE', _locale(context)).format(_asDateTime(date));
+
 /// "Pzt 28 Eyl"
 String formatDayShort(BuildContext context, LocalDate date) =>
     DateFormat('EEE d MMM', _locale(context)).format(_asDateTime(date));

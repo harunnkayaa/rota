@@ -14,3 +14,5 @@ the code location that depends on it is listed.
 | 7 | Min/max length of a custom period | No limit beyond `start < end`. | `PeriodRange` |
 | 8 | Does redistribution include today? | **No by default**; the user can switch it on in the sheet. | `remainingDays` |
 | 9 | Local storage | **`shared_preferences`**, whole state as one versioned JSON document (`schema_version`). Unreadable data is never overwritten; the app shows an error with retry. Not encrypted — revisit before syncing sensitive categories. `drift` is the candidate if data grows or the offline queue needs queries. | `planning/data/` |
+| 10 | Can past days' plans be edited? | **No.** Today and later days are editable; past days are shown locked with done/planned, so "planned vs. done" stays honest. | `applyPlanChanges` |
+| 11 | What does "over-planned" mean after a missed day? | Compared on what is **left**: plan from today on vs. remaining target. Making up a short Monday on Tuesday is "covered", not "over target". | `remainingPlanned`, `GoalProgressView.surplus` |

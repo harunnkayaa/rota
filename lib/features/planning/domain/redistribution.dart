@@ -50,12 +50,9 @@ List<MissedAllocation> detectMissedAllocations({
   return missed..sort((a, b) => a.date.compareTo(b.date));
 }
 
-/// The part of the remaining target that the current plan no longer covers.
-///
-/// remaining target − (what is still planned from [today] on, minus what is
-/// already done on those days). This is the "goal debt" of CLAUDE.md §10.3:
-/// it is shown to the user, never moved silently.
-int unplannedRemaining({
+/// What is still planned from [today] on, minus work already done on those
+/// days: the plan that is left to carry out.
+int remainingPlanned({
   required GoalPeriod period,
   required Iterable<DailyAllocation> allocations,
   required Iterable<ProgressEntry> entries,
@@ -69,7 +66,27 @@ int unplannedRemaining({
       a.allocatedValue - dailyProgress(period, a.date, entries),
     );
   }
-  return max(0, remainingTarget(period, entries) - stillPlanned);
+  return stillPlanned;
+}
+
+/// The part of the remaining target that the current plan no longer covers:
+/// remaining target − [remainingPlanned].
+///
+/// This is the "goal debt" of CLAUDE.md §10.3: it is shown to the user,
+/// never moved silently.
+int unplannedRemaining({
+  required GoalPeriod period,
+  required Iterable<DailyAllocation> allocations,
+  required Iterable<ProgressEntry> entries,
+  required LocalDate today,
+}) {
+  final planned = remainingPlanned(
+    period: period,
+    allocations: allocations,
+    entries: entries,
+    today: today,
+  );
+  return max(0, remainingTarget(period, entries) - planned);
 }
 
 /// Days of [period] that can still receive work.

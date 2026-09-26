@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/widgets.dart';
 
 import '../../../core/time/clock.dart';
@@ -13,6 +15,7 @@ import '../data/planner_data.dart';
 import '../data/planner_json.dart';
 import '../data/planner_storage.dart';
 import '../domain/capacity.dart';
+import '../domain/plan_editing.dart';
 import '../domain/progress_calculator.dart';
 import '../domain/redistribution.dart';
 
@@ -239,6 +242,7 @@ class PlannerController extends ChangeNotifier {
     return TodaySummary(
       plannedMinutes: views.fold(0, (s, v) => s + (v.todayAllocated ?? 0)),
       doneMinutes: views.fold(0, (s, v) => s + v.todayDone),
+      remainingMinutes: views.fold(0, (s, v) => s + v.todayRemaining),
       capacity: capacityOn(today),
     );
   }
@@ -262,6 +266,52 @@ class PlannerController extends ChangeNotifier {
           DayCapacity(d, capacityOn(d).free),
       ],
       strategy: strategy,
+    );
+  }
+
+  GoalProgressView goalView(String periodId) => _view(_period(periodId));
+
+  /// Minutes planned on [date] by every goal except [excludePeriodId]; used
+  /// to warn about capacity while a plan is being edited.
+  int plannedOnExcluding(LocalDate date, {String? excludePeriodId}) =>
+      _durationAllocations()
+          .where((a) => a.date == date && a.goalPeriodId != excludePeriodId)
+          .fold(0, (sum, a) => sum + a.allocatedValue);
+
+  /// Sets the plan for the given days (0 removes a day). Throws
+  /// [PlanEditRejectedException] for past days or invalid amounts.
+  void updatePlan(String periodId, Map<LocalDate, int> changes) {
+    final updated = applyPlanChanges(
+      period: _period(periodId),
+      allocations: _allocations,
+      changes: changes,
+      today: today,
+      newId: generateUuidV4,
+    );
+    _allocations
+      ..clear()
+      ..addAll(updated);
+    _commit();
+  }
+
+  /// What [changes] would do to the week, without saving anything.
+  PlanPreview previewPlan(String periodId, Map<LocalDate, int> changes) {
+    final period = _period(periodId);
+    final draft = applyPlanChanges(
+      period: period,
+      allocations: _allocations,
+      changes: changes,
+      today: today,
+      newId: () => 'preview',
+    );
+    return PlanPreview(
+      remainingTarget: remainingTarget(period, _entries),
+      remainingPlanned: remainingPlanned(
+        period: period,
+        allocations: draft,
+        entries: _entries,
+        today: today,
+      ),
     );
   }
 
@@ -361,8 +411,17 @@ class PlannerController extends ChangeNotifier {
       todayAllocated: allocatedOn(today),
       todayDone: dailyProgress(period, today, _entries),
       periodDone: periodProgress(period, _entries),
-      unallocated: unallocatedAmount(period, _allocations),
       debt: _debt(period),
+      surplus: max(
+        0,
+        remainingPlanned(
+              period: period,
+              allocations: _allocations,
+              entries: _entries,
+              today: today,
+            ) -
+            remainingTarget(period, _entries),
+      ),
       days: [
         for (final d in period.range.days)
           DayProgress(
@@ -423,7 +482,7 @@ class GoalProgressView {
     required this.todayAllocated,
     required this.todayDone,
     required this.periodDone,
-    required this.unallocated,
+    required this.surplus,
     required this.debt,
     required this.days,
   });
@@ -436,10 +495,21 @@ class GoalProgressView {
   final int? todayAllocated;
   final int todayDone;
   final int periodDone;
-  final int unallocated;
 
   /// Part of the remaining target no longer covered by the plan.
   final int debt;
+
+  /// How much the plan from today on exceeds what is left of the target.
+  /// Shortfalls of past days are settled, so they never count here.
+  final int surplus;
+
+  /// Today's plan minus today's work, never negative. Reminders always use
+  /// this "not yet worked" amount (see docs/product/notification-rules.md).
+  int get todayRemaining {
+    final planned = todayAllocated ?? 0;
+    return planned > todayDone ? planned - todayDone : 0;
+  }
+
   final List<DayProgress> days;
 }
 
@@ -470,16 +540,33 @@ class DayProgress {
   }
 }
 
+/// Live numbers shown while the user edits a plan. Past days are settled,
+/// so the edit compares what is left to plan with what is left to do.
+@immutable
+class PlanPreview {
+  const PlanPreview({
+    required this.remainingTarget,
+    required this.remainingPlanned,
+  });
+
+  final int remainingTarget;
+  final int remainingPlanned;
+}
+
 @immutable
 class TodaySummary {
   const TodaySummary({
     required this.plannedMinutes,
     required this.doneMinutes,
+    required this.remainingMinutes,
     required this.capacity,
   });
 
   final int plannedMinutes;
   final int doneMinutes;
+
+  /// Planned but not yet worked today — what reminders talk about.
+  final int remainingMinutes;
   final CapacityCheck capacity;
 }
 

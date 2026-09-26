@@ -147,15 +147,7 @@
       }
     }
   },
-  "unallocated": "Günlere dağıtılmamış: {amount}",
-  "@unallocated": {
-    "placeholders": {
-      "amount": {
-        "type": "String"
-      }
-    }
-  },
-  "overAllocated": "Hedeften {amount} fazla planlandı",
+  "overAllocated": "Kalan hedeften {amount} fazla planlandı.",
   "@overAllocated": {
     "placeholders": {
       "amount": {
@@ -248,5 +240,195 @@
   "loadFailedTitle": "Kayıtlı verilerin okunamadı",
   "loadFailedBody": "Verilerin silinmedi ve üzerine yazılmadı. Tekrar deneyebilirsin; sorun sürerse uygulamanın güncellenmesi gerekebilir.",
   "retry": "Tekrar dene",
-  "saveFailed": "Son değişiklik bu cihaza kaydedilemedi."
+  "saveFailed": "Son değişiklik bu cihaza kaydedilemedi.",
+  "editTodayPlan": "Bugünün planı",
+  "editWeekPlan": "Haftanın planı",
+  "editPlanTooltip": "Planı düzenle",
+  "remainingToday": "Kalan {amount}",
+  "@remainingToday": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "summaryRemaining": "Kalan",
+  "todayRingSemantics": "Bugün {done} / {planned} tamamlandı",
+  "@todayRingSemantics": {
+    "placeholders": {
+      "done": {
+        "type": "String"
+      },
+      "planned": {
+        "type": "String"
+      }
+    }
+  },
+  "planDistributed": "Planlanan {planned} / {target}",
+  "@planDistributed": {
+    "placeholders": {
+      "planned": {
+        "type": "String"
+      },
+      "target": {
+        "type": "String"
+      }
+    }
+  },
+  "planUnallocated": "{amount} henüz günlere dağıtılmadı.",
+  "@planUnallocated": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "planOverTarget": "Hedeften {amount} fazla planladın.",
+  "@planOverTarget": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "planDebt": "Plan, kalan hedefin {amount} kısmını karşılamıyor.",
+  "@planDebt": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "planCovers": "Plan haftalık hedefi karşılıyor.",
+  "distributeEvenlyAction": "Eşit dağıt",
+  "matchTargetToPlan": "Hedefi toplama eşitle",
+  "clearPlan": "Temizle",
+  "decreaseBy": "{amount} azalt",
+  "@decreaseBy": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "increaseBy": "{amount} artır",
+  "@increaseBy": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "durationFieldSemantics": "{label}: {value}. Değiştirmek için dokun.",
+  "@durationFieldSemantics": {
+    "placeholders": {
+      "label": {
+        "type": "String"
+      },
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "durationSheetTitle": "{label} için süre",
+  "@durationSheetTitle": {
+    "placeholders": {
+      "label": {
+        "type": "String"
+      }
+    }
+  },
+  "errorDurationMax": "En fazla {max} girilebilir.",
+  "@errorDurationMax": {
+    "placeholders": {
+      "max": {
+        "type": "String"
+      }
+    }
+  },
+  "pastDayLocked": "Geçmiş gün · {done} / {planned}",
+  "@pastDayLocked": {
+    "placeholders": {
+      "done": {
+        "type": "String"
+      },
+      "planned": {
+        "type": "String"
+      }
+    }
+  },
+  "sectionDailyPlan": "Günlük plan",
+  "dailyPlanHint": "Her gün için ayrı süre belirle. Sonra Bugün ya da Hafta ekranından değiştirebilirsin.",
+  "weekTargetHint": "Bu hafta toplam ne kadar çalışmak istiyorsun?",
+  "capacityRowOver": "Günlük kapasite {amount} aşılıyor",
+  "@capacityRowOver": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "hoursCompact": "{value} sa",
+  "@hoursCompact": {
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "dayCellSemantics": "{day}: {value}, {status}",
+  "@dayCellSemantics": {
+    "placeholders": {
+      "day": {
+        "type": "String"
+      },
+      "value": {
+        "type": "String"
+      },
+      "status": {
+        "type": "String"
+      }
+    }
+  },
+  "dayStatusNoPlan": "Plan yok",
+  "errorPlanPast": "Geçmiş günlerin planı değiştirilemez.",
+  "errorPlanGeneric": "Plan kaydedilemedi. Tekrar dene.",
+  "weekdayToday": "Bugün",
+  "todayProgressOf": "/ {planned}",
+  "@todayProgressOf": {
+    "placeholders": {
+      "planned": {
+        "type": "String"
+      }
+    }
+  },
+  "sectionWeeklyTarget": "Haftalık hedef",
+  "planRemainingOf": "Kalan plan {planned} / kalan hedef {target}",
+  "@planRemainingOf": {
+    "placeholders": {
+      "planned": {
+        "type": "String"
+      },
+      "target": {
+        "type": "String"
+      }
+    }
+  },
+  "planOverRemaining": "Kalan hedeften {amount} fazla planladın.",
+  "@planOverRemaining": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "planCoversRemaining": "Plan, haftanın kalanını karşılıyor.",
+  "dayPlanTitle": "{day} planı",
+  "@dayPlanTitle": {
+    "placeholders": {
+      "day": {
+        "type": "String"
+      }
+    }
+  }
 }

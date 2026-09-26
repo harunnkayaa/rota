@@ -1,13 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 
 import '../../../app/localization/app_localizations.dart';
 import '../../../app/localization/formatters.dart';
 import '../../../app/theme/app_theme.dart';
 import '../../../core/time/local_date.dart';
 import '../../../shared/widgets/content_width.dart';
+import '../../../shared/widgets/duration_stepper.dart';
 import '../../categories/domain/category.dart';
+import '../../categories/presentation/category_style.dart';
 import '../../planning/domain/distribution.dart';
+import '../../planning/presentation/day_plan_editor.dart';
 import '../../planning/presentation/planner_controller.dart';
 
 Future<void> openCreateGoal(BuildContext context) {
@@ -19,11 +21,19 @@ Future<void> openCreateGoal(BuildContext context) {
 /// Longest weekly target the form accepts: the whole week.
 const _maxWeeklyMinutes = Duration.minutesPerDay * DateTime.daysPerWeek;
 
-/// Phase 1 slice: a flexible, minute-based weekly goal for the current week,
-/// split evenly over the chosen days. Other goal and measurement types come
-/// with the full creation wizard (CLAUDE.md §13.4).
+/// The weekly target moves in whole hours; days move in half hours.
+const _weeklyStep = Duration.minutesPerHour;
+
+const double _chipRowHeight = 48;
+
+/// A flexible, minute-based weekly goal with a separate amount for every
+/// day. Other goal and measurement types come with the full creation
+/// wizard (CLAUDE.md §13.4).
 class CreateGoalScreen extends StatefulWidget {
   const CreateGoalScreen({super.key});
+
+  static const categoryRowKey = Key('createGoal.categoryRow');
+  static const titleFieldKey = Key('createGoal.title');
 
   @override
   State<CreateGoalScreen> createState() => _CreateGoalScreenState();
@@ -60,52 +70,40 @@ final class _ExistingChoice extends _CategoryChoice {
 
 class _CreateGoalScreenState extends State<CreateGoalScreen> {
   final _title = TextEditingController();
-  final _hours = TextEditingController();
-  final _minutes = TextEditingController();
+  final _plan = <LocalDate, int>{};
   _CategoryChoice? _category;
-  Set<LocalDate>? _initialDays;
-  Set<LocalDate> get _days => _initialDays!;
+  int _weeklyTarget = 0;
   bool _submitted = false;
 
   @override
   void initState() {
     super.initState();
-    _title.addListener(_refresh);
-    _hours.addListener(_refresh);
-    _minutes.addListener(_refresh);
-  }
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    // Runs again whenever the controller notifies; keep the user's choice.
-    if (_initialDays != null) return;
-    // Past days of the week cannot receive new work; preselect the rest.
-    final controller = PlannerScope.of(context);
-    _initialDays = {
-      for (final d in controller.currentWeek.days)
-        if (!d.isBefore(controller.today)) d,
-    };
+    _title.addListener(() => setState(() {}));
   }
 
   @override
   void dispose() {
     _title.dispose();
-    _hours.dispose();
-    _minutes.dispose();
     super.dispose();
   }
 
-  void _refresh() => setState(() {});
-
-  int get _targetMinutes =>
-      (int.tryParse(_hours.text) ?? 0) * Duration.minutesPerHour +
-      (int.tryParse(_minutes.text) ?? 0);
+  int get _planned => _plan.values.fold(0, (a, b) => a + b);
 
   bool get _targetValid =>
-      _targetMinutes > 0 && _targetMinutes <= _maxWeeklyMinutes;
+      _weeklyTarget > 0 && _weeklyTarget <= _maxWeeklyMinutes;
 
-  List<LocalDate> get _sortedDays => _days.toList()..sort();
+  List<LocalDate> _futureDays(PlannerController controller) => [
+    for (final d in controller.currentWeek.days)
+      if (!d.isBefore(controller.today)) d,
+  ];
+
+  void _distributeEvenly(PlannerController controller) {
+    setState(() {
+      _plan
+        ..clear()
+        ..addAll(distributeEvenly(_weeklyTarget, _futureDays(controller)));
+    });
+  }
 
   Future<void> _addCustomCategory() async {
     final l = AppLocalizations.of(context);
@@ -123,12 +121,8 @@ class _CreateGoalScreenState extends State<CreateGoalScreen> {
     final l = AppLocalizations.of(context);
     setState(() => _submitted = true);
     final choice = _category;
-    if (choice == null ||
-        _title.text.trim().isEmpty ||
-        !_targetValid ||
-        _days.isEmpty) {
-      return;
-    }
+    if (choice == null || _title.text.trim().isEmpty || !_targetValid) return;
+
     final controller = PlannerScope.of(context);
     final category = switch (choice) {
       _PresetChoice(:final preset) => controller.addCategory(
@@ -140,8 +134,8 @@ class _CreateGoalScreenState extends State<CreateGoalScreen> {
     controller.createWeeklyDurationGoal(
       categoryId: category.id,
       title: _title.text,
-      targetMinutes: _targetMinutes,
-      dailyPlan: distributeEvenly(_targetMinutes, _sortedDays),
+      targetMinutes: _weeklyTarget,
+      dailyPlan: Map.of(_plan),
     );
     final messenger = ScaffoldMessenger.of(context);
     Navigator.of(context).pop();
@@ -156,16 +150,9 @@ class _CreateGoalScreenState extends State<CreateGoalScreen> {
     final existing = controller.categories;
     final usedPresets = {for (final c in existing) c.preset};
 
-    Widget section(String title, {String? error}) => Padding(
-      padding: const EdgeInsets.only(top: AppSpacing.l, bottom: AppSpacing.s),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(title, style: theme.textTheme.titleMedium),
-          if (_submitted && error != null)
-            Text(error, style: TextStyle(color: theme.colorScheme.error)),
-        ],
-      ),
+    Widget errorText(String text) => Padding(
+      padding: const EdgeInsets.only(top: AppSpacing.s),
+      child: Text(text, style: TextStyle(color: theme.colorScheme.error)),
     );
 
     return Scaffold(
@@ -174,160 +161,222 @@ class _CreateGoalScreenState extends State<CreateGoalScreen> {
         child: ListView(
           padding: const EdgeInsets.fromLTRB(
             AppSpacing.m,
-            0,
+            AppSpacing.s,
             AppSpacing.m,
             AppSpacing.xl,
           ),
           children: [
-            section(
-              l.sectionCategory,
-              error: _category == null ? l.errorPickCategory : null,
-            ),
-            Wrap(
-              spacing: AppSpacing.s,
-              runSpacing: AppSpacing.s,
+            _Section(
+              title: l.sectionCategory,
               children: [
-                for (final c in existing)
-                  _categoryChip(c.name, _ExistingChoice(c)),
-                for (final p in PresetCategory.values)
-                  if (!usedPresets.contains(p))
-                    _categoryChip(l.presetName(p), _PresetChoice(p)),
-                ActionChip(
-                  avatar: const Icon(Icons.add),
-                  label: Text(l.newCategory),
-                  onPressed: _addCustomCategory,
+                // One swipeable row keeps the form short on a phone.
+                SizedBox(
+                  height: _chipRowHeight,
+                  // ~13 chips: build them all (no lazy list) so every chip
+                  // can be scrolled to directly.
+                  child: SingleChildScrollView(
+                    key: CreateGoalScreen.categoryRowKey,
+                    scrollDirection: Axis.horizontal,
+                    child: Row(
+                      children: [
+                        for (final chip in [
+                          for (final c in existing)
+                            _categoryChip(
+                              c.name,
+                              CategoryStyle.of(c),
+                              _ExistingChoice(c),
+                            ),
+                          for (final p in PresetCategory.values)
+                            if (!usedPresets.contains(p))
+                              _categoryChip(
+                                l.presetName(p),
+                                CategoryStyle.forPreset(p),
+                                _PresetChoice(p),
+                              ),
+                          ActionChip(
+                            avatar: const Icon(Icons.add),
+                            label: Text(l.newCategory),
+                            onPressed: _addCustomCategory,
+                          ),
+                        ])
+                          Padding(
+                            padding: const EdgeInsetsDirectional.only(
+                              end: AppSpacing.s,
+                            ),
+                            child: chip,
+                          ),
+                      ],
+                    ),
+                  ),
+                ),
+                if (_submitted && _category == null)
+                  errorText(l.errorPickCategory),
+              ],
+            ),
+            _Section(
+              title: l.sectionTitle,
+              children: [
+                TextField(
+                  key: CreateGoalScreen.titleFieldKey,
+                  controller: _title,
+                  textCapitalization: TextCapitalization.sentences,
+                  decoration: InputDecoration(
+                    hintText: l.titleHint,
+                    errorText: _submitted && _title.text.trim().isEmpty
+                        ? l.errorTitleRequired
+                        : null,
+                  ),
                 ),
               ],
             ),
-            section(l.sectionTitle),
-            TextField(
-              controller: _title,
-              textCapitalization: TextCapitalization.sentences,
-              decoration: InputDecoration(
-                hintText: l.titleHint,
-                border: const OutlineInputBorder(),
-                errorText: _submitted && _title.text.trim().isEmpty
-                    ? l.errorTitleRequired
-                    : null,
+            _Section(
+              title: l.sectionWeeklyTarget,
+              subtitle: l.weekTargetHint,
+              children: [
+                Center(
+                  child: DurationStepper(
+                    label: l.sectionWeeklyTarget,
+                    value: _weeklyTarget,
+                    step: _weeklyStep,
+                    max: _maxWeeklyMinutes,
+                    emphasized: true,
+                    onChanged: (v) => setState(() => _weeklyTarget = v),
+                  ),
+                ),
+                if (_submitted && !_targetValid)
+                  errorText(l.errorTargetRequired),
+              ],
+            ),
+            _Section(
+              title: l.sectionDailyPlan,
+              subtitle: l.dailyPlanHint,
+              children: [
+                // Nothing to compare until a target or a day is set.
+                if (_weeklyTarget > 0 || _planned > 0) ...[
+                  PlanSummary(planned: _planned, target: _weeklyTarget),
+                  const SizedBox(height: AppSpacing.s),
+                ],
+                Wrap(
+                  spacing: AppSpacing.s,
+                  runSpacing: AppSpacing.s,
+                  children: [
+                    ActionChip(
+                      avatar: const Icon(Icons.auto_awesome_outlined),
+                      label: Text(l.distributeEvenlyAction),
+                      onPressed: _weeklyTarget == 0
+                          ? null
+                          : () => _distributeEvenly(controller),
+                    ),
+                    if (_planned > 0 && _planned != _weeklyTarget)
+                      ActionChip(
+                        avatar: const Icon(Icons.sync_alt),
+                        label: Text(l.matchTargetToPlan),
+                        onPressed: () =>
+                            setState(() => _weeklyTarget = _planned),
+                      ),
+                    if (_planned > 0)
+                      ActionChip(
+                        avatar: const Icon(Icons.clear_all),
+                        label: Text(l.clearPlan),
+                        onPressed: () => setState(_plan.clear),
+                      ),
+                  ],
+                ),
+                const SizedBox(height: AppSpacing.s),
+                DayPlanEditor(
+                  // A new goal can't be planned into the past.
+                  days: _futureDays(controller),
+                  plan: _plan,
+                  today: controller.today,
+                  capacityOn: controller.capacity.capacityOn,
+                  otherPlannedOn: controller.plannedOnExcluding,
+                  onChanged: (day, minutes) =>
+                      setState(() => _plan[day] = minutes),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+      bottomNavigationBar: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(
+            AppSpacing.m,
+            AppSpacing.s,
+            AppSpacing.m,
+            AppSpacing.m,
+          ),
+          // heightFactor 1: the bar hugs the button instead of filling the
+          // screen (a bare Align would hide the whole form).
+          child: Align(
+            heightFactor: 1,
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(
+                maxWidth: AppLayout.maxContentWidth,
+              ),
+              child: SizedBox(
+                width: double.infinity,
+                child: FilledButton(
+                  onPressed: _submit,
+                  child: Text(l.createGoalSubmit),
+                ),
               ),
             ),
-            section(
-              l.sectionTarget,
-              error: _targetValid ? null : l.errorTargetRequired,
-            ),
-            Row(
-              children: [
-                Expanded(child: _numberField(_hours, l.hoursLabel)),
-                const SizedBox(width: AppSpacing.m),
-                Expanded(child: _numberField(_minutes, l.minutesLabel)),
-              ],
-            ),
-            section(
-              l.sectionDays,
-              error: _days.isEmpty ? l.errorPickDays : null,
-            ),
-            Text(l.daysHint, style: theme.textTheme.bodySmall),
-            const SizedBox(height: AppSpacing.s),
-            Wrap(
-              spacing: AppSpacing.s,
-              runSpacing: AppSpacing.s,
-              children: [
-                for (final d in controller.currentWeek.days)
-                  FilterChip(
-                    label: Text(formatDayShort(context, d)),
-                    selected: _days.contains(d),
-                    onSelected: d.isBefore(controller.today)
-                        ? null
-                        : (on) => setState(
-                            () => on ? _days.add(d) : _days.remove(d),
-                          ),
-                  ),
-              ],
-            ),
-            if (_targetValid && _days.isNotEmpty) ...[
-              section(l.sectionPreview),
-              _PlanPreview(plan: distributeEvenly(_targetMinutes, _sortedDays)),
-            ],
-            const SizedBox(height: AppSpacing.l),
-            FilledButton(onPressed: _submit, child: Text(l.createGoalSubmit)),
-          ],
+          ),
         ),
       ),
     );
   }
 
-  Widget _categoryChip(String label, _CategoryChoice choice) => ChoiceChip(
+  Widget _categoryChip(
+    String label,
+    CategoryStyle style,
+    _CategoryChoice choice,
+  ) => ChoiceChip(
+    avatar: Icon(style.icon, color: style.color),
     label: Text(label),
     selected: _category == choice,
     onSelected: (_) => setState(() => _category = choice),
   );
-
-  Widget _numberField(TextEditingController controller, String label) =>
-      TextField(
-        controller: controller,
-        keyboardType: TextInputType.number,
-        inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-        decoration: InputDecoration(
-          labelText: label,
-          border: const OutlineInputBorder(),
-        ),
-      );
 }
 
-/// Per-day share, with a warning where the day's capacity would be exceeded.
-class _PlanPreview extends StatelessWidget {
-  const _PlanPreview({required this.plan});
+/// A titled card that groups one step of the form.
+class _Section extends StatelessWidget {
+  const _Section({required this.title, required this.children, this.subtitle});
 
-  final Map<LocalDate, int> plan;
+  final String title;
+  final String? subtitle;
+  final List<Widget> children;
 
   @override
   Widget build(BuildContext context) {
-    final l = AppLocalizations.of(context);
-    final controller = PlannerScope.of(context);
-    final scheme = Theme.of(context).colorScheme;
-
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(AppSpacing.m),
-        child: Column(
-          children: [
-            for (final MapEntry(key: day, value: minutes) in plan.entries) ...[
-              Row(
-                children: [
-                  Expanded(child: Text(formatDayShort(context, day))),
-                  Text(l.minutes(minutes)),
-                ],
-              ),
-              if (_overBy(controller, day, minutes) case final over
-                  when over > 0)
-                Row(
-                  children: [
-                    Icon(
-                      Icons.warning_amber_rounded,
-                      size: 18,
-                      color: scheme.tertiary,
+    final theme = Theme.of(context);
+    return Padding(
+      padding: const EdgeInsets.only(top: AppSpacing.m),
+      child: Card(
+        child: Padding(
+          padding: const EdgeInsets.all(AppSpacing.m),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Text(title, style: theme.textTheme.titleMedium),
+              if (subtitle case final subtitle?)
+                Padding(
+                  padding: const EdgeInsets.only(top: AppSpacing.xs),
+                  child: Text(
+                    subtitle,
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: theme.colorScheme.onSurfaceVariant,
                     ),
-                    const SizedBox(width: AppSpacing.xs),
-                    Expanded(
-                      child: Text(
-                        l.capacityWarningDay(
-                          formatDayShort(context, day),
-                          l.minutes(over),
-                        ),
-                      ),
-                    ),
-                  ],
+                  ),
                 ),
+              const SizedBox(height: AppSpacing.m),
+              ...children,
             ],
-          ],
+          ),
         ),
       ),
     );
-  }
-
-  int _overBy(PlannerController controller, LocalDate day, int minutes) {
-    final check = controller.capacityOn(day);
-    return check.planned + minutes - check.capacity;
   }
 }
 

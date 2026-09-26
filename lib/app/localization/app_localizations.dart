@@ -386,16 +386,10 @@ abstract class AppLocalizations {
   /// **'{amount} fazla'**
   String capacityDayOver(String amount);
 
-  /// No description provided for @unallocated.
-  ///
-  /// In tr, this message translates to:
-  /// **'Günlere dağıtılmamış: {amount}'**
-  String unallocated(String amount);
-
   /// No description provided for @overAllocated.
   ///
   /// In tr, this message translates to:
-  /// **'Hedeften {amount} fazla planlandı'**
+  /// **'Kalan hedeften {amount} fazla planlandı.'**
   String overAllocated(String amount);
 
   /// No description provided for @dayStatusDone.
@@ -667,6 +661,222 @@ abstract class AppLocalizations {
   /// In tr, this message translates to:
   /// **'Son değişiklik bu cihaza kaydedilemedi.'**
   String get saveFailed;
+
+  /// No description provided for @editTodayPlan.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bugünün planı'**
+  String get editTodayPlan;
+
+  /// No description provided for @editWeekPlan.
+  ///
+  /// In tr, this message translates to:
+  /// **'Haftanın planı'**
+  String get editWeekPlan;
+
+  /// No description provided for @editPlanTooltip.
+  ///
+  /// In tr, this message translates to:
+  /// **'Planı düzenle'**
+  String get editPlanTooltip;
+
+  /// No description provided for @remainingToday.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kalan {amount}'**
+  String remainingToday(String amount);
+
+  /// No description provided for @summaryRemaining.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kalan'**
+  String get summaryRemaining;
+
+  /// No description provided for @todayRingSemantics.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bugün {done} / {planned} tamamlandı'**
+  String todayRingSemantics(String done, String planned);
+
+  /// No description provided for @planDistributed.
+  ///
+  /// In tr, this message translates to:
+  /// **'Planlanan {planned} / {target}'**
+  String planDistributed(String planned, String target);
+
+  /// No description provided for @planUnallocated.
+  ///
+  /// In tr, this message translates to:
+  /// **'{amount} henüz günlere dağıtılmadı.'**
+  String planUnallocated(String amount);
+
+  /// No description provided for @planOverTarget.
+  ///
+  /// In tr, this message translates to:
+  /// **'Hedeften {amount} fazla planladın.'**
+  String planOverTarget(String amount);
+
+  /// No description provided for @planDebt.
+  ///
+  /// In tr, this message translates to:
+  /// **'Plan, kalan hedefin {amount} kısmını karşılamıyor.'**
+  String planDebt(String amount);
+
+  /// No description provided for @planCovers.
+  ///
+  /// In tr, this message translates to:
+  /// **'Plan haftalık hedefi karşılıyor.'**
+  String get planCovers;
+
+  /// No description provided for @distributeEvenlyAction.
+  ///
+  /// In tr, this message translates to:
+  /// **'Eşit dağıt'**
+  String get distributeEvenlyAction;
+
+  /// No description provided for @matchTargetToPlan.
+  ///
+  /// In tr, this message translates to:
+  /// **'Hedefi toplama eşitle'**
+  String get matchTargetToPlan;
+
+  /// No description provided for @clearPlan.
+  ///
+  /// In tr, this message translates to:
+  /// **'Temizle'**
+  String get clearPlan;
+
+  /// No description provided for @decreaseBy.
+  ///
+  /// In tr, this message translates to:
+  /// **'{amount} azalt'**
+  String decreaseBy(String amount);
+
+  /// No description provided for @increaseBy.
+  ///
+  /// In tr, this message translates to:
+  /// **'{amount} artır'**
+  String increaseBy(String amount);
+
+  /// No description provided for @durationFieldSemantics.
+  ///
+  /// In tr, this message translates to:
+  /// **'{label}: {value}. Değiştirmek için dokun.'**
+  String durationFieldSemantics(String label, String value);
+
+  /// No description provided for @durationSheetTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'{label} için süre'**
+  String durationSheetTitle(String label);
+
+  /// No description provided for @errorDurationMax.
+  ///
+  /// In tr, this message translates to:
+  /// **'En fazla {max} girilebilir.'**
+  String errorDurationMax(String max);
+
+  /// No description provided for @pastDayLocked.
+  ///
+  /// In tr, this message translates to:
+  /// **'Geçmiş gün · {done} / {planned}'**
+  String pastDayLocked(String done, String planned);
+
+  /// No description provided for @sectionDailyPlan.
+  ///
+  /// In tr, this message translates to:
+  /// **'Günlük plan'**
+  String get sectionDailyPlan;
+
+  /// No description provided for @dailyPlanHint.
+  ///
+  /// In tr, this message translates to:
+  /// **'Her gün için ayrı süre belirle. Sonra Bugün ya da Hafta ekranından değiştirebilirsin.'**
+  String get dailyPlanHint;
+
+  /// No description provided for @weekTargetHint.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bu hafta toplam ne kadar çalışmak istiyorsun?'**
+  String get weekTargetHint;
+
+  /// No description provided for @capacityRowOver.
+  ///
+  /// In tr, this message translates to:
+  /// **'Günlük kapasite {amount} aşılıyor'**
+  String capacityRowOver(String amount);
+
+  /// No description provided for @hoursCompact.
+  ///
+  /// In tr, this message translates to:
+  /// **'{value} sa'**
+  String hoursCompact(String value);
+
+  /// No description provided for @dayCellSemantics.
+  ///
+  /// In tr, this message translates to:
+  /// **'{day}: {value}, {status}'**
+  String dayCellSemantics(String day, String value, String status);
+
+  /// No description provided for @dayStatusNoPlan.
+  ///
+  /// In tr, this message translates to:
+  /// **'Plan yok'**
+  String get dayStatusNoPlan;
+
+  /// No description provided for @errorPlanPast.
+  ///
+  /// In tr, this message translates to:
+  /// **'Geçmiş günlerin planı değiştirilemez.'**
+  String get errorPlanPast;
+
+  /// No description provided for @errorPlanGeneric.
+  ///
+  /// In tr, this message translates to:
+  /// **'Plan kaydedilemedi. Tekrar dene.'**
+  String get errorPlanGeneric;
+
+  /// No description provided for @weekdayToday.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bugün'**
+  String get weekdayToday;
+
+  /// No description provided for @todayProgressOf.
+  ///
+  /// In tr, this message translates to:
+  /// **'/ {planned}'**
+  String todayProgressOf(String planned);
+
+  /// No description provided for @sectionWeeklyTarget.
+  ///
+  /// In tr, this message translates to:
+  /// **'Haftalık hedef'**
+  String get sectionWeeklyTarget;
+
+  /// No description provided for @planRemainingOf.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kalan plan {planned} / kalan hedef {target}'**
+  String planRemainingOf(String planned, String target);
+
+  /// No description provided for @planOverRemaining.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kalan hedeften {amount} fazla planladın.'**
+  String planOverRemaining(String amount);
+
+  /// No description provided for @planCoversRemaining.
+  ///
+  /// In tr, this message translates to:
+  /// **'Plan, haftanın kalanını karşılıyor.'**
+  String get planCoversRemaining;
+
+  /// No description provided for @dayPlanTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'{day} planı'**
+  String dayPlanTitle(String day);
 }
 
 class _AppLocalizationsDelegate

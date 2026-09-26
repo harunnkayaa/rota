@@ -184,13 +184,8 @@ class AppLocalizationsTr extends AppLocalizations {
   }
 
   @override
-  String unallocated(String amount) {
-    return 'Günlere dağıtılmamış: $amount';
-  }
-
-  @override
   String overAllocated(String amount) {
-    return 'Hedeften $amount fazla planlandı';
+    return 'Kalan hedeften $amount fazla planlandı.';
   }
 
   @override
@@ -340,4 +335,151 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get saveFailed => 'Son değişiklik bu cihaza kaydedilemedi.';
+
+  @override
+  String get editTodayPlan => 'Bugünün planı';
+
+  @override
+  String get editWeekPlan => 'Haftanın planı';
+
+  @override
+  String get editPlanTooltip => 'Planı düzenle';
+
+  @override
+  String remainingToday(String amount) {
+    return 'Kalan $amount';
+  }
+
+  @override
+  String get summaryRemaining => 'Kalan';
+
+  @override
+  String todayRingSemantics(String done, String planned) {
+    return 'Bugün $done / $planned tamamlandı';
+  }
+
+  @override
+  String planDistributed(String planned, String target) {
+    return 'Planlanan $planned / $target';
+  }
+
+  @override
+  String planUnallocated(String amount) {
+    return '$amount henüz günlere dağıtılmadı.';
+  }
+
+  @override
+  String planOverTarget(String amount) {
+    return 'Hedeften $amount fazla planladın.';
+  }
+
+  @override
+  String planDebt(String amount) {
+    return 'Plan, kalan hedefin $amount kısmını karşılamıyor.';
+  }
+
+  @override
+  String get planCovers => 'Plan haftalık hedefi karşılıyor.';
+
+  @override
+  String get distributeEvenlyAction => 'Eşit dağıt';
+
+  @override
+  String get matchTargetToPlan => 'Hedefi toplama eşitle';
+
+  @override
+  String get clearPlan => 'Temizle';
+
+  @override
+  String decreaseBy(String amount) {
+    return '$amount azalt';
+  }
+
+  @override
+  String increaseBy(String amount) {
+    return '$amount artır';
+  }
+
+  @override
+  String durationFieldSemantics(String label, String value) {
+    return '$label: $value. Değiştirmek için dokun.';
+  }
+
+  @override
+  String durationSheetTitle(String label) {
+    return '$label için süre';
+  }
+
+  @override
+  String errorDurationMax(String max) {
+    return 'En fazla $max girilebilir.';
+  }
+
+  @override
+  String pastDayLocked(String done, String planned) {
+    return 'Geçmiş gün · $done / $planned';
+  }
+
+  @override
+  String get sectionDailyPlan => 'Günlük plan';
+
+  @override
+  String get dailyPlanHint =>
+      'Her gün için ayrı süre belirle. Sonra Bugün ya da Hafta ekranından değiştirebilirsin.';
+
+  @override
+  String get weekTargetHint => 'Bu hafta toplam ne kadar çalışmak istiyorsun?';
+
+  @override
+  String capacityRowOver(String amount) {
+    return 'Günlük kapasite $amount aşılıyor';
+  }
+
+  @override
+  String hoursCompact(String value) {
+    return '$value sa';
+  }
+
+  @override
+  String dayCellSemantics(String day, String value, String status) {
+    return '$day: $value, $status';
+  }
+
+  @override
+  String get dayStatusNoPlan => 'Plan yok';
+
+  @override
+  String get errorPlanPast => 'Geçmiş günlerin planı değiştirilemez.';
+
+  @override
+  String get errorPlanGeneric => 'Plan kaydedilemedi. Tekrar dene.';
+
+  @override
+  String get weekdayToday => 'Bugün';
+
+  @override
+  String todayProgressOf(String planned) {
+    return '/ $planned';
+  }
+
+  @override
+  String get sectionWeeklyTarget => 'Haftalık hedef';
+
+  @override
+  String planRemainingOf(String planned, String target) {
+    return 'Kalan plan $planned / kalan hedef $target';
+  }
+
+  @override
+  String planOverRemaining(String amount) {
+    return 'Kalan hedeften $amount fazla planladın.';
+  }
+
+  @override
+  String get planCoversRemaining => 'Plan, haftanın kalanını karşılıyor.';
+
+  @override
+  String dayPlanTitle(String day) {
+    return '$day planı';
+  }
 }

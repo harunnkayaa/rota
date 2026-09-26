@@ -111,4 +111,43 @@ void main() {
     expect(goals.last.debt, 150);
     expect(controller.todaySummary().plannedMinutes, 90);
   });
+
+  test('making up a short Monday is not "over target"', () {
+    final category = controller.addCategory('Proje');
+    final periodId = controller
+        .createWeeklyDurationGoal(
+          categoryId: category.id,
+          title: 'Proje',
+          targetMinutes: 600,
+          dailyPlan: {monday: 240, tuesday: 120, wednesday: 240},
+        )
+        .id;
+    controller.addProgress(periodId, 180);
+    clock.day = tuesday;
+
+    controller.updatePlan(periodId, {tuesday: 180});
+    var view = controller.activeGoals().single;
+    expect(view.debt, 0);
+    expect(view.surplus, 0);
+    expect(view.todayRemaining, 180);
+
+    controller.updatePlan(periodId, {thursday: 30});
+    view = controller.activeGoals().single;
+    expect(view.surplus, 30);
+  });
+
+  test('today remaining never goes below zero', () {
+    final category = controller.addCategory('Proje');
+    final periodId = controller
+        .createWeeklyDurationGoal(
+          categoryId: category.id,
+          title: 'Proje',
+          targetMinutes: 600,
+          dailyPlan: {monday: 60},
+        )
+        .id;
+    controller.addProgress(periodId, 90);
+    expect(controller.activeGoals().single.todayRemaining, 0);
+    expect(controller.todaySummary().remainingMinutes, 0);
+  });
 }

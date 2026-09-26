@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 
 import '../../../app/localization/app_localizations.dart';
+import '../../../app/localization/formatters.dart';
 import '../../../app/theme/app_theme.dart';
 import '../../../shared/widgets/debt_notice.dart';
 import '../../../shared/widgets/progress_line.dart';
+import '../../categories/presentation/category_style.dart';
+import '../../planning/presentation/plan_editor_sheet.dart';
 import '../../planning/presentation/planner_controller.dart';
 import '../../planning/presentation/redistribution_sheet.dart';
 import 'add_progress_sheet.dart';
@@ -18,6 +21,8 @@ class GoalCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final l = AppLocalizations.of(context);
     final theme = Theme.of(context);
+    final scheme = theme.colorScheme;
+    final today = PlannerScope.of(context).today;
 
     return Card(
       child: Padding(
@@ -26,8 +31,9 @@ class GoalCard extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                CategoryAvatar(style: CategoryStyle.of(view.category)),
+                const SizedBox(width: AppSpacing.m),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -35,16 +41,17 @@ class GoalCard extends StatelessWidget {
                       Text(view.goal.title, style: theme.textTheme.titleMedium),
                       Text(
                         view.category.name,
-                        style: theme.textTheme.bodySmall,
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          color: scheme.onSurfaceVariant,
+                        ),
                       ),
                     ],
                   ),
                 ),
-                Chip(
-                  avatar: const Icon(Icons.swap_horiz, size: 18),
-                  label: Text(l.flexibleChip),
-                  visualDensity: VisualDensity.compact,
-                ),
+                if (view.todayRemaining > 0)
+                  _RemainingBadge(
+                    text: l.remainingToday(l.minutes(view.todayRemaining)),
+                  ),
               ],
             ),
             const SizedBox(height: AppSpacing.m),
@@ -68,16 +75,60 @@ class GoalCard extends StatelessWidget {
                     showRedistributionSheet(context, view.period.id),
               ),
             ],
-            const SizedBox(height: AppSpacing.s),
-            Align(
-              alignment: Alignment.centerRight,
-              child: FilledButton.tonalIcon(
-                onPressed: () => showAddProgressSheet(context, view),
-                icon: const Icon(Icons.add),
-                label: Text(l.addProgress),
-              ),
+            const SizedBox(height: AppSpacing.m),
+            Wrap(
+              alignment: WrapAlignment.end,
+              spacing: AppSpacing.s,
+              runSpacing: AppSpacing.s,
+              children: [
+                OutlinedButton.icon(
+                  onPressed: () => showPlanEditorSheet(
+                    context,
+                    periodId: view.period.id,
+                    onlyDate: today,
+                  ),
+                  icon: const Icon(Icons.edit_calendar_outlined),
+                  label: Text(l.editTodayPlan),
+                ),
+                FilledButton.tonalIcon(
+                  style: FilledButton.styleFrom(
+                    minimumSize: const Size(64, 44),
+                  ),
+                  onPressed: () => showAddProgressSheet(context, view),
+                  icon: const Icon(Icons.add),
+                  label: Text(l.addProgress),
+                ),
+              ],
             ),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+class _RemainingBadge extends StatelessWidget {
+  const _RemainingBadge({required this.text});
+
+  final String text;
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    return Container(
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.s + AppSpacing.xs,
+        vertical: AppSpacing.xs + 2,
+      ),
+      decoration: BoxDecoration(
+        color: scheme.primaryContainer,
+        borderRadius: BorderRadius.circular(AppLayout.controlRadius),
+      ),
+      child: Text(
+        text,
+        style: Theme.of(context).textTheme.labelMedium?.copyWith(
+          color: scheme.onPrimaryContainer,
+          fontWeight: FontWeight.w700,
         ),
       ),
     );

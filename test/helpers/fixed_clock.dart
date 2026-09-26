@@ -20,22 +20,61 @@ class FixedClock implements Clock {
 }
 
 /// Pumps the whole app on a phone-sized screen.
+///
+/// Pass [controller] to prepare data (and move its clock) before the app
+/// is shown; otherwise a fresh one for [today] is created and loaded.
 Future<PlannerController> pumpRota(
   WidgetTester tester, {
-  required LocalDate today,
+  LocalDate? today,
+  PlannerController? controller,
   Size size = const Size(390, 844),
   PlannerStorage? storage,
 }) async {
+  assert(
+    (today == null) != (controller == null),
+    'Pass either today or controller',
+  );
   tester.view.physicalSize = size;
   tester.view.devicePixelRatio = 1;
   addTearDown(tester.view.reset);
 
-  final controller = PlannerController(
-    clock: FixedClock(today),
-    storage: storage,
-  );
-  await controller.load();
-  await tester.pumpWidget(RotaApp(controller: controller));
+  final c =
+      controller ??
+      PlannerController(clock: FixedClock(today!), storage: storage);
+  if (controller == null) await c.load();
+  await tester.pumpWidget(RotaApp(controller: c));
   await tester.pumpAndSettle();
-  return controller;
+  return c;
 }
+
+/// Taps [finder] after scrolling it into view.
+Future<void> tapVisible(WidgetTester tester, Finder finder) async {
+  await tester.ensureVisible(finder);
+  await tester.pumpAndSettle();
+  await tester.tap(finder);
+  await tester.pumpAndSettle();
+}
+
+/// Scrolls the page's main list until [finder] is built and visible, then
+/// taps it. Long forms build lazily, so plain finders miss what is below.
+Future<void> scrollAndTap(WidgetTester tester, Finder finder) async {
+  await scrollTo(tester, finder);
+  await tester.tap(finder);
+  await tester.pumpAndSettle();
+}
+
+Future<void> scrollTo(WidgetTester tester, Finder finder) async {
+  await tester.scrollUntilVisible(
+    finder,
+    200,
+    scrollable: find.byType(Scrollable).first,
+  );
+  await tester.pumpAndSettle();
+}
+
+/// Finds a [Semantics] widget by its label, whether or not it is currently
+/// on screen (screen-reader nodes only exist for visible widgets).
+Finder semanticsLabel(RegExp pattern) => find.byWidgetPredicate(
+  (w) => w is Semantics && pattern.hasMatch(w.properties.label ?? ''),
+  description: 'Semantics label $pattern',
+);
