@@ -1,0 +1,248 @@
+{
+  "@@locale": "tr",
+  "appTitle": "Rota",
+  "navToday": "Bugün",
+  "navWeek": "Hafta",
+  "addGoal": "Hedef ekle",
+  "emptyTitle": "Henüz hedefin yok",
+  "emptyBody": "Haftalık bir hedef oluştur ve günlere dağıt. Rota, her gün yaptığın çalışmanın haftalık hedefine nasıl yansıdığını gösterir.",
+  "createGoalCta": "Hedef oluştur",
+  "loadSampleCta": "Örnek haftayı yükle",
+  "inMemoryNotice": "Veriler şimdilik yalnızca bu oturumda tutulur; sayfa yenilenince silinir.",
+  "summaryPlanned": "Planlanan",
+  "summaryDone": "Gerçekleşen",
+  "summaryCapacityLeft": "Boş kapasite",
+  "capacityOver": "Bugünün planı kapasiteni {amount} aşıyor.",
+  "@capacityOver": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "progressOf": "{done} / {target}",
+  "@progressOf": {
+    "placeholders": {
+      "done": {
+        "type": "String"
+      },
+      "target": {
+        "type": "String"
+      }
+    }
+  },
+  "todayLabel": "Bugün",
+  "weekLabel": "Bu hafta",
+  "todayNoPlan": "Bugün için plan yok",
+  "flexibleChip": "Esnek",
+  "addProgress": "İlerleme ekle",
+  "goalDebt": "Bu haftanın planında {amount} açıkta kaldı.",
+  "@goalDebt": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "redistribute": "Yeniden dağıt",
+  "addProgressTitle": "{goal} için ilerleme",
+  "@addProgressTitle": {
+    "placeholders": {
+      "goal": {
+        "type": "String"
+      }
+    }
+  },
+  "customMinutesLabel": "Dakika",
+  "save": "Kaydet",
+  "cancel": "Vazgeç",
+  "progressAdded": "{amount} eklendi",
+  "@progressAdded": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "errorMinutesInvalid": "1 ile 1440 arasında bir dakika değeri gir.",
+  "errorPeriodClosed": "Bu dönem kapandı; yeni ilerleme eklenemez.",
+  "errorDateOutside": "Bugün bu hedefin dönemi içinde değil.",
+  "errorProgressGeneric": "İlerleme kaydedilemedi. Tekrar dene.",
+  "redistributeTitle": "Yeniden dağıtma önerisi",
+  "strategyEven": "Eşit",
+  "strategyCapacity": "Boş kapasiteye göre",
+  "includeToday": "Bugünü de dahil et",
+  "redistributeFeasible": "{deficit} mevcut planın dışında kaldı. Kalan günlere şöyle dağıtılabilir:",
+  "@redistributeFeasible": {
+    "placeholders": {
+      "deficit": {
+        "type": "String"
+      }
+    }
+  },
+  "redistributeInfeasible": "{deficit} planın dışında kaldı, ancak kalan günlerde yalnızca {capacity} boş kapasite var. {shortfall} bu haftaya sığmıyor. Aşağıdaki kısmı planlayabilir, hedefi azaltmayı ya da başka bir esnek hedefi düşürmeyi düşünebilirsin.",
+  "@redistributeInfeasible": {
+    "placeholders": {
+      "deficit": {
+        "type": "String"
+      },
+      "capacity": {
+        "type": "String"
+      },
+      "shortfall": {
+        "type": "String"
+      }
+    }
+  },
+  "redistributeNoDays": "{deficit} planın dışında kaldı, ancak bu dönemde boş kapasitesi olan gün kalmadı.",
+  "@redistributeNoDays": {
+    "placeholders": {
+      "deficit": {
+        "type": "String"
+      }
+    }
+  },
+  "notAllowedFixed": "Sabit saatli hedefler yeniden dağıtılmaz.",
+  "notAllowedNothing": "Dağıtılacak eksik yok; plan hedefi karşılıyor.",
+  "notAllowedClosed": "Bu dönem kapandı.",
+  "applyPlan": "Planı uygula",
+  "planApplied": "Plan güncellendi",
+  "addition": "+{amount}",
+  "@addition": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "weekTitle": "Hafta",
+  "weekRange": "{start} – {end}",
+  "@weekRange": {
+    "placeholders": {
+      "start": {
+        "type": "String"
+      },
+      "end": {
+        "type": "String"
+      }
+    }
+  },
+  "weekNoGoals": "Bu hafta için hedef yok.",
+  "capacityTitle": "Günlük kapasite",
+  "capacityOfDay": "{planned} / {capacity}",
+  "@capacityOfDay": {
+    "placeholders": {
+      "planned": {
+        "type": "String"
+      },
+      "capacity": {
+        "type": "String"
+      }
+    }
+  },
+  "capacityDayOver": "{amount} fazla",
+  "@capacityDayOver": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "unallocated": "Günlere dağıtılmamış: {amount}",
+  "@unallocated": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "overAllocated": "Hedeften {amount} fazla planlandı",
+  "@overAllocated": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "dayStatusDone": "Tamamlandı",
+  "dayStatusMissed": "{amount} eksik",
+  "@dayStatusMissed": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "dayStatusToday": "Bugün",
+  "dayStatusUpcoming": "Planlandı",
+  "createGoalTitle": "Yeni haftalık hedef",
+  "sectionCategory": "Kategori",
+  "newCategory": "Yeni kategori",
+  "newCategoryName": "Kategori adı",
+  "sectionTitle": "Hedef adı",
+  "titleHint": "Örn. Rota MVP geliştirme",
+  "sectionTarget": "Haftalık hedef",
+  "hoursLabel": "Saat",
+  "minutesLabel": "Dakika",
+  "sectionDays": "Günlere dağıt",
+  "daysHint": "Hedef seçtiğin günlere eşit dağıtılır. Geçmiş günler seçilemez.",
+  "sectionPreview": "Günlük plan",
+  "capacityWarningDay": "{day}: kapasite {amount} aşılacak",
+  "@capacityWarningDay": {
+    "placeholders": {
+      "day": {
+        "type": "String"
+      },
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "createGoalSubmit": "Hedefi oluştur",
+  "errorPickCategory": "Bir kategori seç.",
+  "errorTitleRequired": "Hedef adı gerekli.",
+  "errorTargetRequired": "Haftalık hedef 0'dan büyük ve bir haftadan kısa olmalı.",
+  "errorPickDays": "En az bir gün seç.",
+  "goalCreated": "Hedef oluşturuldu",
+  "durationMinutes": "{minutes} dk",
+  "@durationMinutes": {
+    "placeholders": {
+      "minutes": {
+        "type": "String"
+      }
+    }
+  },
+  "durationHours": "{hours} sa",
+  "@durationHours": {
+    "placeholders": {
+      "hours": {
+        "type": "String"
+      }
+    }
+  },
+  "durationHoursMinutes": "{hours} sa {minutes} dk",
+  "@durationHoursMinutes": {
+    "placeholders": {
+      "hours": {
+        "type": "String"
+      },
+      "minutes": {
+        "type": "String"
+      }
+    }
+  },
+  "categoryWork": "İş hayatı",
+  "categoryJobApplication": "İş başvurusu",
+  "categoryInterview": "Mülakat",
+  "categoryProjectDevelopment": "Proje geliştirme",
+  "categoryGraduateStudy": "Yüksek lisans / ders",
+  "categoryLanguage": "PTE / dil",
+  "categoryReading": "Kitap",
+  "categorySport": "Spor",
+  "categoryHealthMedication": "Sağlık / ilaç",
+  "categoryBrainTraining": "Beyin jimnastiği",
+  "categoryWorship": "Namaz / ibadet",
+  "categoryPersonal": "Kişisel",
+  "sampleProjectGoal": "Rota MVP geliştirme",
+  "sampleLanguageGoal": "PTE hazırlık"
+}

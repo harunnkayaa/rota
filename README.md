@@ -1,16 +1,46 @@
-# rota
+# Rota
 
-A new Flutter project.
+Personal planning app that links weekly goals to daily work: log 90 minutes
+on Monday and see both "90/120 today" and "90/600 this week". Missed work is
+shown, never silently moved; re-planning is always a proposal you approve.
 
-## Getting Started
+Product and engineering rules: [CLAUDE.md](CLAUDE.md).
+Defaults for undecided product questions: [docs/product/open-decisions.md](docs/product/open-decisions.md).
 
-This project is a starting point for a Flutter application.
+## Status
 
-A few resources to get you started if this is your first Flutter project:
+Phase 0 (domain + planning engine) and the Phase 1 local slice are done.
+Data is **in memory only** — it disappears on reload. Supabase sync,
+focus timer and notifications are next.
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+## Run
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+```bash
+flutter run -d chrome          # web
+flutter run -d "iPhone 17 Pro" # iOS simulator (any installed simulator name)
+```
+
+## Check
+
+```bash
+dart format lib test
+flutter analyze
+flutter test
+```
+
+## Layout
+
+```text
+lib/
+  app/            app shell, theme, localization (ARB + formatters)
+  core/time/      LocalDate, PeriodRange, Clock
+  features/
+    categories/   GoalCategory
+    goals/        Goal, GoalPeriod, DailyAllocation, ProgressEntry, create form
+    planning/     planning engine (pure Dart), controller, week screen
+    today/        today screen, goal card, add-progress sheet
+  shared/widgets/ small reusable widgets
+test/
+  unit/           domain + controller
+  widget/         end-to-end UI flows
+```

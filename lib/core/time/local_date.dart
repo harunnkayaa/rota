@@ -20,6 +20,13 @@ class LocalDate implements Comparable<LocalDate> {
     return LocalDate._(year, month, day);
   }
 
+  /// Takes the calendar fields of [dateTime] as they are.
+  ///
+  /// The caller decides which timezone [dateTime] is expressed in; this
+  /// constructor never converts.
+  LocalDate.fromDateTime(DateTime dateTime)
+    : this._(dateTime.year, dateTime.month, dateTime.day);
+
   const LocalDate._(this.year, this.month, this.day);
 
   final int year;

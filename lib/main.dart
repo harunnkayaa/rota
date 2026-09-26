@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
 
-// Phase 0: the domain layer is built and tested first.
-// The real app shell arrives with the Phase 1 vertical slice.
+import 'app/app.dart';
+import 'core/time/clock.dart';
+import 'features/planning/presentation/planner_controller.dart';
+
 void main() {
-  runApp(
-    const MaterialApp(
-      home: Scaffold(body: Center(child: Text('Rota'))),
-    ),
-  );
+  runApp(RotaApp(controller: PlannerController(clock: const SystemClock())));
 }
