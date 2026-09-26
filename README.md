@@ -6,6 +6,7 @@ shown, never silently moved; re-planning is always a proposal you approve.
 
 Product and engineering rules: [CLAUDE.md](CLAUDE.md).
 Defaults for undecided product questions: [docs/product/open-decisions.md](docs/product/open-decisions.md).
+Where we left off and what is next: [docs/PROGRESS.md](docs/PROGRESS.md).
 
 ## Status
 

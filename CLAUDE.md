@@ -3,6 +3,8 @@
 > Bu dosya Rota projesinin ürün, mimari, güvenlik, kalite ve geliştirme kurallarının ana kaynağıdır.
 > Claude veya projede çalışan başka bir geliştirici, herhangi bir değişiklik yapmadan önce bu dosyanın tamamını okumalıdır.
 > Bu dosyayla çelişen geçici bir talep varsa çelişki açıkça belirtilmeli; sessizce kapsam veya mimari değiştirilmemelidir.
+>
+> **Güncel durum ve sıradaki adımlar:** [docs/PROGRESS.md](docs/PROGRESS.md). “Kaldığımız yerden devam edelim” denirse önce onu oku.
 
 ---
 
