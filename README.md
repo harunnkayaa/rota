@@ -11,7 +11,7 @@ and stay on course when real life gets in the way.**
 ![Dart](https://img.shields.io/badge/Dart-0175C2?logo=dart&logoColor=white)
 ![iOS](https://img.shields.io/badge/iOS-000000?logo=apple&logoColor=white)
 ![Web](https://img.shields.io/badge/Web-4285F4?logo=googlechrome&logoColor=white)
-![Tests](https://img.shields.io/badge/tests-126%20passing-2ea44f)
+![Tests](https://img.shields.io/badge/tests-208%20passing-2ea44f)
 ![Status](https://img.shields.io/badge/status-in%20development-orange)
 
 </div>
@@ -39,6 +39,7 @@ from your goals to your days.
 | 🔁 **Missed time, re-planned — with your approval** | Fell short on Monday? Rota shows exactly how much is uncovered and proposes an explainable redistribution. Nothing moves silently. |
 | ⚖️ **Make-up aware** | Add the missing hour to Tuesday and the gap simply closes — no "over target" nagging for catching up. |
 | 🔒 **Different goals, different rules** | Flexible study hours can be moved; fixed-time routines like medication or prayer never are. Past days stay as history. |
+| 🎯 **Plans backwards from a date** | "PTE on 15 Nov, 40 hours": Rota computes the weekly pace, tells you early if it won't fit, and can borrow time from other goals — only the ones you pick. |
 | 🧘 **No guilt, no gamification** | Neutral language ("60 minutes not completed yet"), no red punishment screens, no points economy. |
 
 ## 🧠 How it works
@@ -73,12 +74,14 @@ snapshots and explicit carry-over.
 
 - [x] Planning engine: progress, capacity, goal debt, redistribution, period close
 - [x] Today & Week screens, per-day planning and editing
-- [x] On-device persistence
+- [x] Deadline goals (exams, interviews, deliveries): weekly pace, feasibility, catch-up with your approval
+- [x] Weeks that roll over by themselves, with an honest weekly review and opt-in carry-over
+- [x] Focus timer that survives app restarts
+- [x] Weekly reports: planned vs. done, time per life area, week-to-week change
+- [x] Smart iPhone reminders — always about the time *not yet worked*, with quiet hours and a daily budget
+- [x] On-device persistence, data export and delete-all
 - [ ] Sign-in and iPhone ↔ web sync (Supabase, PostgreSQL + RLS)
-- [ ] Focus timer and offline-safe progress queue
-- [ ] Smart reminders — always about the time *not yet worked*, with quiet hours and a daily budget
-- [ ] Weekly reports: planned vs. done
-- [ ] Interview & exam modes: plan backwards from a deadline
+- [ ] Offline-safe sync queue and conflict handling
 
 ## 🚀 Getting started
 

@@ -1,10 +1,19 @@
 # Rota — Nerede kaldık?
 
-> Son güncelleme: 2026-09-28. Yeni bir oturuma başlarken önce bu dosyayı,
+> Son güncelleme: 2026-09-28 (akşam). Yeni bir oturuma başlarken önce bu dosyayı,
 > sonra [CLAUDE.md](../CLAUDE.md)'yi oku.
 >
 > Çalışma dalı: `feat/deadline-route` (GitHub'da). `main`'e birleştirme
 > kullanıcı tarafından PR ile yapılacak.
+
+## Kısa özet
+
+MVP akışının (CLAUDE.md §5) **giriş ve cihazlar arası senkronizasyon
+dışındaki bütün adımları** çalışıyor: hedef oluşturma (haftalık ve tarihli),
+günlere dağıtma, ilerleme (elle ve odak sayacıyla), eksik tespiti ve
+onaylı yeniden planlama, hafta kapanışı ve rapor, iPhone hatırlatmaları.
+Veriler cihazda. Sıradaki büyük adım Supabase ve kullanıcının kurulumunu
+bekliyor.
 
 ## Tamamlanan aşamalar
 
@@ -14,14 +23,12 @@
 | Phase 1 — Yerel dikey dilim | ✅ | Bugün / Hafta / Hedef oluşturma ekranları, cihazda kalıcı kayıt (`shared_preferences`, JSON, `schema_version: 1`), açık/koyu tema, Türkçe metinler (gen-l10n). |
 | Kullanıcı istekleri (26.09) | ✅ | Her güne ayrı süre; planı Bugün ve Hafta ekranından düzenleme; geçmiş günler kilitli; eksik gün sonradan telafi edilince "fazla planlandı" denmiyor (kalan plan ↔ kalan hedef). |
 | Hedef tarihi rotası (28.09) | ✅ | Tarihli hedef (sınav/mülakat/teslim): kalan süre, haftalık tempo, bu haftanın payı, kapasiteye göre yetişme riski. Geride kalınca "Tempoyu yakala": önce boş zamandan, yetmezse **kullanıcının seçtiği** hedeflerden süre alır; toplam hedef değiştirilebilir. Motor: `planning/domain/deadline_pace.dart`. |
-
 | Hafta geçişi ve kapanış (28.09) | ✅ | Yeni hafta başlayınca biten dönemler kapanır (snapshot), aktif haftalık hedefler aynı varsayılan hedefle yeni haftaya açılır, gün dağılımı bugünden itibaren kopyalanır. Eksik süre yalnızca kullanıcı "bu haftaya ekle" derse taşınır. Hedef arşivleme. Uygulama öne gelince tarih yeniden kontrol edilir. |
 | Ayarlar (28.09) | ✅ | Günlük kapasite, güne özel kapasite, hafta başlangıcı. |
 | Odak sayacı (28.09) | ✅ | Başlat / duraklat / devam / bitir; süre zaman damgalarından hesaplanır, uygulama kapanınca kaybolmaz; bitirince tek ilerleme kaydı (`focus:<id>` idempotency). |
 | Raporlar (28.09) | ✅ | Bu hafta planlanan–gerçekleşen, kategori dağılımı, geçmiş haftalar (snapshot'lardan), önceki haftayla fark, biten tarihli hedefler. |
 | Kayıt şeması v2 | ✅ | v1 dosyaları otomatik taşınır (varsayılan haftalık hedef son haftadan alınır). Simülatördeki gerçek v1 verisiyle doğrulandı. |
 | iOS hatırlatmaları (28.09) | ✅ | Kurallar [notification-rules.md](product/notification-rules.md): her zaman henüz çalışılmamış süre, sessiz saatler, günlük bütçe, hassas hedeflerde gizli metin, sabit id ile tekrar yok. Her değişiklikte yeniden planlanır. İzin yalnızca kullanıcı hatırlatmaları açınca istenir (simülatörde gerçek iOS izin penceresiyle doğrulandı). Web'de bildirim yok. Bildirimin gerçek teslimatı otomasyonla doğrulanamadı; iPhone 15'te elle denenmeli. |
-
 | Veri sahipliği (28.09) | ✅ | Ayarlar'dan tüm verileri JSON olarak görüp panoya kopyalama; onaylı "tüm verileri sil" (CLAUDE.md §4.6). |
 
 Doğrulama: 208 test geçiyor, `flutter analyze` temiz.
@@ -43,17 +50,17 @@ Doğrulama: 208 test geçiyor, `flutter analyze` temiz.
 ## Ürün yönü (kullanıcının 26.09 isteği)
 
 Rota basit bir to-do uygulaması gibi algılanmamalı; **kariyer ve kişisel
-gelişim rotası** olarak konumlanmalı. Kullanıcı diğer uygulamalarda olmayan
-yeni özellikler istiyor. Sonraki oturumda Innovation Review formatıyla
-(CLAUDE.md §12.3, §26) değerlendirilecek adaylar:
+gelişim rotası** olarak konumlanmalı. Yeni özellikler Innovation Review
+formatıyla önerilir, onaysız eklenmez.
 
-- Mülakat / sınav modu: tarihe göre kalan süre ve kapasite, esnek
-  hedefleri onayla geçici azaltma (CLAUDE.md §6.4, §12.2)
-- Uzun vadeli "rota" görünümü: hedeflerin haftalar boyunca ilerleyişi
-- Gerçekçilik aynası: geçmiş plan/gerçekleşme oranından sonraki haftaya
-  gerçekçi kapasite önerisi
-- (Daha önce önerilen) Plan baseline: raporda ilk plan / son plan /
-  gerçekleşen
+- ✅ Hedef tarihi rotası (mülakat / sınav / teslim) — 28.09'da yapıldı.
+- ✅ Kategori bazlı zaman dağılımı raporu ("hayat alanları dengesi"nin
+  temel hali).
+- Sıradaki adaylar (v1.1): hayat alanları için hedef yüzde ve sapma,
+  gerçekçilik aynası (geçmiş plan/gerçekleşme oranından kapasite önerisi),
+  uzun vadeli rota görünümü, "Haftayı planla" asistanı (tüm hedefleri
+  kapasiteye sığdıran haftalık öneri), plan baseline (ilk plan / son plan /
+  gerçekleşen).
 
 GitHub açıklaması bu konumlandırmaya göre yazıldı ("personal growth
 roadmap").
