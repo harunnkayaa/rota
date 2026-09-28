@@ -910,4 +910,39 @@ class AppLocalizationsTr extends AppLocalizations {
   @override
   String get settingsReminderInQuiet =>
       'Hatırlatma saati sessiz saatlerin içinde; bu saatte bildirim gönderilmez.';
+
+  @override
+  String get settingsExport => 'Verilerini dışa aktar';
+
+  @override
+  String get settingsExportHint =>
+      'Hedeflerin, planların, ilerlemen ve ayarların okunabilir JSON olarak.';
+
+  @override
+  String get exportTitle => 'Dışa aktarılan veri';
+
+  @override
+  String get exportCopy => 'Panoya kopyala';
+
+  @override
+  String get exportCopied => 'Veriler panoya kopyalandı';
+
+  @override
+  String get close => 'Kapat';
+
+  @override
+  String get settingsDelete => 'Tüm verileri sil';
+
+  @override
+  String get deleteConfirmTitle => 'Tüm veriler silinsin mi?';
+
+  @override
+  String get deleteConfirmBody =>
+      'Hedeflerin, planların, ilerleme kayıtların, sonuçların ve ayarların bu cihazdan kalıcı olarak silinir. Bu işlem geri alınamaz. İstersen önce verilerini dışa aktar.';
+
+  @override
+  String get deleteConfirm => 'Kalıcı olarak sil';
+
+  @override
+  String get dataDeleted => 'Tüm veriler silindi';
 }

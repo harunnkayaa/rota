@@ -1591,6 +1591,72 @@ abstract class AppLocalizations {
   /// In tr, this message translates to:
   /// **'Hatırlatma saati sessiz saatlerin içinde; bu saatte bildirim gönderilmez.'**
   String get settingsReminderInQuiet;
+
+  /// No description provided for @settingsExport.
+  ///
+  /// In tr, this message translates to:
+  /// **'Verilerini dışa aktar'**
+  String get settingsExport;
+
+  /// No description provided for @settingsExportHint.
+  ///
+  /// In tr, this message translates to:
+  /// **'Hedeflerin, planların, ilerlemen ve ayarların okunabilir JSON olarak.'**
+  String get settingsExportHint;
+
+  /// No description provided for @exportTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Dışa aktarılan veri'**
+  String get exportTitle;
+
+  /// No description provided for @exportCopy.
+  ///
+  /// In tr, this message translates to:
+  /// **'Panoya kopyala'**
+  String get exportCopy;
+
+  /// No description provided for @exportCopied.
+  ///
+  /// In tr, this message translates to:
+  /// **'Veriler panoya kopyalandı'**
+  String get exportCopied;
+
+  /// No description provided for @close.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kapat'**
+  String get close;
+
+  /// No description provided for @settingsDelete.
+  ///
+  /// In tr, this message translates to:
+  /// **'Tüm verileri sil'**
+  String get settingsDelete;
+
+  /// No description provided for @deleteConfirmTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Tüm veriler silinsin mi?'**
+  String get deleteConfirmTitle;
+
+  /// No description provided for @deleteConfirmBody.
+  ///
+  /// In tr, this message translates to:
+  /// **'Hedeflerin, planların, ilerleme kayıtların, sonuçların ve ayarların bu cihazdan kalıcı olarak silinir. Bu işlem geri alınamaz. İstersen önce verilerini dışa aktar.'**
+  String get deleteConfirmBody;
+
+  /// No description provided for @deleteConfirm.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kalıcı olarak sil'**
+  String get deleteConfirm;
+
+  /// No description provided for @dataDeleted.
+  ///
+  /// In tr, this message translates to:
+  /// **'Tüm veriler silindi'**
+  String get dataDeleted;
 }
 
 class _AppLocalizationsDelegate

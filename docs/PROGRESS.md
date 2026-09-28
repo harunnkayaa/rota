@@ -22,7 +22,9 @@
 | Kayıt şeması v2 | ✅ | v1 dosyaları otomatik taşınır (varsayılan haftalık hedef son haftadan alınır). Simülatördeki gerçek v1 verisiyle doğrulandı. |
 | iOS hatırlatmaları (28.09) | ✅ | Kurallar [notification-rules.md](product/notification-rules.md): her zaman henüz çalışılmamış süre, sessiz saatler, günlük bütçe, hassas hedeflerde gizli metin, sabit id ile tekrar yok. Her değişiklikte yeniden planlanır. İzin yalnızca kullanıcı hatırlatmaları açınca istenir (simülatörde gerçek iOS izin penceresiyle doğrulandı). Web'de bildirim yok. Bildirimin gerçek teslimatı otomasyonla doğrulanamadı; iPhone 15'te elle denenmeli. |
 
-Doğrulama: 204 test geçiyor, `flutter analyze` temiz.
+| Veri sahipliği (28.09) | ✅ | Ayarlar'dan tüm verileri JSON olarak görüp panoya kopyalama; onaylı "tüm verileri sil" (CLAUDE.md §4.6). |
+
+Doğrulama: 208 test geçiyor, `flutter analyze` temiz.
 
 ## Sıradaki adımlar (öncelik sırasıyla)
 
@@ -36,7 +38,7 @@ Doğrulama: 204 test geçiyor, `flutter analyze` temiz.
    - JSON alan adları SQL sütun adlarıyla aynı tutuldu
      (`lib/features/planning/data/planner_json.dart`); RLS zorunlu.
 3. Offline kuyruk ve çakışma yönetimi (Supabase ile birlikte).
-4. Veri dışa aktarma / hesap-veri silme (CLAUDE.md §4.6).
+4. Hesap silme sunucu tarafı (Supabase ile birlikte; yerel silme hazır).
 
 ## Ürün yönü (kullanıcının 26.09 isteği)
 

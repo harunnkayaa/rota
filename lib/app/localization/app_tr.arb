@@ -742,5 +742,16 @@
   "settingsShowSensitiveHint": "Kapalıyken kilit ekranında yalnızca \"Planlanmış kişisel hatırlatıcın var.\" yazar.",
   "settingsPermissionDenied": "Bildirim izni verilmedi. iPhone Ayarlar > Rota > Bildirimler bölümünden açabilirsin.",
   "settingsRemindersWebNote": "Hatırlatmalar iPhone uygulamasında çalışır; web sürümü bildirim göndermez.",
-  "settingsReminderInQuiet": "Hatırlatma saati sessiz saatlerin içinde; bu saatte bildirim gönderilmez."
+  "settingsReminderInQuiet": "Hatırlatma saati sessiz saatlerin içinde; bu saatte bildirim gönderilmez.",
+  "settingsExport": "Verilerini dışa aktar",
+  "settingsExportHint": "Hedeflerin, planların, ilerlemen ve ayarların okunabilir JSON olarak.",
+  "exportTitle": "Dışa aktarılan veri",
+  "exportCopy": "Panoya kopyala",
+  "exportCopied": "Veriler panoya kopyalandı",
+  "close": "Kapat",
+  "settingsDelete": "Tüm verileri sil",
+  "deleteConfirmTitle": "Tüm veriler silinsin mi?",
+  "deleteConfirmBody": "Hedeflerin, planların, ilerleme kayıtların, sonuçların ve ayarların bu cihazdan kalıcı olarak silinir. Bu işlem geri alınamaz. İstersen önce verilerini dışa aktar.",
+  "deleteConfirm": "Kalıcı olarak sil",
+  "dataDeleted": "Tüm veriler silindi"
 }

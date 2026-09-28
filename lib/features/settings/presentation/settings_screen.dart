@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import '../../../app/localization/app_localizations.dart';
 import '../../../app/localization/formatters.dart';
@@ -141,7 +142,11 @@ class SettingsScreen extends StatelessWidget {
                     card(l.settingsReminders, l.settingsRemindersHint, [
                       const _ReminderSection(),
                     ]),
-                    card(l.settingsDataTitle, null, [Text(l.settingsDataBody)]),
+                    card(l.settingsDataTitle, null, [
+                      Text(l.settingsDataBody),
+                      const SizedBox(height: AppSpacing.m),
+                      const _DataActions(),
+                    ]),
                   ],
                 ),
               ),
@@ -311,6 +316,102 @@ class _ReminderSection extends StatelessWidget {
             ),
           ),
         ],
+      ],
+    );
+  }
+}
+
+/// Export and delete: the data belongs to the user (CLAUDE.md §4.6).
+class _DataActions extends StatelessWidget {
+  const _DataActions();
+
+  Future<void> _export(BuildContext context) async {
+    final l = AppLocalizations.of(context);
+    final json = PlannerScope.of(context).exportJson();
+    await showDialog<void>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(l.exportTitle),
+        content: SizedBox(
+          width: double.maxFinite,
+          height: 320,
+          child: SingleChildScrollView(
+            child: SelectableText(
+              json,
+              style: const TextStyle(fontFamily: 'monospace', fontSize: 12),
+            ),
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: Text(l.close),
+          ),
+          FilledButton.icon(
+            onPressed: () async {
+              final messenger = ScaffoldMessenger.of(context);
+              await Clipboard.setData(ClipboardData(text: json));
+              messenger.showSnackBar(SnackBar(content: Text(l.exportCopied)));
+            },
+            icon: const Icon(Icons.copy),
+            label: Text(l.exportCopy),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _delete(BuildContext context) async {
+    final l = AppLocalizations.of(context);
+    final controller = PlannerScope.of(context);
+    final messenger = ScaffoldMessenger.of(context);
+    final scheme = Theme.of(context).colorScheme;
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(l.deleteConfirmTitle),
+        content: Text(l.deleteConfirmBody),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: Text(l.cancel),
+          ),
+          FilledButton(
+            style: FilledButton.styleFrom(
+              backgroundColor: scheme.error,
+              foregroundColor: scheme.onError,
+            ),
+            onPressed: () => Navigator.of(context).pop(true),
+            child: Text(l.deleteConfirm),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true) return;
+    controller.deleteAllData();
+    messenger.showSnackBar(SnackBar(content: Text(l.dataDeleted)));
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context);
+    final scheme = Theme.of(context).colorScheme;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        ListTile(
+          contentPadding: EdgeInsets.zero,
+          leading: const Icon(Icons.download_outlined),
+          title: Text(l.settingsExport),
+          subtitle: Text(l.settingsExportHint),
+          onTap: () => _export(context),
+        ),
+        ListTile(
+          contentPadding: EdgeInsets.zero,
+          leading: Icon(Icons.delete_forever_outlined, color: scheme.error),
+          title: Text(l.settingsDelete, style: TextStyle(color: scheme.error)),
+          onTap: () => _delete(context),
+        ),
       ],
     );
   }

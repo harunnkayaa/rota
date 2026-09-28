@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:math';
 
 import 'package:flutter/widgets.dart';
@@ -148,21 +149,21 @@ class PlannerController extends ChangeNotifier {
     if (_loadStatus != LoadStatus.ready) return;
     // Encode now, so the saved snapshot matches this exact change even if
     // more changes happen before the write runs.
-    final snapshot = encodePlannerData(
-      PlannerData(
-        categories: List.of(_categories),
-        goals: List.of(_goals),
-        periods: List.of(_periods),
-        allocations: List.of(_allocations),
-        entries: List.of(_entries),
-        snapshots: List.of(_snapshots),
-        reviewedPeriodIds: Set.of(_reviewed),
-        settings: _settings,
-        activeFocus: _activeFocus,
-      ),
-    );
+    final snapshot = encodePlannerData(_currentData());
     _saveChain = _saveChain.then((_) => _write(snapshot));
   }
+
+  PlannerData _currentData() => PlannerData(
+    categories: List.of(_categories),
+    goals: List.of(_goals),
+    periods: List.of(_periods),
+    allocations: List.of(_allocations),
+    entries: List.of(_entries),
+    snapshots: List.of(_snapshots),
+    reviewedPeriodIds: Set.of(_reviewed),
+    settings: _settings,
+    activeFocus: _activeFocus,
+  );
 
   Future<void> _write(String snapshot) async {
     _saveStatus = SaveStatus.saving;
@@ -422,6 +423,27 @@ class PlannerController extends ChangeNotifier {
       existingPeriods: _periods,
     );
     _periods[_periods.indexWhere((p) => p.id == week.id)] = updated;
+    _commit();
+  }
+
+  /// Everything Rota stores about the user, as readable JSON
+  /// (CLAUDE.md §4.6: the data belongs to the user).
+  String exportJson() => const JsonEncoder.withIndent(
+    '  ',
+  ).convert(jsonDecode(encodePlannerData(_currentData())));
+
+  /// Permanently removes every goal, plan, entry, result and setting from
+  /// this device. The empty state is saved right away.
+  void deleteAllData() {
+    _categories.clear();
+    _goals.clear();
+    _periods.clear();
+    _allocations.clear();
+    _entries.clear();
+    _snapshots.clear();
+    _reviewed.clear();
+    _settings = PlannerSettings();
+    _activeFocus = null;
     _commit();
   }
 
