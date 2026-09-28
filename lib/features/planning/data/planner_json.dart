@@ -8,6 +8,7 @@ import '../../goals/domain/daily_allocation.dart';
 import '../../goals/domain/goal.dart';
 import '../../goals/domain/goal_period.dart';
 import '../../goals/domain/progress_entry.dart';
+import '../../reminders/domain/reminder_planner.dart';
 import '../../settings/domain/planner_settings.dart';
 import '../domain/period_closing.dart';
 import 'planner_data.dart';
@@ -92,6 +93,14 @@ String encodePlannerData(PlannerData data) => jsonEncode({
         '$day': minutes,
     },
     'week_start_day': data.settings.weekStartDay,
+    'reminders': {
+      'enabled': data.settings.reminders.enabled,
+      'daily_time_minutes': data.settings.reminders.dailyTimeMinutes,
+      'quiet_start_minutes': data.settings.reminders.quietStartMinutes,
+      'quiet_end_minutes': data.settings.reminders.quietEndMinutes,
+      'daily_budget': data.settings.reminders.dailyBudget,
+      'show_sensitive_details': data.settings.reminders.showSensitiveDetails,
+    },
   },
   'active_focus': switch (data.activeFocus) {
     null => null,
@@ -229,6 +238,19 @@ PlannerSettings _settings(Map<String, Object?> m) => PlannerSettings(
       int.parse(day): minutes as int,
   },
   weekStartDay: m['week_start_day'] as int,
+  // Added within v2: files saved before reminders existed use defaults.
+  reminders: switch (m['reminders']) {
+    null => const ReminderSettings(),
+    final Map<String, Object?> r => ReminderSettings(
+      enabled: r['enabled'] as bool,
+      dailyTimeMinutes: r['daily_time_minutes'] as int,
+      quietStartMinutes: r['quiet_start_minutes'] as int,
+      quietEndMinutes: r['quiet_end_minutes'] as int,
+      dailyBudget: r['daily_budget'] as int,
+      showSensitiveDetails: r['show_sensitive_details'] as bool,
+    ),
+    _ => throw const FormatException('reminders'),
+  },
 );
 
 GoalPeriod _period(Map<String, Object?> m) {

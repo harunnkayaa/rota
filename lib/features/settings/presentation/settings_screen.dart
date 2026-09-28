@@ -6,6 +6,8 @@ import '../../../app/theme/app_theme.dart';
 import '../../../shared/widgets/content_width.dart';
 import '../../../shared/widgets/duration_stepper.dart';
 import '../../planning/presentation/planner_controller.dart';
+import '../../reminders/domain/reminder_planner.dart';
+import '../../reminders/presentation/reminder_sync.dart';
 
 /// Capacity and calendar preferences (CLAUDE.md §13.7). Every change is
 /// saved immediately; there is no separate "save" step.
@@ -136,6 +138,9 @@ class SettingsScreen extends StatelessWidget {
                         },
                       ),
                     ]),
+                    card(l.settingsReminders, l.settingsRemindersHint, [
+                      const _ReminderSection(),
+                    ]),
                     card(l.settingsDataTitle, null, [Text(l.settingsDataBody)]),
                   ],
                 ),
@@ -144,6 +149,169 @@ class SettingsScreen extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+}
+
+/// Reminder switches. Permission is requested only when the user turns
+/// reminders on, with the reason already on screen (CLAUDE.md §13.1).
+class _ReminderSection extends StatelessWidget {
+  const _ReminderSection();
+
+  static const _budgetChoices = [1, 2, 3, 4, 5];
+
+  Future<void> _toggle(BuildContext context, bool on) async {
+    final l = AppLocalizations.of(context);
+    final controller = PlannerScope.of(context);
+    final scheduler = ReminderScope.of(context);
+    final messenger = ScaffoldMessenger.of(context);
+    final settings = controller.settings;
+    if (on && !await scheduler.requestPermission()) {
+      messenger.showSnackBar(
+        SnackBar(content: Text(l.settingsPermissionDenied)),
+      );
+      return;
+    }
+    controller.updateSettings(
+      settings.copyWith(reminders: settings.reminders.copyWith(enabled: on)),
+    );
+  }
+
+  Future<void> _pickTime(
+    BuildContext context,
+    int current,
+    ReminderSettings Function(ReminderSettings r, int minute) apply,
+  ) async {
+    final controller = PlannerScope.of(context);
+    final picked = await showTimePicker(
+      context: context,
+      initialTime: TimeOfDay(
+        hour: current ~/ Duration.minutesPerHour,
+        minute: current % Duration.minutesPerHour,
+      ),
+    );
+    if (picked == null) return;
+    final settings = controller.settings;
+    controller.updateSettings(
+      settings.copyWith(
+        reminders: apply(
+          settings.reminders,
+          picked.hour * Duration.minutesPerHour + picked.minute,
+        ),
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context);
+    final theme = Theme.of(context);
+    final controller = PlannerScope.of(context);
+    final scheduler = ReminderScope.of(context);
+    final settings = controller.settings;
+    final r = settings.reminders;
+
+    if (!scheduler.isSupported) return Text(l.settingsRemindersWebNote);
+
+    String time(int minute) =>
+        MaterialLocalizations.of(context).formatTimeOfDay(
+          TimeOfDay(
+            hour: minute ~/ Duration.minutesPerHour,
+            minute: minute % Duration.minutesPerHour,
+          ),
+          alwaysUse24HourFormat: true,
+        );
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        SwitchListTile(
+          contentPadding: EdgeInsets.zero,
+          title: Text(l.settingsRemindersEnable),
+          value: r.enabled,
+          onChanged: (on) => _toggle(context, on),
+        ),
+        if (r.enabled) ...[
+          ListTile(
+            contentPadding: EdgeInsets.zero,
+            title: Text(l.settingsReminderTime),
+            trailing: Text(
+              time(r.dailyTimeMinutes),
+              style: theme.textTheme.titleMedium,
+            ),
+            onTap: () => _pickTime(
+              context,
+              r.dailyTimeMinutes,
+              (r, m) => r.copyWith(dailyTimeMinutes: m),
+            ),
+          ),
+          ListTile(
+            contentPadding: EdgeInsets.zero,
+            title: Text(l.settingsQuietFrom),
+            trailing: Text(
+              time(r.quietStartMinutes),
+              style: theme.textTheme.titleMedium,
+            ),
+            onTap: () => _pickTime(
+              context,
+              r.quietStartMinutes,
+              (r, m) => r.copyWith(quietStartMinutes: m),
+            ),
+          ),
+          ListTile(
+            contentPadding: EdgeInsets.zero,
+            title: Text(l.settingsQuietTo),
+            trailing: Text(
+              time(r.quietEndMinutes),
+              style: theme.textTheme.titleMedium,
+            ),
+            onTap: () => _pickTime(
+              context,
+              r.quietEndMinutes,
+              (r, m) => r.copyWith(quietEndMinutes: m),
+            ),
+          ),
+          if (r.isQuiet(r.dailyTimeMinutes))
+            Padding(
+              padding: const EdgeInsets.only(bottom: AppSpacing.s),
+              child: Text(
+                l.settingsReminderInQuiet,
+                style: TextStyle(color: theme.colorScheme.tertiary),
+              ),
+            ),
+          ListTile(
+            contentPadding: EdgeInsets.zero,
+            title: Text(l.settingsDailyBudget),
+            trailing: DropdownButton<int>(
+              value: _budgetChoices.contains(r.dailyBudget)
+                  ? r.dailyBudget
+                  : _budgetChoices.last,
+              underline: const SizedBox.shrink(),
+              items: [
+                for (final n in _budgetChoices)
+                  DropdownMenuItem(value: n, child: Text('$n')),
+              ],
+              onChanged: (n) {
+                if (n == null) return;
+                controller.updateSettings(
+                  settings.copyWith(reminders: r.copyWith(dailyBudget: n)),
+                );
+              },
+            ),
+          ),
+          SwitchListTile(
+            contentPadding: EdgeInsets.zero,
+            title: Text(l.settingsShowSensitive),
+            subtitle: Text(l.settingsShowSensitiveHint),
+            value: r.showSensitiveDetails,
+            onChanged: (on) => controller.updateSettings(
+              settings.copyWith(
+                reminders: r.copyWith(showSensitiveDetails: on),
+              ),
+            ),
+          ),
+        ],
+      ],
     );
   }
 }

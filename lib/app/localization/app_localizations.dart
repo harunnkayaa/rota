@@ -1495,6 +1495,102 @@ abstract class AppLocalizations {
   /// In tr, this message translates to:
   /// **'tempo'**
   String get weekPaceShort;
+
+  /// No description provided for @reminderTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Rota'**
+  String get reminderTitle;
+
+  /// No description provided for @reminderTodayBody.
+  ///
+  /// In tr, this message translates to:
+  /// **'{goal}: bugün {amount} kaldı.'**
+  String reminderTodayBody(String goal, String amount);
+
+  /// No description provided for @reminderPaceBody.
+  ///
+  /// In tr, this message translates to:
+  /// **'{goal}: tempo için bu hafta {amount} daha gerekiyor.'**
+  String reminderPaceBody(String goal, String amount);
+
+  /// No description provided for @reminderHiddenBody.
+  ///
+  /// In tr, this message translates to:
+  /// **'Planlanmış kişisel hatırlatıcın var.'**
+  String get reminderHiddenBody;
+
+  /// No description provided for @settingsReminders.
+  ///
+  /// In tr, this message translates to:
+  /// **'Hatırlatmalar'**
+  String get settingsReminders;
+
+  /// No description provided for @settingsRemindersHint.
+  ///
+  /// In tr, this message translates to:
+  /// **'Akşam, bugün henüz çalışmadığın süreyi hatırlatır. Planını tamamladıysan bildirim gelmez.'**
+  String get settingsRemindersHint;
+
+  /// No description provided for @settingsRemindersEnable.
+  ///
+  /// In tr, this message translates to:
+  /// **'Hatırlatmaları aç'**
+  String get settingsRemindersEnable;
+
+  /// No description provided for @settingsReminderTime.
+  ///
+  /// In tr, this message translates to:
+  /// **'Hatırlatma saati'**
+  String get settingsReminderTime;
+
+  /// No description provided for @settingsQuietFrom.
+  ///
+  /// In tr, this message translates to:
+  /// **'Sessiz saat başlangıcı'**
+  String get settingsQuietFrom;
+
+  /// No description provided for @settingsQuietTo.
+  ///
+  /// In tr, this message translates to:
+  /// **'Sessiz saat bitişi'**
+  String get settingsQuietTo;
+
+  /// No description provided for @settingsDailyBudget.
+  ///
+  /// In tr, this message translates to:
+  /// **'Günlük en fazla bildirim'**
+  String get settingsDailyBudget;
+
+  /// No description provided for @settingsShowSensitive.
+  ///
+  /// In tr, this message translates to:
+  /// **'Sağlık ve ibadet hedeflerinin adını göster'**
+  String get settingsShowSensitive;
+
+  /// No description provided for @settingsShowSensitiveHint.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kapalıyken kilit ekranında yalnızca \"Planlanmış kişisel hatırlatıcın var.\" yazar.'**
+  String get settingsShowSensitiveHint;
+
+  /// No description provided for @settingsPermissionDenied.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bildirim izni verilmedi. iPhone Ayarlar > Rota > Bildirimler bölümünden açabilirsin.'**
+  String get settingsPermissionDenied;
+
+  /// No description provided for @settingsRemindersWebNote.
+  ///
+  /// In tr, this message translates to:
+  /// **'Hatırlatmalar iPhone uygulamasında çalışır; web sürümü bildirim göndermez.'**
+  String get settingsRemindersWebNote;
+
+  /// No description provided for @settingsReminderInQuiet.
+  ///
+  /// In tr, this message translates to:
+  /// **'Hatırlatma saati sessiz saatlerin içinde; bu saatte bildirim gönderilmez.'**
+  String get settingsReminderInQuiet;
 }
 
 class _AppLocalizationsDelegate

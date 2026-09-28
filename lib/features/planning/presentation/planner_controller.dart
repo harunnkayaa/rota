@@ -12,6 +12,7 @@ import '../../goals/domain/daily_allocation.dart';
 import '../../goals/domain/goal.dart';
 import '../../goals/domain/goal_period.dart';
 import '../../goals/domain/progress_entry.dart';
+import '../../reminders/domain/reminder_planner.dart';
 import '../../reports/domain/weekly_report.dart';
 import '../../settings/domain/planner_settings.dart';
 import '../data/planner_data.dart';
@@ -621,6 +622,46 @@ class PlannerController extends ChangeNotifier {
       remainingMinutes: views.fold(0, (s, v) => s + v.todayRemaining),
       capacity: capacityOn(today),
     );
+  }
+
+  /// What reminders could talk about today and tomorrow — always the time
+  /// not yet worked (docs/product/notification-rules.md). Planning which of
+  /// these become notifications is up to the reminder rules.
+  List<ReminderCandidate> reminderCandidates() {
+    final tomorrow = today.addDays(1);
+    return [
+      for (final v in activeGoals()) ...[
+        if (v.todayRemaining > 0)
+          ReminderCandidate(
+            kind: ReminderKind.todayRemaining,
+            periodId: v.period.id,
+            date: today,
+            goalTitle: v.goal.title,
+            minutes: v.todayRemaining,
+            isSensitive: v.goal.isSensitive,
+          ),
+        if (v.pace case final pace?
+            when pace.status == DeadlineStatus.behindThisWeek)
+          ReminderCandidate(
+            kind: ReminderKind.paceBehind,
+            periodId: v.period.id,
+            date: today,
+            goalTitle: v.goal.title,
+            minutes: pace.thisWeekGap,
+            isSensitive: v.goal.isSensitive,
+          ),
+        for (final d in v.days)
+          if (d.date == tomorrow && d.inPeriod && d.shortfall > 0)
+            ReminderCandidate(
+              kind: ReminderKind.todayRemaining,
+              periodId: v.period.id,
+              date: tomorrow,
+              goalTitle: v.goal.title,
+              minutes: d.shortfall,
+              isSensitive: v.goal.isSensitive,
+            ),
+      ],
+    ];
   }
 
   RedistributionResult proposeRedistributionFor(

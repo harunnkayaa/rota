@@ -706,5 +706,41 @@
   },
   "reportsChangeSame": "Önceki haftayla aynı",
   "reportsDeadlines": "Tarihli hedefler",
-  "weekPaceShort": "tempo"
+  "weekPaceShort": "tempo",
+  "reminderTitle": "Rota",
+  "reminderTodayBody": "{goal}: bugün {amount} kaldı.",
+  "@reminderTodayBody": {
+    "placeholders": {
+      "goal": {
+        "type": "String"
+      },
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "reminderPaceBody": "{goal}: tempo için bu hafta {amount} daha gerekiyor.",
+  "@reminderPaceBody": {
+    "placeholders": {
+      "goal": {
+        "type": "String"
+      },
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "reminderHiddenBody": "Planlanmış kişisel hatırlatıcın var.",
+  "settingsReminders": "Hatırlatmalar",
+  "settingsRemindersHint": "Akşam, bugün henüz çalışmadığın süreyi hatırlatır. Planını tamamladıysan bildirim gelmez.",
+  "settingsRemindersEnable": "Hatırlatmaları aç",
+  "settingsReminderTime": "Hatırlatma saati",
+  "settingsQuietFrom": "Sessiz saat başlangıcı",
+  "settingsQuietTo": "Sessiz saat bitişi",
+  "settingsDailyBudget": "Günlük en fazla bildirim",
+  "settingsShowSensitive": "Sağlık ve ibadet hedeflerinin adını göster",
+  "settingsShowSensitiveHint": "Kapalıyken kilit ekranında yalnızca \"Planlanmış kişisel hatırlatıcın var.\" yazar.",
+  "settingsPermissionDenied": "Bildirim izni verilmedi. iPhone Ayarlar > Rota > Bildirimler bölümünden açabilirsin.",
+  "settingsRemindersWebNote": "Hatırlatmalar iPhone uygulamasında çalışır; web sürümü bildirim göndermez.",
+  "settingsReminderInQuiet": "Hatırlatma saati sessiz saatlerin içinde; bu saatte bildirim gönderilmez."
 }

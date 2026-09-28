@@ -19,16 +19,15 @@
 | Ayarlar (28.09) | ✅ | Günlük kapasite, güne özel kapasite, hafta başlangıcı. |
 | Odak sayacı (28.09) | ✅ | Başlat / duraklat / devam / bitir; süre zaman damgalarından hesaplanır, uygulama kapanınca kaybolmaz; bitirince tek ilerleme kaydı (`focus:<id>` idempotency). |
 | Raporlar (28.09) | ✅ | Bu hafta planlanan–gerçekleşen, kategori dağılımı, geçmiş haftalar (snapshot'lardan), önceki haftayla fark, biten tarihli hedefler. |
-| Kayıt şeması v2 | ✅ | v1 dosyaları otomatik taşınır (varsayılan haftalık hedef son haftadan alınır). |
+| Kayıt şeması v2 | ✅ | v1 dosyaları otomatik taşınır (varsayılan haftalık hedef son haftadan alınır). Simülatördeki gerçek v1 verisiyle doğrulandı. |
+| iOS hatırlatmaları (28.09) | ✅ | Kurallar [notification-rules.md](product/notification-rules.md): her zaman henüz çalışılmamış süre, sessiz saatler, günlük bütçe, hassas hedeflerde gizli metin, sabit id ile tekrar yok. Her değişiklikte yeniden planlanır. İzin yalnızca kullanıcı hatırlatmaları açınca istenir (simülatörde gerçek iOS izin penceresiyle doğrulandı). Web'de bildirim yok. Bildirimin gerçek teslimatı otomasyonla doğrulanamadı; iPhone 15'te elle denenmeli. |
 
-Doğrulama: 183 test geçiyor, `flutter analyze` temiz.
+Doğrulama: 204 test geçiyor, `flutter analyze` temiz.
 
 ## Sıradaki adımlar (öncelik sırasıyla)
 
-1. **Bildirimler (iOS yerel).** Kurallar:
-   [docs/product/notification-rules.md](product/notification-rules.md)
-   (her zaman *henüz çalışılmamış* süre; sessiz saatler; günlük bütçe;
-   hassas hedeflerde gizli metin). Web'de yerel bildirim yok.
+1. **iPhone 15 fiziksel test** — hatırlatma teslimatı, odak sayacının
+   arka planda devamı (CLAUDE.md §20.4).
 2. **Phase 2 — Supabase (giriş + telefon/web senkronizasyonu)** —
    kullanıcı gerektiriyor:
    - `brew install supabase/tap/supabase` kurulumu

@@ -9,6 +9,9 @@ abstract interface class Clock {
 
   /// The user's current calendar day.
   LocalDate today();
+
+  /// Minutes since the user's local midnight (0..1439).
+  int minuteOfDay();
 }
 
 class SystemClock implements Clock {
@@ -21,4 +24,10 @@ class SystemClock implements Clock {
   // default Europe/Istanbul) replaces this when profiles arrive in Phase 2.
   @override
   LocalDate today() => LocalDate.fromDateTime(DateTime.now());
+
+  @override
+  int minuteOfDay() {
+    final now = DateTime.now();
+    return now.hour * Duration.minutesPerHour + now.minute;
+  }
 }

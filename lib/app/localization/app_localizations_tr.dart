@@ -852,4 +852,62 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get weekPaceShort => 'tempo';
+
+  @override
+  String get reminderTitle => 'Rota';
+
+  @override
+  String reminderTodayBody(String goal, String amount) {
+    return '$goal: bugün $amount kaldı.';
+  }
+
+  @override
+  String reminderPaceBody(String goal, String amount) {
+    return '$goal: tempo için bu hafta $amount daha gerekiyor.';
+  }
+
+  @override
+  String get reminderHiddenBody => 'Planlanmış kişisel hatırlatıcın var.';
+
+  @override
+  String get settingsReminders => 'Hatırlatmalar';
+
+  @override
+  String get settingsRemindersHint =>
+      'Akşam, bugün henüz çalışmadığın süreyi hatırlatır. Planını tamamladıysan bildirim gelmez.';
+
+  @override
+  String get settingsRemindersEnable => 'Hatırlatmaları aç';
+
+  @override
+  String get settingsReminderTime => 'Hatırlatma saati';
+
+  @override
+  String get settingsQuietFrom => 'Sessiz saat başlangıcı';
+
+  @override
+  String get settingsQuietTo => 'Sessiz saat bitişi';
+
+  @override
+  String get settingsDailyBudget => 'Günlük en fazla bildirim';
+
+  @override
+  String get settingsShowSensitive =>
+      'Sağlık ve ibadet hedeflerinin adını göster';
+
+  @override
+  String get settingsShowSensitiveHint =>
+      'Kapalıyken kilit ekranında yalnızca \"Planlanmış kişisel hatırlatıcın var.\" yazar.';
+
+  @override
+  String get settingsPermissionDenied =>
+      'Bildirim izni verilmedi. iPhone Ayarlar > Rota > Bildirimler bölümünden açabilirsin.';
+
+  @override
+  String get settingsRemindersWebNote =>
+      'Hatırlatmalar iPhone uygulamasında çalışır; web sürümü bildirim göndermez.';
+
+  @override
+  String get settingsReminderInQuiet =>
+      'Hatırlatma saati sessiz saatlerin içinde; bu saatte bildirim gönderilmez.';
 }

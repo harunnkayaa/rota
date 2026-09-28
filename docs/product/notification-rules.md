@@ -1,7 +1,7 @@
 # Notification rules
 
-Agreed with the user on 2026-09-26. Notifications themselves arrive in
-Phase 4; this file is the contract they must follow.
+Agreed with the user on 2026-09-26; implemented on 2026-09-28 as iOS local
+notifications (`lib/features/reminders/`). This file is the contract.
 
 ## 1. Always talk about the time not yet worked
 

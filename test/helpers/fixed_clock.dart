@@ -5,6 +5,7 @@ import 'package:rota/core/time/clock.dart';
 import 'package:rota/core/time/local_date.dart';
 import 'package:rota/features/planning/data/planner_storage.dart';
 import 'package:rota/features/planning/presentation/planner_controller.dart';
+import 'package:rota/features/reminders/data/reminder_scheduler.dart';
 
 /// A clock that only moves when a test moves it. Starts on [day] at noon
 /// UTC; setting [day] jumps to noon of that day, [advance] moves forward.
@@ -24,6 +25,10 @@ class FixedClock implements Clock {
   @override
   LocalDate today() => day;
 
+  /// Tests treat the fixed UTC time as the local time of day.
+  @override
+  int minuteOfDay() => _now.hour * Duration.minutesPerHour + _now.minute;
+
   static DateTime _noon(LocalDate d) =>
       DateTime.utc(d.year, d.month, d.day, 12);
 }
@@ -38,6 +43,7 @@ Future<PlannerController> pumpRota(
   PlannerController? controller,
   Size size = const Size(390, 844),
   PlannerStorage? storage,
+  ReminderScheduler reminderScheduler = const NoopReminderScheduler(),
 }) async {
   assert(
     (today == null) != (controller == null),
@@ -51,7 +57,9 @@ Future<PlannerController> pumpRota(
       controller ??
       PlannerController(clock: FixedClock(today!), storage: storage);
   if (controller == null) await c.load();
-  await tester.pumpWidget(RotaApp(controller: c));
+  await tester.pumpWidget(
+    RotaApp(controller: c, reminderScheduler: reminderScheduler),
+  );
   await tester.pumpAndSettle();
   return c;
 }

@@ -1,14 +1,21 @@
 import 'package:flutter/material.dart';
 
 import '../features/planning/presentation/planner_controller.dart';
+import '../features/reminders/data/reminder_scheduler.dart';
+import '../features/reminders/presentation/reminder_sync.dart';
 import 'home_shell.dart';
 import 'localization/app_localizations.dart';
 import 'theme/app_theme.dart';
 
 class RotaApp extends StatefulWidget {
-  const RotaApp({required this.controller, super.key});
+  const RotaApp({
+    required this.controller,
+    this.reminderScheduler = const NoopReminderScheduler(),
+    super.key,
+  });
 
   final PlannerController controller;
+  final ReminderScheduler reminderScheduler;
 
   @override
   State<RotaApp> createState() => _RotaAppState();
@@ -36,16 +43,19 @@ class _RotaAppState extends State<RotaApp> with WidgetsBindingObserver {
 
   @override
   Widget build(BuildContext context) {
-    return PlannerScope(
-      controller: widget.controller,
-      child: MaterialApp(
-        onGenerateTitle: (context) => AppLocalizations.of(context).appTitle,
-        debugShowCheckedModeBanner: false,
-        theme: AppTheme.light(),
-        darkTheme: AppTheme.dark(),
-        localizationsDelegates: AppLocalizations.localizationsDelegates,
-        supportedLocales: AppLocalizations.supportedLocales,
-        home: const _StartupGate(),
+    return ReminderScope(
+      scheduler: widget.reminderScheduler,
+      child: PlannerScope(
+        controller: widget.controller,
+        child: MaterialApp(
+          onGenerateTitle: (context) => AppLocalizations.of(context).appTitle,
+          debugShowCheckedModeBanner: false,
+          theme: AppTheme.light(),
+          darkTheme: AppTheme.dark(),
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          home: const _StartupGate(),
+        ),
       ),
     );
   }
