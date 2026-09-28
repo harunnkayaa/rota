@@ -1724,6 +1724,12 @@ abstract class AppLocalizations {
   /// **'Giriş yapmadan önce e-postanı onaylaman gerekiyor.'**
   String get authEmailNotConfirmed;
 
+  /// No description provided for @authConfirmationSent.
+  ///
+  /// In tr, this message translates to:
+  /// **'{email} adresine bir onay bağlantısı gönderdik. Bağlantıya tıkladıktan sonra buradan giriş yap.'**
+  String authConfirmationSent(String email);
+
   /// No description provided for @authNetwork.
   ///
   /// In tr, this message translates to:

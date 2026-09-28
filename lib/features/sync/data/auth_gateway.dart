@@ -31,7 +31,10 @@ abstract interface class AuthGateway {
   Stream<String?> get userChanges;
 
   Future<void> signIn({required String email, required String password});
-  Future<void> signUp({required String email, required String password});
+
+  /// Returns false when the account still has to be confirmed by email
+  /// before anyone can sign in with it.
+  Future<bool> signUp({required String email, required String password});
   Future<void> signOut();
 }
 
@@ -55,8 +58,14 @@ class SupabaseAuthGateway implements AuthGateway {
       _guard(() => _auth.signInWithPassword(email: email, password: password));
 
   @override
-  Future<void> signUp({required String email, required String password}) =>
-      _guard(() => _auth.signUp(email: email, password: password));
+  Future<bool> signUp({required String email, required String password}) async {
+    AuthResponse? response;
+    await _guard(
+      () async =>
+          response = await _auth.signUp(email: email, password: password),
+    );
+    return response?.session != null;
+  }
 
   @override
   Future<void> signOut() => _auth.signOut();

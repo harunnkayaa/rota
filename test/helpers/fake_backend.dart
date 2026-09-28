@@ -10,6 +10,7 @@ class FakeServer {
   PlannerData? data;
   int _version = 0;
   bool offline = false;
+  bool requireEmailConfirmation = false;
   final passwords = <String, String>{};
 
   String? get marker => data == null ? null : 'v$_version';
@@ -47,13 +48,15 @@ class FakeAuth implements AuthGateway {
   }
 
   @override
-  Future<void> signUp({required String email, required String password}) async {
+  Future<bool> signUp({required String email, required String password}) async {
     server._check();
     if (server.passwords.containsKey(email)) {
       throw const SignInException(AuthFailure.emailTaken);
     }
     server.passwords[email] = password;
+    if (server.requireEmailConfirmation) return false;
     await signIn(email: email, password: password);
+    return true;
   }
 
   @override

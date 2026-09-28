@@ -18,6 +18,7 @@ class _AccountSectionState extends State<AccountSection> {
   final _email = TextEditingController();
   final _password = TextEditingController();
   String? _error;
+  String? _info;
   bool _busy = false;
 
   static const _minPasswordLength = 8;
@@ -46,10 +47,12 @@ class _AccountSectionState extends State<AccountSection> {
     setState(() {
       _busy = true;
       _error = null;
+      _info = null;
     });
     try {
       if (createAccount) {
-        await sync.signUp(email: email, password: password);
+        final signedIn = await sync.signUp(email: email, password: password);
+        if (!signedIn) setState(() => _info = l.authConfirmationSent(email));
       } else {
         await sync.signIn(email: email, password: password);
       }
@@ -133,6 +136,11 @@ class _AccountSectionState extends State<AccountSection> {
               decoration: InputDecoration(labelText: l.passwordLabel),
               onSubmitted: (_) => _submit(createAccount: false),
             ),
+            if (_info case final info?)
+              Padding(
+                padding: const EdgeInsets.only(top: AppSpacing.s),
+                child: Text(info),
+              ),
             if (_error case final error?)
               Padding(
                 padding: const EdgeInsets.only(top: AppSpacing.s),

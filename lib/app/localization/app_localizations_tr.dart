@@ -984,6 +984,11 @@ class AppLocalizationsTr extends AppLocalizations {
       'Giriş yapmadan önce e-postanı onaylaman gerekiyor.';
 
   @override
+  String authConfirmationSent(String email) {
+    return '$email adresine bir onay bağlantısı gönderdik. Bağlantıya tıkladıktan sonra buradan giriş yap.';
+  }
+
+  @override
   String get authNetwork =>
       'Sunucuya ulaşılamadı. İnternet bağlantını kontrol et.';
 

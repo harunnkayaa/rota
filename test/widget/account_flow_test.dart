@@ -65,6 +65,17 @@ void main() {
     sync.dispose();
   });
 
+  testWidgets('sign-up that needs email confirmation says so', (tester) async {
+    final server = FakeServer()..requireEmailConfirmation = true;
+    final (_, sync, _) = await _pump(tester, server: server);
+
+    await _fillAndTap(tester, 'Hesap oluştur');
+
+    expect(find.textContaining('onay bağlantısı gönderdik'), findsOneWidget);
+    expect(sync.status, SyncStatus.signedOut);
+    sync.dispose();
+  });
+
   testWidgets('wrong password is explained, no stack trace', (tester) async {
     final server = FakeServer()..passwords[_email] = 'something-else';
     final (_, sync, _) = await _pump(tester, server: server);

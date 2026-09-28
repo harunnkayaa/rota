@@ -267,7 +267,8 @@ class SyncService extends ChangeNotifier {
   Future<void> signIn({required String email, required String password}) =>
       auth!.signIn(email: email, password: password);
 
-  Future<void> signUp({required String email, required String password}) =>
+  /// False: a confirmation email was sent; sign in after confirming.
+  Future<bool> signUp({required String email, required String password}) =>
       auth!.signUp(email: email, password: password);
 
   /// Signs out; the data stays on this device.
