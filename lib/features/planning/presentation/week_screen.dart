@@ -9,6 +9,7 @@ import '../../../shared/widgets/debt_notice.dart';
 import '../../../shared/widgets/progress_line.dart';
 import '../../categories/presentation/category_style.dart';
 import '../domain/capacity.dart';
+import 'deadline_pace_section.dart';
 import 'plan_editor_sheet.dart';
 import 'planner_controller.dart';
 import 'redistribution_sheet.dart';
@@ -245,11 +246,14 @@ class _WeekGoalCard extends StatelessWidget {
               ],
             ),
             const SizedBox(height: AppSpacing.m),
-            ProgressLine(
-              label: l.weekLabel,
-              done: view.periodDone,
-              target: view.period.targetValue,
-            ),
+            if (view.isDeadline)
+              DeadlinePaceSection(view: view)
+            else
+              ProgressLine(
+                label: l.weekLabel,
+                done: view.periodDone,
+                target: view.period.targetValue,
+              ),
             if (view.surplus > 0) ...[
               const SizedBox(height: AppSpacing.s),
               Text(
@@ -265,7 +269,8 @@ class _WeekGoalCard extends StatelessWidget {
                     child: _DayCell(
                       day: day,
                       isToday: day.date == controller.today,
-                      onTap: day.date.isBefore(controller.today)
+                      onTap:
+                          !day.inPeriod || day.date.isBefore(controller.today)
                           ? null
                           : () => showPlanEditorSheet(
                               context,

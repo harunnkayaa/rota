@@ -15,6 +15,7 @@ import '../data/planner_data.dart';
 import '../data/planner_json.dart';
 import '../data/planner_storage.dart';
 import '../domain/capacity.dart';
+import '../domain/deadline_pace.dart';
 import '../domain/plan_editing.dart';
 import '../domain/progress_calculator.dart';
 import '../domain/redistribution.dart';
@@ -194,20 +195,183 @@ class PlannerController extends ChangeNotifier {
     );
     _goals.add(goal);
     _periods.add(period);
-    for (final MapEntry(key: date, value: minutes) in dailyPlan.entries) {
-      if (minutes == 0) continue;
-      _allocations.add(
-        DailyAllocation(
-          id: generateUuidV4(),
-          goalPeriodId: period.id,
-          date: date,
-          allocatedValue: minutes,
-        ),
-      );
-    }
+    _allocations.addAll(_allocationsFor(period.id, dailyPlan));
     _commit();
     return period;
   }
+
+  /// Creates a goal with a due date ("PTE sınavı, 15 Kasım, 40 saat").
+  /// Work is planned from today until the day before [dueDate].
+  GoalPeriod createDeadlineGoal({
+    required String categoryId,
+    required String title,
+    required int totalMinutes,
+    required LocalDate dueDate,
+    required Map<LocalDate, int> dailyPlan,
+  }) {
+    final category = _categories.firstWhere((c) => c.id == categoryId);
+    if (!today.isBefore(dueDate)) {
+      throw ArgumentError.value(dueDate, 'dueDate', 'Must be after today');
+    }
+    final range = PeriodRange(today, dueDate);
+    if (dailyPlan.keys.any((d) => !range.contains(d))) {
+      throw ArgumentError('Daily plan must stay inside $range.');
+    }
+    final goal = Goal(
+      id: generateUuidV4(),
+      categoryId: categoryId,
+      title: title,
+      goalType: GoalType.deadline,
+      measurementType: MeasurementType.durationMinutes,
+      isSensitive: category.isSensitive,
+    );
+    final period = GoalPeriod(
+      id: generateUuidV4(),
+      goalId: goal.id,
+      periodType: PeriodType.custom,
+      range: range,
+      targetValue: totalMinutes,
+    );
+    _goals.add(goal);
+    _periods.add(period);
+    _allocations.addAll(_allocationsFor(period.id, dailyPlan));
+    _commit();
+    return period;
+  }
+
+  /// Pace of a deadline goal that is still being filled in on the form.
+  DeadlinePace previewDeadline({
+    required int totalMinutes,
+    required LocalDate dueDate,
+    required Map<LocalDate, int> dailyPlan,
+  }) {
+    const draftId = 'draft';
+    final period = GoalPeriod(
+      id: draftId,
+      goalId: draftId,
+      periodType: PeriodType.custom,
+      range: PeriodRange(today, dueDate),
+      targetValue: totalMinutes,
+    );
+    return computeDeadlinePace(
+      period: period,
+      allocations: _allocationsFor(draftId, dailyPlan),
+      entries: const [],
+      today: today,
+      week: currentWeek,
+      freeCapacityOn: freeCapacityFor,
+    );
+  }
+
+  /// Capacity left on [day] after every goal except [periodId]; a goal's
+  /// own plan is time it may use.
+  int freeCapacityFor(LocalDate day, {String? periodId}) => max(
+    0,
+    capacity.capacityOn(day) -
+        plannedOnExcluding(day, excludePeriodId: periodId),
+  );
+
+  /// Changes a goal's total target; progress is kept and every derived
+  /// number (pace, remaining, debt) follows automatically.
+  void updateTarget(String periodId, int targetMinutes) {
+    final index = _periods.indexWhere((p) => p.id == periodId);
+    _periods[index] = _periods[index].withTarget(targetMinutes);
+    _commit();
+  }
+
+  /// Other flexible goals with time planned but not yet done on the days a
+  /// deadline goal could catch up. Only these may give time, and only with
+  /// the user's explicit choice.
+  List<GoalProgressView> catchUpDonors(String periodId) {
+    final days = _catchUpDays(_period(periodId)).toSet();
+    return [
+      for (final v in activeGoals())
+        if (v.period.id != periodId &&
+            v.goal.goalType.isRedistributable &&
+            v.days.any((d) => days.contains(d.date) && d.shortfall > 0))
+          v,
+    ];
+  }
+
+  CatchUpProposal proposeCatchUpFor(
+    String periodId, {
+    Set<String> donorPeriodIds = const {},
+  }) {
+    final period = _period(periodId);
+    final days = _catchUpDays(period);
+    return proposeCatchUp(
+      gap: _view(period).pace?.thisWeekGap ?? 0,
+      days: days,
+      freeCapacityOn: (d) => capacityOn(d).free,
+      donors: [
+        for (final v in catchUpDonors(periodId))
+          if (donorPeriodIds.contains(v.period.id))
+            DonorPlan(
+              periodId: v.period.id,
+              plannedByDay: {
+                for (final d in v.days)
+                  if (days.contains(d.date) && d.shortfall > 0)
+                    d.date: d.shortfall,
+              },
+            ),
+      ],
+    );
+  }
+
+  /// Applies a catch-up the user accepted: adds to the deadline goal and
+  /// takes the same minutes from the chosen goals, all in one save.
+  void applyCatchUp(String periodId, CatchUpProposal proposal) {
+    int allocated(String id, LocalDate day) => _allocations
+        .where((a) => a.goalPeriodId == id && a.date == day)
+        .fold(0, (sum, a) => sum + a.allocatedValue);
+
+    var updated = List.of(_allocations);
+    final changes = {
+      periodId: {
+        for (final MapEntry(key: day, value: extra)
+            in proposal.additions.entries)
+          day: allocated(periodId, day) + extra,
+      },
+      for (final MapEntry(key: donorId, value: byDay)
+          in proposal.reductions.entries)
+        donorId: {
+          for (final MapEntry(key: day, value: taken) in byDay.entries)
+            day: allocated(donorId, day) - taken,
+        },
+    };
+    for (final MapEntry(key: id, value: dayChanges) in changes.entries) {
+      updated = applyPlanChanges(
+        period: _period(id),
+        allocations: updated,
+        changes: dayChanges,
+        today: today,
+        newId: generateUuidV4,
+      );
+    }
+    _allocations
+      ..clear()
+      ..addAll(updated);
+    _commit();
+  }
+
+  List<LocalDate> _catchUpDays(GoalPeriod period) => [
+    for (final d in currentWeek.days)
+      if (!d.isBefore(today) && period.range.contains(d)) d,
+  ];
+
+  List<DailyAllocation> _allocationsFor(
+    String periodId,
+    Map<LocalDate, int> plan,
+  ) => [
+    for (final MapEntry(key: date, value: minutes) in plan.entries)
+      if (minutes > 0)
+        DailyAllocation(
+          id: periodId == 'draft' ? 'draft-$date' : generateUuidV4(),
+          goalPeriodId: periodId,
+          date: date,
+          allocatedValue: minutes,
+        ),
+  ];
 
   /// Records work done today. Throws [ProgressRejectedException] when a
   /// domain rule forbids it; the UI turns the reason into a message.
@@ -304,6 +468,14 @@ class PlannerController extends ChangeNotifier {
       today: today,
       newId: () => 'preview',
     );
+    if (_goal(period.goalId).goalType == GoalType.deadline) {
+      final pace = _pace(period, draft);
+      return PlanPreview(
+        remainingTarget: max(0, pace.requiredThisWeek - pace.doneThisWeek),
+        remainingPlanned: pace.plannedRestOfWeek,
+        weekPace: true,
+      );
+    }
     return PlanPreview(
       remainingTarget: remainingTarget(period, _entries),
       remainingPlanned: remainingPlanned(
@@ -404,35 +576,52 @@ class PlannerController extends ChangeNotifier {
       return null;
     }
 
+    final isDeadline = goal.goalType == GoalType.deadline;
     return GoalProgressView(
       period: period,
       goal: goal,
+      pace: isDeadline ? _pace(period, _allocations) : null,
       category: _categories.firstWhere((c) => c.id == goal.categoryId),
       todayAllocated: allocatedOn(today),
       todayDone: dailyProgress(period, today, _entries),
       periodDone: periodProgress(period, _entries),
-      debt: _debt(period),
-      surplus: max(
-        0,
-        remainingPlanned(
-              period: period,
-              allocations: _allocations,
-              entries: _entries,
-              today: today,
-            ) -
-            remainingTarget(period, _entries),
-      ),
+      // A deadline goal spans many weeks: its plan beyond this week is
+      // intentionally empty, so it is judged by pace, not by debt.
+      debt: isDeadline ? 0 : _debt(period),
+      surplus: isDeadline
+          ? 0
+          : max(
+              0,
+              remainingPlanned(
+                    period: period,
+                    allocations: _allocations,
+                    entries: _entries,
+                    today: today,
+                  ) -
+                  remainingTarget(period, _entries),
+            ),
       days: [
-        for (final d in period.range.days)
+        for (final d in currentWeek.days)
           DayProgress(
             date: d,
             allocated: allocatedOn(d) ?? 0,
             done: dailyProgress(period, d, _entries),
             today: today,
+            inPeriod: period.range.contains(d),
           ),
       ],
     );
   }
+
+  DeadlinePace _pace(GoalPeriod period, List<DailyAllocation> allocations) =>
+      computeDeadlinePace(
+        period: period,
+        allocations: allocations,
+        entries: _entries,
+        today: today,
+        week: currentWeek,
+        freeCapacityOn: (d) => freeCapacityFor(d, periodId: period.id),
+      );
 
   int _debt(GoalPeriod period) => unplannedRemaining(
     period: period,
@@ -479,6 +668,7 @@ class GoalProgressView {
     required this.period,
     required this.goal,
     required this.category,
+    required this.pace,
     required this.todayAllocated,
     required this.todayDone,
     required this.periodDone,
@@ -490,6 +680,11 @@ class GoalProgressView {
   final GoalPeriod period;
   final Goal goal;
   final GoalCategory category;
+
+  /// Set for goals with a due date; null for weekly goals.
+  final DeadlinePace? pace;
+
+  bool get isDeadline => pace != null;
 
   /// Null when nothing is planned for today.
   final int? todayAllocated;
@@ -522,12 +717,17 @@ class DayProgress {
     required this.allocated,
     required this.done,
     required LocalDate today,
+    this.inPeriod = true,
   }) : _today = today;
 
   final LocalDate date;
   final int allocated;
   final int done;
   final LocalDate _today;
+
+  /// False for days of this week outside the goal's own dates (a deadline
+  /// goal that starts mid-week or ends before Sunday).
+  final bool inPeriod;
 
   int get shortfall => allocated > done ? allocated - done : 0;
 
@@ -547,10 +747,15 @@ class PlanPreview {
   const PlanPreview({
     required this.remainingTarget,
     required this.remainingPlanned,
+    this.weekPace = false,
   });
 
   final int remainingTarget;
   final int remainingPlanned;
+
+  /// True for deadline goals: the numbers are this week's pace share, not
+  /// the whole target.
+  final bool weekPace;
 }
 
 @immutable

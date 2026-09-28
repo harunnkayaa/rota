@@ -419,7 +419,7 @@ abstract class AppLocalizations {
   /// No description provided for @createGoalTitle.
   ///
   /// In tr, this message translates to:
-  /// **'Yeni haftalık hedef'**
+  /// **'Yeni hedef'**
   String get createGoalTitle;
 
   /// No description provided for @sectionCategory.
@@ -877,6 +877,270 @@ abstract class AppLocalizations {
   /// In tr, this message translates to:
   /// **'{day} planı'**
   String dayPlanTitle(String day);
+
+  /// No description provided for @sectionGoalKind.
+  ///
+  /// In tr, this message translates to:
+  /// **'Hedef türü'**
+  String get sectionGoalKind;
+
+  /// No description provided for @goalKindWeekly.
+  ///
+  /// In tr, this message translates to:
+  /// **'Haftalık'**
+  String get goalKindWeekly;
+
+  /// No description provided for @goalKindDeadline.
+  ///
+  /// In tr, this message translates to:
+  /// **'Tarihli'**
+  String get goalKindDeadline;
+
+  /// No description provided for @goalKindWeeklyHint.
+  ///
+  /// In tr, this message translates to:
+  /// **'Her hafta tekrarlanan çalışma: haftada 10 sa proje.'**
+  String get goalKindWeeklyHint;
+
+  /// No description provided for @goalKindDeadlineHint.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bir tarihe yetişmesi gereken iş: 15 Kasım\'daki sınava 40 sa hazırlık.'**
+  String get goalKindDeadlineHint;
+
+  /// No description provided for @sectionDueDate.
+  ///
+  /// In tr, this message translates to:
+  /// **'Tarih'**
+  String get sectionDueDate;
+
+  /// No description provided for @dueDateHint.
+  ///
+  /// In tr, this message translates to:
+  /// **'Sınav, mülakat veya teslim günü. Çalışma bu günden öncesine planlanır.'**
+  String get dueDateHint;
+
+  /// No description provided for @pickDueDate.
+  ///
+  /// In tr, this message translates to:
+  /// **'Tarih seç'**
+  String get pickDueDate;
+
+  /// No description provided for @dueDateValue.
+  ///
+  /// In tr, this message translates to:
+  /// **'{date} · {days} gün kaldı'**
+  String dueDateValue(String date, String days);
+
+  /// No description provided for @sectionTotalTarget.
+  ///
+  /// In tr, this message translates to:
+  /// **'Toplam hedef'**
+  String get sectionTotalTarget;
+
+  /// No description provided for @totalTargetHint.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bu tarihe kadar toplam ne kadar çalışmak istiyorsun?'**
+  String get totalTargetHint;
+
+  /// No description provided for @errorDueDate.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bugünden sonraki bir tarih seç.'**
+  String get errorDueDate;
+
+  /// No description provided for @errorTotalRequired.
+  ///
+  /// In tr, this message translates to:
+  /// **'Toplam hedef 0\'dan büyük olmalı.'**
+  String get errorTotalRequired;
+
+  /// No description provided for @pacePerWeek.
+  ///
+  /// In tr, this message translates to:
+  /// **'Haftada ~{amount} gerekiyor'**
+  String pacePerWeek(String amount);
+
+  /// No description provided for @paceFeasible.
+  ///
+  /// In tr, this message translates to:
+  /// **'Mevcut kapasitenle bu tarihe yetişebilirsin.'**
+  String get paceFeasible;
+
+  /// No description provided for @paceShortfall.
+  ///
+  /// In tr, this message translates to:
+  /// **'Mevcut kapasitenle {amount} eksik kalır.'**
+  String paceShortfall(String amount);
+
+  /// No description provided for @pickDateFirst.
+  ///
+  /// In tr, this message translates to:
+  /// **'Günlük planı görmek için önce tarihi ve toplam hedefi seç.'**
+  String get pickDateFirst;
+
+  /// No description provided for @weekPaceLabel.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bu haftanın temposu'**
+  String get weekPaceLabel;
+
+  /// No description provided for @totalLabel.
+  ///
+  /// In tr, this message translates to:
+  /// **'Toplam'**
+  String get totalLabel;
+
+  /// No description provided for @deadlineStatusOnTrack.
+  ///
+  /// In tr, this message translates to:
+  /// **'Yolunda'**
+  String get deadlineStatusOnTrack;
+
+  /// No description provided for @deadlineStatusBehind.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bu hafta {amount} açık'**
+  String deadlineStatusBehind(String amount);
+
+  /// No description provided for @deadlineStatusNotFeasible.
+  ///
+  /// In tr, this message translates to:
+  /// **'{amount} eksik kalıyor'**
+  String deadlineStatusNotFeasible(String amount);
+
+  /// No description provided for @deadlineStatusCompleted.
+  ///
+  /// In tr, this message translates to:
+  /// **'Tamamlandı'**
+  String get deadlineStatusCompleted;
+
+  /// No description provided for @deadlineStatusOverdue.
+  ///
+  /// In tr, this message translates to:
+  /// **'Tarih geçti'**
+  String get deadlineStatusOverdue;
+
+  /// No description provided for @paceBehindNotice.
+  ///
+  /// In tr, this message translates to:
+  /// **'Tempoya yetişmek için bu hafta {amount} daha planlaman gerekiyor.'**
+  String paceBehindNotice(String amount);
+
+  /// No description provided for @paceNotFeasibleNotice.
+  ///
+  /// In tr, this message translates to:
+  /// **'Mevcut planla {date} tarihine {amount} eksikle varırsın.'**
+  String paceNotFeasibleNotice(String date, String amount);
+
+  /// No description provided for @paceOptions.
+  ///
+  /// In tr, this message translates to:
+  /// **'Seçenekler'**
+  String get paceOptions;
+
+  /// No description provided for @catchUpTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Tempoyu yakala'**
+  String get catchUpTitle;
+
+  /// No description provided for @catchUpGap.
+  ///
+  /// In tr, this message translates to:
+  /// **'Tempoya yetişmek için bu hafta {amount} daha gerekiyor.'**
+  String catchUpGap(String amount);
+
+  /// No description provided for @catchUpFromFree.
+  ///
+  /// In tr, this message translates to:
+  /// **'Boş zamanından'**
+  String get catchUpFromFree;
+
+  /// No description provided for @catchUpFromOthers.
+  ///
+  /// In tr, this message translates to:
+  /// **'Diğer hedeflerden'**
+  String get catchUpFromOthers;
+
+  /// No description provided for @catchUpDonorsTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Başka hedeften süre al'**
+  String get catchUpDonorsTitle;
+
+  /// No description provided for @catchUpDonorsHint.
+  ///
+  /// In tr, this message translates to:
+  /// **'Seçtiğin hedefin bu haftaki planından alınır; o günün toplam yükü değişmez.'**
+  String get catchUpDonorsHint;
+
+  /// No description provided for @catchUpDonorPlanned.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bu hafta {amount} planlı'**
+  String catchUpDonorPlanned(String amount);
+
+  /// No description provided for @catchUpShortfall.
+  ///
+  /// In tr, this message translates to:
+  /// **'{amount} bu haftaya sığmıyor. Başka bir hedeften süre alabilir ya da toplam hedefi düşürebilirsin.'**
+  String catchUpShortfall(String amount);
+
+  /// No description provided for @catchUpNoDays.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bu hafta telafi edilecek gün kalmadı; tempo gelecek haftaya yansıyacak.'**
+  String get catchUpNoDays;
+
+  /// No description provided for @catchUpNothingNeeded.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bu haftanın temposu karşılanıyor.'**
+  String get catchUpNothingNeeded;
+
+  /// No description provided for @catchUpReduction.
+  ///
+  /// In tr, this message translates to:
+  /// **'{goal}: −{amount}'**
+  String catchUpReduction(String goal, String amount);
+
+  /// No description provided for @changeTotalTarget.
+  ///
+  /// In tr, this message translates to:
+  /// **'Toplam hedefi değiştir'**
+  String get changeTotalTarget;
+
+  /// No description provided for @targetUpdated.
+  ///
+  /// In tr, this message translates to:
+  /// **'Hedef güncellendi'**
+  String get targetUpdated;
+
+  /// No description provided for @planWeekPaceOf.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bu hafta planlanan {planned} / tempo {target}'**
+  String planWeekPaceOf(String planned, String target);
+
+  /// No description provided for @planWeekPaceMissing.
+  ///
+  /// In tr, this message translates to:
+  /// **'Tempo için bu hafta {amount} daha planla.'**
+  String planWeekPaceMissing(String amount);
+
+  /// No description provided for @planWeekPaceOver.
+  ///
+  /// In tr, this message translates to:
+  /// **'Tempodan {amount} fazla planladın.'**
+  String planWeekPaceOver(String amount);
+
+  /// No description provided for @planWeekPaceCovers.
+  ///
+  /// In tr, this message translates to:
+  /// **'Plan bu haftanın temposunu karşılıyor.'**
+  String get planWeekPaceCovers;
 }
 
 class _AppLocalizationsDelegate

@@ -166,7 +166,7 @@
   },
   "dayStatusToday": "Bugün",
   "dayStatusUpcoming": "Planlandı",
-  "createGoalTitle": "Yeni haftalık hedef",
+  "createGoalTitle": "Yeni hedef",
   "sectionCategory": "Kategori",
   "newCategory": "Yeni kategori",
   "newCategoryName": "Kategori adı",
@@ -430,5 +430,159 @@
         "type": "String"
       }
     }
-  }
+  },
+  "sectionGoalKind": "Hedef türü",
+  "goalKindWeekly": "Haftalık",
+  "goalKindDeadline": "Tarihli",
+  "goalKindWeeklyHint": "Her hafta tekrarlanan çalışma: haftada 10 sa proje.",
+  "goalKindDeadlineHint": "Bir tarihe yetişmesi gereken iş: 15 Kasım'daki sınava 40 sa hazırlık.",
+  "sectionDueDate": "Tarih",
+  "dueDateHint": "Sınav, mülakat veya teslim günü. Çalışma bu günden öncesine planlanır.",
+  "pickDueDate": "Tarih seç",
+  "dueDateValue": "{date} · {days} gün kaldı",
+  "@dueDateValue": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      },
+      "days": {
+        "type": "String"
+      }
+    }
+  },
+  "sectionTotalTarget": "Toplam hedef",
+  "totalTargetHint": "Bu tarihe kadar toplam ne kadar çalışmak istiyorsun?",
+  "errorDueDate": "Bugünden sonraki bir tarih seç.",
+  "errorTotalRequired": "Toplam hedef 0'dan büyük olmalı.",
+  "pacePerWeek": "Haftada ~{amount} gerekiyor",
+  "@pacePerWeek": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "paceFeasible": "Mevcut kapasitenle bu tarihe yetişebilirsin.",
+  "paceShortfall": "Mevcut kapasitenle {amount} eksik kalır.",
+  "@paceShortfall": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "pickDateFirst": "Günlük planı görmek için önce tarihi ve toplam hedefi seç.",
+  "weekPaceLabel": "Bu haftanın temposu",
+  "totalLabel": "Toplam",
+  "deadlineStatusOnTrack": "Yolunda",
+  "deadlineStatusBehind": "Bu hafta {amount} açık",
+  "@deadlineStatusBehind": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "deadlineStatusNotFeasible": "{amount} eksik kalıyor",
+  "@deadlineStatusNotFeasible": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "deadlineStatusCompleted": "Tamamlandı",
+  "deadlineStatusOverdue": "Tarih geçti",
+  "paceBehindNotice": "Tempoya yetişmek için bu hafta {amount} daha planlaman gerekiyor.",
+  "@paceBehindNotice": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "paceNotFeasibleNotice": "Mevcut planla {date} tarihine {amount} eksikle varırsın.",
+  "@paceNotFeasibleNotice": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      },
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "paceOptions": "Seçenekler",
+  "catchUpTitle": "Tempoyu yakala",
+  "catchUpGap": "Tempoya yetişmek için bu hafta {amount} daha gerekiyor.",
+  "@catchUpGap": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "catchUpFromFree": "Boş zamanından",
+  "catchUpFromOthers": "Diğer hedeflerden",
+  "catchUpDonorsTitle": "Başka hedeften süre al",
+  "catchUpDonorsHint": "Seçtiğin hedefin bu haftaki planından alınır; o günün toplam yükü değişmez.",
+  "catchUpDonorPlanned": "Bu hafta {amount} planlı",
+  "@catchUpDonorPlanned": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "catchUpShortfall": "{amount} bu haftaya sığmıyor. Başka bir hedeften süre alabilir ya da toplam hedefi düşürebilirsin.",
+  "@catchUpShortfall": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "catchUpNoDays": "Bu hafta telafi edilecek gün kalmadı; tempo gelecek haftaya yansıyacak.",
+  "catchUpNothingNeeded": "Bu haftanın temposu karşılanıyor.",
+  "catchUpReduction": "{goal}: −{amount}",
+  "@catchUpReduction": {
+    "placeholders": {
+      "goal": {
+        "type": "String"
+      },
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "changeTotalTarget": "Toplam hedefi değiştir",
+  "targetUpdated": "Hedef güncellendi",
+  "planWeekPaceOf": "Bu hafta planlanan {planned} / tempo {target}",
+  "@planWeekPaceOf": {
+    "placeholders": {
+      "planned": {
+        "type": "String"
+      },
+      "target": {
+        "type": "String"
+      }
+    }
+  },
+  "planWeekPaceMissing": "Tempo için bu hafta {amount} daha planla.",
+  "@planWeekPaceMissing": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "planWeekPaceOver": "Tempodan {amount} fazla planladın.",
+  "@planWeekPaceOver": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "planWeekPaceCovers": "Plan bu haftanın temposunu karşılıyor."
 }

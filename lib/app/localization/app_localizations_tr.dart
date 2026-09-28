@@ -203,7 +203,7 @@ class AppLocalizationsTr extends AppLocalizations {
   String get dayStatusUpcoming => 'Planlandı';
 
   @override
-  String get createGoalTitle => 'Yeni haftalık hedef';
+  String get createGoalTitle => 'Yeni hedef';
 
   @override
   String get sectionCategory => 'Kategori';
@@ -482,4 +482,171 @@ class AppLocalizationsTr extends AppLocalizations {
   String dayPlanTitle(String day) {
     return '$day planı';
   }
+
+  @override
+  String get sectionGoalKind => 'Hedef türü';
+
+  @override
+  String get goalKindWeekly => 'Haftalık';
+
+  @override
+  String get goalKindDeadline => 'Tarihli';
+
+  @override
+  String get goalKindWeeklyHint =>
+      'Her hafta tekrarlanan çalışma: haftada 10 sa proje.';
+
+  @override
+  String get goalKindDeadlineHint =>
+      'Bir tarihe yetişmesi gereken iş: 15 Kasım\'daki sınava 40 sa hazırlık.';
+
+  @override
+  String get sectionDueDate => 'Tarih';
+
+  @override
+  String get dueDateHint =>
+      'Sınav, mülakat veya teslim günü. Çalışma bu günden öncesine planlanır.';
+
+  @override
+  String get pickDueDate => 'Tarih seç';
+
+  @override
+  String dueDateValue(String date, String days) {
+    return '$date · $days gün kaldı';
+  }
+
+  @override
+  String get sectionTotalTarget => 'Toplam hedef';
+
+  @override
+  String get totalTargetHint =>
+      'Bu tarihe kadar toplam ne kadar çalışmak istiyorsun?';
+
+  @override
+  String get errorDueDate => 'Bugünden sonraki bir tarih seç.';
+
+  @override
+  String get errorTotalRequired => 'Toplam hedef 0\'dan büyük olmalı.';
+
+  @override
+  String pacePerWeek(String amount) {
+    return 'Haftada ~$amount gerekiyor';
+  }
+
+  @override
+  String get paceFeasible => 'Mevcut kapasitenle bu tarihe yetişebilirsin.';
+
+  @override
+  String paceShortfall(String amount) {
+    return 'Mevcut kapasitenle $amount eksik kalır.';
+  }
+
+  @override
+  String get pickDateFirst =>
+      'Günlük planı görmek için önce tarihi ve toplam hedefi seç.';
+
+  @override
+  String get weekPaceLabel => 'Bu haftanın temposu';
+
+  @override
+  String get totalLabel => 'Toplam';
+
+  @override
+  String get deadlineStatusOnTrack => 'Yolunda';
+
+  @override
+  String deadlineStatusBehind(String amount) {
+    return 'Bu hafta $amount açık';
+  }
+
+  @override
+  String deadlineStatusNotFeasible(String amount) {
+    return '$amount eksik kalıyor';
+  }
+
+  @override
+  String get deadlineStatusCompleted => 'Tamamlandı';
+
+  @override
+  String get deadlineStatusOverdue => 'Tarih geçti';
+
+  @override
+  String paceBehindNotice(String amount) {
+    return 'Tempoya yetişmek için bu hafta $amount daha planlaman gerekiyor.';
+  }
+
+  @override
+  String paceNotFeasibleNotice(String date, String amount) {
+    return 'Mevcut planla $date tarihine $amount eksikle varırsın.';
+  }
+
+  @override
+  String get paceOptions => 'Seçenekler';
+
+  @override
+  String get catchUpTitle => 'Tempoyu yakala';
+
+  @override
+  String catchUpGap(String amount) {
+    return 'Tempoya yetişmek için bu hafta $amount daha gerekiyor.';
+  }
+
+  @override
+  String get catchUpFromFree => 'Boş zamanından';
+
+  @override
+  String get catchUpFromOthers => 'Diğer hedeflerden';
+
+  @override
+  String get catchUpDonorsTitle => 'Başka hedeften süre al';
+
+  @override
+  String get catchUpDonorsHint =>
+      'Seçtiğin hedefin bu haftaki planından alınır; o günün toplam yükü değişmez.';
+
+  @override
+  String catchUpDonorPlanned(String amount) {
+    return 'Bu hafta $amount planlı';
+  }
+
+  @override
+  String catchUpShortfall(String amount) {
+    return '$amount bu haftaya sığmıyor. Başka bir hedeften süre alabilir ya da toplam hedefi düşürebilirsin.';
+  }
+
+  @override
+  String get catchUpNoDays =>
+      'Bu hafta telafi edilecek gün kalmadı; tempo gelecek haftaya yansıyacak.';
+
+  @override
+  String get catchUpNothingNeeded => 'Bu haftanın temposu karşılanıyor.';
+
+  @override
+  String catchUpReduction(String goal, String amount) {
+    return '$goal: −$amount';
+  }
+
+  @override
+  String get changeTotalTarget => 'Toplam hedefi değiştir';
+
+  @override
+  String get targetUpdated => 'Hedef güncellendi';
+
+  @override
+  String planWeekPaceOf(String planned, String target) {
+    return 'Bu hafta planlanan $planned / tempo $target';
+  }
+
+  @override
+  String planWeekPaceMissing(String amount) {
+    return 'Tempo için bu hafta $amount daha planla.';
+  }
+
+  @override
+  String planWeekPaceOver(String amount) {
+    return 'Tempodan $amount fazla planladın.';
+  }
+
+  @override
+  String get planWeekPaceCovers => 'Plan bu haftanın temposunu karşılıyor.';
 }

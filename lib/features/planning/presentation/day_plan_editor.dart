@@ -176,23 +176,31 @@ class _DayRow extends StatelessWidget {
   }
 }
 
+/// What a [PlanSummary] compares.
+enum PlanSummaryMode {
+  /// A new weekly goal: the whole plan against the weekly target.
+  weeklyTarget,
+
+  /// Editing a weekly goal: plan from today on against what is left. Past
+  /// days are settled, so making up a short Monday counts as covered.
+  remaining,
+
+  /// A deadline goal: this week's plan against this week's pace share.
+  weekPace,
+}
+
 /// Planned vs. target with a bar and a plain-language status line.
-///
-/// Creating a goal compares the whole plan with the weekly target. Editing
-/// an existing goal compares only what is left ([editing]): past days are
-/// settled, so extra minutes that make up for a short Monday count as
-/// "covered", not as "over target".
 class PlanSummary extends StatelessWidget {
   const PlanSummary({
     required this.planned,
     required this.target,
-    this.editing = false,
+    this.mode = PlanSummaryMode.weeklyTarget,
     super.key,
   });
 
   final int planned;
   final int target;
-  final bool editing;
+  final PlanSummaryMode mode;
 
   @override
   Widget build(BuildContext context) {
@@ -200,38 +208,52 @@ class PlanSummary extends StatelessWidget {
     final theme = Theme.of(context);
     final scheme = theme.colorScheme;
     final gap = target - planned;
+    final plannedText = l.minutes(planned);
+    final targetText = l.minutes(target);
+    final gapText = l.minutes(gap.abs());
 
+    final title = switch (mode) {
+      PlanSummaryMode.weeklyTarget => l.planDistributed(
+        plannedText,
+        targetText,
+      ),
+      PlanSummaryMode.remaining => l.planRemainingOf(plannedText, targetText),
+      PlanSummaryMode.weekPace => l.planWeekPaceOf(plannedText, targetText),
+    };
     final (IconData icon, Color color, String message) = switch (gap) {
       > 0 => (
         Icons.info_outline,
         scheme.tertiary,
-        editing
-            ? l.planDebt(l.minutes(gap))
-            : l.planUnallocated(l.minutes(gap)),
+        switch (mode) {
+          PlanSummaryMode.weeklyTarget => l.planUnallocated(gapText),
+          PlanSummaryMode.remaining => l.planDebt(gapText),
+          PlanSummaryMode.weekPace => l.planWeekPaceMissing(gapText),
+        },
       ),
       < 0 => (
         Icons.trending_up,
         scheme.primary,
-        editing
-            ? l.planOverRemaining(l.minutes(-gap))
-            : l.planOverTarget(l.minutes(-gap)),
+        switch (mode) {
+          PlanSummaryMode.weeklyTarget => l.planOverTarget(gapText),
+          PlanSummaryMode.remaining => l.planOverRemaining(gapText),
+          PlanSummaryMode.weekPace => l.planWeekPaceOver(gapText),
+        },
       ),
       _ => (
         Icons.check_circle,
         scheme.primary,
-        editing ? l.planCoversRemaining : l.planCovers,
+        switch (mode) {
+          PlanSummaryMode.weeklyTarget => l.planCovers,
+          PlanSummaryMode.remaining => l.planCoversRemaining,
+          PlanSummaryMode.weekPace => l.planWeekPaceCovers,
+        },
       ),
     };
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Text(
-          editing
-              ? l.planRemainingOf(l.minutes(planned), l.minutes(target))
-              : l.planDistributed(l.minutes(planned), l.minutes(target)),
-          style: theme.textTheme.titleMedium,
-        ),
+        Text(title, style: theme.textTheme.titleMedium),
         const SizedBox(height: AppSpacing.s),
         LinearProgressIndicator(
           value: target == 0 ? 0 : (planned / target).clamp(0, 1),

@@ -10,9 +10,19 @@
 | Phase 0 — Domain ve planlama motoru | ✅ | `LocalDate`, `PeriodRange`, hedef/dönem/günlük plan/ilerleme modelleri, ilerleme hesabı (mükerrer sayım yok), kapasite, açık (goal debt), yeniden dağıtım, dönem kapanışı ve carry-over. Saf Dart, testli. |
 | Phase 1 — Yerel dikey dilim | ✅ | Bugün / Hafta / Hedef oluşturma ekranları, cihazda kalıcı kayıt (`shared_preferences`, JSON, `schema_version: 1`), açık/koyu tema, Türkçe metinler (gen-l10n). |
 | Kullanıcı istekleri (26.09) | ✅ | Her güne ayrı süre; planı Bugün ve Hafta ekranından düzenleme; geçmiş günler kilitli; eksik gün sonradan telafi edilince "fazla planlandı" denmiyor (kalan plan ↔ kalan hedef). |
+| Hedef tarihi rotası (28.09) | ✅ | Tarihli hedef (sınav/mülakat/teslim): kalan süre, haftalık tempo, bu haftanın payı, kapasiteye göre yetişme riski. Geride kalınca "Tempoyu yakala": önce boş zamandan, yetmezse **kullanıcının seçtiği** hedeflerden süre alır; toplam hedef değiştirilebilir. Motor: `planning/domain/deadline_pace.dart`. |
 
-Doğrulama: 126 test geçiyor, `flutter analyze` temiz. Chrome'da ve iPhone 17
-simülatöründe elle denendi.
+Doğrulama: 148 test geçiyor, `flutter analyze` temiz.
+
+## ⚠️ Önce çözülmesi gereken eksik: haftalık hedefler yeni haftaya geçmiyor
+
+Haftalık hedef bir `calendarWeek` dönemi olarak oluşturuluyor; hafta bitince
+yeni dönem açılmıyor ve hedef Bugün ekranından kayboluyor (28.09'da
+görüldü). Önerilen çözüm: yeni hafta başladığında her aktif haftalık hedef
+için aynı haftalık hedefle yeni dönem açmak ve geçen haftanın gün dağılımını
+öneri olarak kopyalamak. Eksik kalan süre **otomatik taşınmaz** (CLAUDE.md
+§4.3); geçen haftanın sonucu snapshot olarak kapanır. Kullanıcı kararı:
+gün dağılımı kopyalansın mı, boş mu başlasın?
 
 ## Sıradaki adımlar (öncelik sırasıyla)
 

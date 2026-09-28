@@ -64,8 +64,12 @@ class _PlanEditorSheetState extends State<PlanEditorSheet> {
     final preview = controller.previewPlan(widget.periodId, _changes);
     final saved = {for (final d in view.days) d.date: d.allocated};
     final plan = {...saved, ..._changes};
+    // This week only: a deadline goal can span many weeks.
     final days = widget.onlyDate == null
-        ? view.period.range.days.toList()
+        ? [
+            for (final d in view.days)
+              if (d.inPeriod) d.date,
+          ]
         : [widget.onlyDate!];
 
     return Padding(
@@ -90,7 +94,9 @@ class _PlanEditorSheetState extends State<PlanEditorSheet> {
             PlanSummary(
               planned: preview.remainingPlanned,
               target: preview.remainingTarget,
-              editing: true,
+              mode: preview.weekPace
+                  ? PlanSummaryMode.weekPace
+                  : PlanSummaryMode.remaining,
             ),
             const SizedBox(height: AppSpacing.m),
             DayPlanEditor(

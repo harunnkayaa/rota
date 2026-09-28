@@ -6,6 +6,7 @@ import '../../../app/theme/app_theme.dart';
 import '../../../shared/widgets/debt_notice.dart';
 import '../../../shared/widgets/progress_line.dart';
 import '../../categories/presentation/category_style.dart';
+import '../../planning/presentation/deadline_pace_section.dart';
 import '../../planning/presentation/plan_editor_sheet.dart';
 import '../../planning/presentation/planner_controller.dart';
 import '../../planning/presentation/redistribution_sheet.dart';
@@ -62,11 +63,14 @@ class GoalCard extends StatelessWidget {
               emptyText: l.todayNoPlan,
             ),
             const SizedBox(height: AppSpacing.m),
-            ProgressLine(
-              label: l.weekLabel,
-              done: view.periodDone,
-              target: view.period.targetValue,
-            ),
+            if (view.isDeadline)
+              DeadlinePaceSection(view: view)
+            else
+              ProgressLine(
+                label: l.weekLabel,
+                done: view.periodDone,
+                target: view.period.targetValue,
+              ),
             if (view.debt > 0) ...[
               const SizedBox(height: AppSpacing.m),
               DebtNotice(
