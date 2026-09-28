@@ -1,0 +1,63 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  app:
+    name: Format, analyze, test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          flutter-version: 3.38.7
+          cache: true
+      - run: flutter pub get
+      - run: dart format --output=none --set-exit-if-changed lib test
+      - run: flutter analyze
+      # The end-to-end sync test skips itself here: no local backend.
+      - run: flutter test
+
+  backend:
+    name: Database and sync against Supabase
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: supabase/setup-cli@v3
+        with:
+          version: 2.118.0
+      - name: Start Supabase
+        run: >
+          supabase start
+          -x realtime,storage-api,imgproxy,edge-runtime,logflare,vector,supavisor,mailpit
+      - name: Database security tests
+        run: supabase test db
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          flutter-version: 3.38.7
+          cache: true
+      - run: flutter pub get
+      - name: Point the app at the CI backend
+        run: |
+          mkdir -p env
+          supabase status -o json | python3 -c "
+          import json, sys
+          d = json.load(sys.stdin)
+          json.dump({'SUPABASE_URL': d['API_URL'],
+                     'SUPABASE_PUBLISHABLE_KEY': d['PUBLISHABLE_KEY']},
+                    open('env/local.json', 'w'))
+          "
+      - name: End-to-end sync test
+        run: flutter test test/integration
