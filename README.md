@@ -11,7 +11,7 @@ and stay on course when real life gets in the way.**
 ![Dart](https://img.shields.io/badge/Dart-0175C2?logo=dart&logoColor=white)
 ![iOS](https://img.shields.io/badge/iOS-000000?logo=apple&logoColor=white)
 ![Web](https://img.shields.io/badge/Web-4285F4?logo=googlechrome&logoColor=white)
-![Tests](https://img.shields.io/badge/tests-208%20passing-2ea44f)
+![Tests](https://img.shields.io/badge/tests-231%20app%20%2B%2025%20db-2ea44f)
 ![Status](https://img.shields.io/badge/status-in%20development-orange)
 
 </div>
@@ -64,8 +64,10 @@ snapshots and explicit carry-over.
 - **Flutter / Dart** — one codebase for iPhone and web, responsive layout
   (bottom bar on phones, side rail on desktop), light & dark themes
 - **Feature-first architecture** — `domain` (pure Dart) · `data` · `presentation`
-- **Local-first** — data saved on device with a versioned schema; unreadable
-  data is never overwritten
+- **Local-first + sync** — the app works on a device copy (versioned schema,
+  unreadable data never overwritten) and syncs through Supabase when signed in
+- **Database security** — Row Level Security on every table, ownership-checked
+  foreign keys against IDOR, append-only progress, tested with pgTAP
 - **Localization-ready** — all UI text via `gen-l10n` (Turkish first)
 - **Accessibility** — screen-reader labels, Dynamic Type-safe layouts,
   reduce-motion aware animations, colour never the only signal
@@ -80,8 +82,9 @@ snapshots and explicit carry-over.
 - [x] Weekly reports: planned vs. done, time per life area, week-to-week change
 - [x] Smart iPhone reminders — always about the time *not yet worked*, with quiet hours and a daily budget
 - [x] On-device persistence, data export and delete-all
-- [ ] Sign-in and iPhone ↔ web sync (Supabase, PostgreSQL + RLS)
-- [ ] Offline-safe sync queue and conflict handling
+- [x] Accounts and iPhone ↔ web sync (Supabase, PostgreSQL + Row Level Security)
+- [x] Offline-first sync with explicit conflict choice — work logged on any device is never lost
+- [ ] Hosted backend (supabase.com) and TestFlight build
 
 ## 🚀 Getting started
 
@@ -91,13 +94,23 @@ Requires the [Flutter SDK](https://docs.flutter.dev/get-started/install).
 git clone git@github.com:harunnkayaa/rota.git
 cd rota
 flutter pub get
-flutter run -d chrome        # or pick an iOS simulator with: flutter devices
+flutter run -d chrome        # local-only: everything stays on the device
+```
+
+With accounts and sync (local backend, needs [Docker](https://www.docker.com/) and the
+[Supabase CLI](https://supabase.com/docs/guides/local-development/cli/getting-started)):
+
+```bash
+supabase start                              # database + auth in Docker
+cp env/local.example.json env/local.json    # paste the Publishable key from `supabase status`
+flutter run --dart-define-from-file=env/local.json
 ```
 
 Run the checks:
 
 ```bash
-flutter analyze && flutter test
+flutter analyze && flutter test   # app (sync test runs if Supabase is up)
+supabase test db                  # database security tests
 ```
 
 <details>
@@ -111,11 +124,13 @@ lib/
     categories/   categories and their styles
     goals/        goals, periods, daily allocations, progress entries
     planning/     planning engine (pure Dart), storage, week screen, plan editor
+    sync/         accounts and sync (Supabase)
     today/        today screen, goal card, add-progress sheet
   shared/widgets/ reusable UI pieces
 test/
   unit/           planning engine, storage, controller
   widget/         end-to-end UI flows
+supabase/         SQL migrations and pgTAP tests
 docs/             product decisions, notification rules, progress notes
 ```
 

@@ -8,12 +8,14 @@
 
 ## Kısa özet
 
-MVP akışının (CLAUDE.md §5) **giriş ve cihazlar arası senkronizasyon
-dışındaki bütün adımları** çalışıyor: hedef oluşturma (haftalık ve tarihli),
-günlere dağıtma, ilerleme (elle ve odak sayacıyla), eksik tespiti ve
-onaylı yeniden planlama, hafta kapanışı ve rapor, iPhone hatırlatmaları.
-Veriler cihazda. Sıradaki büyük adım Supabase ve kullanıcının kurulumunu
-bekliyor.
+MVP akışının (CLAUDE.md §5) **bütün adımları yerel geliştirme ortamında**
+çalışıyor: giriş, hedef oluşturma (haftalık ve tarihli), günlere dağıtma,
+ilerleme (elle ve odak sayacıyla), eksik tespiti ve onaylı yeniden
+planlama, hafta kapanışı ve rapor, iPhone hatırlatmaları, telefon ↔ web
+eşitleme (yerel Supabase ile uçtan uca test edildi).
+
+Kalan: bulut Supabase projesi (kullanıcının supabase.com hesabı), iPhone 15
+fiziksel test, TestFlight/web yayını.
 
 ## Tamamlanan aşamalar
 
@@ -31,21 +33,31 @@ bekliyor.
 | iOS hatırlatmaları (28.09) | ✅ | Kurallar [notification-rules.md](product/notification-rules.md): her zaman henüz çalışılmamış süre, sessiz saatler, günlük bütçe, hassas hedeflerde gizli metin, sabit id ile tekrar yok. Her değişiklikte yeniden planlanır. İzin yalnızca kullanıcı hatırlatmaları açınca istenir (simülatörde gerçek iOS izin penceresiyle doğrulandı). Web'de bildirim yok. Bildirimin gerçek teslimatı otomasyonla doğrulanamadı; iPhone 15'te elle denenmeli. |
 | Veri sahipliği (28.09) | ✅ | Ayarlar'dan tüm verileri JSON olarak görüp panoya kopyalama; onaylı "tüm verileri sil" (CLAUDE.md §4.6). |
 
-Doğrulama: 208 test geçiyor, `flutter analyze` temiz.
+| Supabase veritabanı (28.09) | ✅ | 3 migration: tablolar, her tabloda RLS, `(id, user_id)` bağlantılarıyla IDOR koruması, sadece eklenebilir ilerleme, kapanıştan önceki işin geç eşitlemesi, hesap silme fonksiyonu. 25 pgTAP testi. |
+| Hesap ve eşitleme (28.09) | ✅ | E-posta/şifre ile hesap; önce-yerel eşitleme (itme / çekme / çakışmada kullanıcı seçer, iki taraftaki ilerleme korunur); çevrimdışı değişiklikler bekler; çıkış, hesap silme. Gerçek yerel Supabase'e karşı uçtan uca test. |
+
+Doğrulama: 231 uygulama testi + 25 veritabanı testi geçiyor, `flutter analyze` temiz.
+
+### Yerel çalıştırma
+
+```bash
+supabase start
+flutter run --dart-define-from-file=env/local.json
+```
+
+`env/local.json` git'e girmez; yerel test hesabının bilgileri de oradadır.
 
 ## Sıradaki adımlar (öncelik sırasıyla)
 
-1. **iPhone 15 fiziksel test** — hatırlatma teslimatı, odak sayacının
-   arka planda devamı (CLAUDE.md §20.4).
-2. **Phase 2 — Supabase (giriş + telefon/web senkronizasyonu)** —
-   kullanıcı gerektiriyor:
-   - `brew install supabase/tap/supabase` kurulumu
-   - Karar: önce **yerel** Supabase (Docker kurulu) mı, yoksa supabase.com
-     bulut projesi mi? Öneri: önce yerel.
-   - JSON alan adları SQL sütun adlarıyla aynı tutuldu
-     (`lib/features/planning/data/planner_json.dart`); RLS zorunlu.
-3. Offline kuyruk ve çakışma yönetimi (Supabase ile birlikte).
-4. Hesap silme sunucu tarafı (Supabase ile birlikte; yerel silme hazır).
+1. **Bulut Supabase** — kullanıcı supabase.com'da proje açar, sonra:
+   `supabase link --project-ref <ref>` ve `supabase db push` (migration'lar
+   aynen uygulanır), `env/prod.json` ile derleme. Auth'ta e-posta onayı
+   açılmalı.
+2. **iPhone 15 fiziksel test** — hatırlatma teslimatı, odak sayacı, gerçek
+   cihazdan buluta eşitleme (CLAUDE.md §20.4).
+3. **Yayın** — web hosting seçimi ve iOS TestFlight (Apple Developer hesabı).
+4. İsteğe bağlı: sunucu tarafı hatırlatmalar (Edge Function + Cron), hassas
+   veriler için cihazda şifreleme.
 
 ## Ürün yönü (kullanıcının 26.09 isteği)
 
