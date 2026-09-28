@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import '../features/planning/presentation/planner_controller.dart';
 import '../features/reminders/data/reminder_scheduler.dart';
 import '../features/reminders/presentation/reminder_sync.dart';
+import '../features/sync/presentation/sign_in_screen.dart';
 import '../features/sync/presentation/sync_service.dart';
 import 'home_shell.dart';
 import 'localization/app_localizations.dart';
@@ -78,15 +79,18 @@ class _RotaAppState extends State<RotaApp> with WidgetsBindingObserver {
   }
 }
 
-/// Shows the app only once saved data is loaded; otherwise a spinner or a
-/// recoverable error.
+/// Shows the app only once saved data is loaded (otherwise a spinner or a
+/// recoverable error) and, when the build has a server, someone is signed in.
 class _StartupGate extends StatelessWidget {
   const _StartupGate();
 
   @override
   Widget build(BuildContext context) {
     final controller = PlannerScope.of(context);
+    final sync = SyncScope.of(context);
+    final needsSignIn = sync.status != SyncStatus.disabled && !sync.isSignedIn;
     return switch (controller.loadStatus) {
+      LoadStatus.ready when needsSignIn => const SignInScreen(),
       LoadStatus.ready => const HomeShell(),
       LoadStatus.loading => const _LoadingScreen(),
       LoadStatus.failed => _LoadFailedScreen(onRetry: controller.load),

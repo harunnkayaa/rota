@@ -15,6 +15,8 @@ const _password = 'correct-horse';
 Future<(PlannerController, SyncService, FakeServer)> _pump(
   WidgetTester tester, {
   FakeServer? server,
+  bool signedIn = false,
+  void Function(PlannerController)? before,
 }) async {
   tester.view.physicalSize = const Size(390, 844);
   tester.view.devicePixelRatio = 1;
@@ -22,46 +24,75 @@ Future<(PlannerController, SyncService, FakeServer)> _pump(
 
   final s = server ?? FakeServer();
   final controller = PlannerController(clock: FixedClock(monday));
+  final auth = FakeAuth(s);
   final sync = SyncService(
     controller: controller,
-    auth: FakeAuth(s),
+    auth: auth,
     remote: FakeRemote(s),
     stateStorage: InMemoryPlannerStorage(),
     debounce: const Duration(hours: 1),
   );
   await controller.load();
+  before?.call(controller);
+  if (signedIn) await auth.signIn(email: _email, password: _password);
   await sync.start();
   await tester.pumpWidget(RotaApp(controller: controller, syncService: sync));
-  await tester.pumpAndSettle();
-  await tester.tap(find.text('Ayarlar'));
   await tester.pumpAndSettle();
   return (controller, sync, s);
 }
 
-Future<void> _fillAndTap(WidgetTester tester, String button) async {
+Future<void> _fill(WidgetTester tester, {String password = _password}) async {
   await tester.enterText(find.widgetWithText(TextField, 'E-posta'), _email);
   await tester.enterText(
     find.widgetWithText(TextField, 'Şifre (en az 8 karakter)'),
-    _password,
+    password,
   );
-  await tester.tap(find.text(button));
+}
+
+Future<void> _submit(WidgetTester tester, String label) async {
+  await tester.tap(find.widgetWithText(FilledButton, label));
   await tester.pumpAndSettle();
 }
 
+final _signInScreen = find.text('Hesabın yok mu? Hesap oluştur');
+final _home = find.text('Bugün');
+
 void main() {
-  testWidgets('create an account from Settings and see it synced', (
+  testWidgets('signed out: the first screen is sign-in, not the app', (
+    tester,
+  ) async {
+    final (_, sync, _) = await _pump(tester);
+    expect(_signInScreen, findsOneWidget);
+    expect(_home, findsNothing);
+    sync.dispose();
+  });
+
+  testWidgets('a kept session opens the app directly', (tester) async {
+    final server = FakeServer()..passwords[_email] = _password;
+    final (_, sync, _) = await _pump(tester, server: server, signedIn: true);
+    expect(_signInScreen, findsNothing);
+    expect(_home, findsWidgets);
+    sync.dispose();
+  });
+
+  testWidgets('create an account, land in the app, see it synced', (
     tester,
   ) async {
     final (_, sync, server) = await _pump(tester);
-    expect(find.text('Hesap ve eşitleme'), findsOneWidget);
 
-    await _fillAndTap(tester, 'Hesap oluştur');
+    await tester.tap(_signInScreen);
+    await tester.pumpAndSettle();
+    await _fill(tester);
+    await _submit(tester, 'Hesap oluştur');
     await tester.runAsync(sync.sync);
     await tester.pumpAndSettle();
 
+    expect(_home, findsWidgets);
+    expect(server.passwords, contains(_email));
+    await tester.tap(find.text('Ayarlar'));
+    await tester.pumpAndSettle();
     expect(find.text('$_email olarak giriş yapıldı'), findsOneWidget);
     expect(find.textContaining('Eşitlendi'), findsOneWidget);
-    expect(server.passwords, contains(_email));
     sync.dispose();
   });
 
@@ -69,10 +100,15 @@ void main() {
     final server = FakeServer()..requireEmailConfirmation = true;
     final (_, sync, _) = await _pump(tester, server: server);
 
-    await _fillAndTap(tester, 'Hesap oluştur');
+    await tester.tap(_signInScreen);
+    await tester.pumpAndSettle();
+    await _fill(tester);
+    await _submit(tester, 'Hesap oluştur');
 
     expect(find.textContaining('onay bağlantısı gönderdik'), findsOneWidget);
-    expect(sync.status, SyncStatus.signedOut);
+    // Back in sign-in mode, ready for after the email is confirmed.
+    expect(find.widgetWithText(FilledButton, 'Giriş yap'), findsOneWidget);
+    expect(_home, findsNothing);
     sync.dispose();
   });
 
@@ -80,9 +116,11 @@ void main() {
     final server = FakeServer()..passwords[_email] = 'something-else';
     final (_, sync, _) = await _pump(tester, server: server);
 
-    await _fillAndTap(tester, 'Giriş yap');
+    await _fill(tester);
+    await _submit(tester, 'Giriş yap');
 
     expect(find.text('E-posta veya şifre hatalı.'), findsOneWidget);
+    expect(_home, findsNothing);
     sync.dispose();
   });
 
@@ -90,19 +128,38 @@ void main() {
     final (_, sync, server) = await _pump(tester);
 
     await tester.enterText(find.widgetWithText(TextField, 'E-posta'), 'harun');
-    await tester.tap(find.text('Giriş yap'));
-    await tester.pumpAndSettle();
+    await _submit(tester, 'Giriş yap');
     expect(find.text('Geçerli bir e-posta adresi gir.'), findsOneWidget);
 
-    await tester.enterText(find.widgetWithText(TextField, 'E-posta'), _email);
-    await tester.enterText(
-      find.widgetWithText(TextField, 'Şifre (en az 8 karakter)'),
-      'short',
-    );
-    await tester.tap(find.text('Giriş yap'));
-    await tester.pumpAndSettle();
+    await _fill(tester, password: 'short');
+    await _submit(tester, 'Giriş yap');
     expect(find.text('Şifre en az 8 karakter olmalı.'), findsOneWidget);
     expect(server.passwords, isEmpty);
+    sync.dispose();
+  });
+
+  testWidgets('signing out returns to sign-in; the data stays', (tester) async {
+    final server = FakeServer()..passwords[_email] = _password;
+    final (controller, sync, _) = await _pump(
+      tester,
+      server: server,
+      signedIn: true,
+    );
+    final category = controller.addCategory('Proje');
+    controller.createWeeklyDurationGoal(
+      categoryId: category.id,
+      title: 'Proje',
+      targetMinutes: 600,
+      dailyPlan: {monday: 120},
+    );
+
+    await tester.tap(find.text('Ayarlar'));
+    await tester.pumpAndSettle();
+    await scrollAndTap(tester, find.text('Çıkış yap'));
+    await tester.pumpAndSettle();
+
+    expect(_signInScreen, findsOneWidget);
+    expect(controller.activeGoals(), hasLength(1));
     sync.dispose();
   });
 
@@ -121,19 +178,23 @@ void main() {
     );
     await FakeRemote(server).push(other.snapshotData());
 
-    final (controller, sync, _) = await _pump(tester, server: server);
-    final category = controller.addCategory('Proje');
-    controller.createWeeklyDurationGoal(
-      categoryId: category.id,
-      title: 'Proje',
-      targetMinutes: 600,
-      dailyPlan: {monday: 120},
+    final (_, sync, _) = await _pump(
+      tester,
+      server: server,
+      before: (controller) {
+        final category = controller.addCategory('Proje');
+        controller.createWeeklyDurationGoal(
+          categoryId: category.id,
+          title: 'Proje',
+          targetMinutes: 600,
+          dailyPlan: {monday: 120},
+        );
+      },
     );
 
-    await _fillAndTap(tester, 'Giriş yap');
+    await _fill(tester);
+    await _submit(tester, 'Giriş yap');
     await tester.runAsync(sync.sync);
-    await tester.pumpAndSettle();
-    await tester.tap(find.text('Bugün'));
     await tester.pumpAndSettle();
     expect(
       find.text('Eşitleme çakışması: hangi sürümün kullanılacağını seç.'),

@@ -39,7 +39,9 @@ migration uygulandı, 25 güvenlik testi bulutta da geçti, girişsiz istekler
 
 | Bulut Supabase (28.09) | ✅ | `supabase link` + `db push`; `supabase test db --linked` 25/25. Kayıtta e-posta onayı açık; uygulama "onay bağlantısı gönderdik" der. |
 
-Doğrulama: 232 uygulama testi + 25 veritabanı testi geçiyor, `flutter analyze` temiz.
+| Giriş ekranı (28.09) | ✅ | Sunucu tanımlı derlemede ilk ekran giriş / hesap oluşturma; oturum saklıysa doğrudan uygulama açılır; çıkış yapınca giriş ekranına dönülür, veriler cihazda kalır. Sunucusuz derleme eskisi gibi doğrudan açılır. |
+
+Doğrulama: 235 uygulama testi + 25 veritabanı testi geçiyor, `flutter analyze` temiz.
 
 ### Yerel çalıştırma
 

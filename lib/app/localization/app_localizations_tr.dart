@@ -970,6 +970,20 @@ class AppLocalizationsTr extends AppLocalizations {
   String get signUpAction => 'Hesap oluştur';
 
   @override
+  String get signInTagline =>
+      'Haftalık hedeflerini gerçekçi bir günlük plana dönüştür.';
+
+  @override
+  String get signInSwitchToSignUp => 'Hesabın yok mu? Hesap oluştur';
+
+  @override
+  String get signInSwitchToSignIn => 'Zaten hesabın var mı? Giriş yap';
+
+  @override
+  String get signInSyncHint =>
+      'Hedeflerin aynı hesapla telefonda ve webde eşitlenir.';
+
+  @override
   String get authInvalidCredentials => 'E-posta veya şifre hatalı.';
 
   @override

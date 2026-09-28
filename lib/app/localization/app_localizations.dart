@@ -1700,6 +1700,30 @@ abstract class AppLocalizations {
   /// **'Hesap oluştur'**
   String get signUpAction;
 
+  /// No description provided for @signInTagline.
+  ///
+  /// In tr, this message translates to:
+  /// **'Haftalık hedeflerini gerçekçi bir günlük plana dönüştür.'**
+  String get signInTagline;
+
+  /// No description provided for @signInSwitchToSignUp.
+  ///
+  /// In tr, this message translates to:
+  /// **'Hesabın yok mu? Hesap oluştur'**
+  String get signInSwitchToSignUp;
+
+  /// No description provided for @signInSwitchToSignIn.
+  ///
+  /// In tr, this message translates to:
+  /// **'Zaten hesabın var mı? Giriş yap'**
+  String get signInSwitchToSignIn;
+
+  /// No description provided for @signInSyncHint.
+  ///
+  /// In tr, this message translates to:
+  /// **'Hedeflerin aynı hesapla telefonda ve webde eşitlenir.'**
+  String get signInSyncHint;
+
   /// No description provided for @authInvalidCredentials.
   ///
   /// In tr, this message translates to:
