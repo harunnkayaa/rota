@@ -945,4 +945,129 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get dataDeleted => 'Tüm veriler silindi';
+
+  @override
+  String get settingsAccount => 'Hesap ve eşitleme';
+
+  @override
+  String get accountHint =>
+      'Giriş yaparsan hedeflerin telefonunda ve web\'de aynı olur. Hesap olmadan da her şey bu cihazda çalışır.';
+
+  @override
+  String get accountDisabled =>
+      'Bu sürümde hesap ve eşitleme kapalı; veriler yalnızca bu cihazda.';
+
+  @override
+  String get emailLabel => 'E-posta';
+
+  @override
+  String get passwordLabel => 'Şifre (en az 8 karakter)';
+
+  @override
+  String get signInAction => 'Giriş yap';
+
+  @override
+  String get signUpAction => 'Hesap oluştur';
+
+  @override
+  String get authInvalidCredentials => 'E-posta veya şifre hatalı.';
+
+  @override
+  String get authEmailTaken =>
+      'Bu e-postayla zaten bir hesap var; giriş yapmayı dene.';
+
+  @override
+  String get authWeakPassword => 'Şifre en az 8 karakter olmalı.';
+
+  @override
+  String get authEmailNotConfirmed =>
+      'Giriş yapmadan önce e-postanı onaylaman gerekiyor.';
+
+  @override
+  String get authNetwork =>
+      'Sunucuya ulaşılamadı. İnternet bağlantını kontrol et.';
+
+  @override
+  String get authUnknown => 'Giriş yapılamadı. Tekrar dene.';
+
+  @override
+  String get errorEmailInvalid => 'Geçerli bir e-posta adresi gir.';
+
+  @override
+  String signedInAs(String email) {
+    return '$email olarak giriş yapıldı';
+  }
+
+  @override
+  String syncStatusSynced(String time) {
+    return 'Eşitlendi · $time';
+  }
+
+  @override
+  String get syncStatusSyncing => 'Eşitleniyor…';
+
+  @override
+  String get syncStatusOffline =>
+      'Çevrimdışı: değişiklikler bu cihazda bekliyor, bağlantı gelince gönderilecek.';
+
+  @override
+  String get syncStatusError =>
+      'Sunucu bir değişikliği kabul etmedi; değişikliklerin bu cihazda duruyor.';
+
+  @override
+  String get syncStatusConflict =>
+      'Bu cihaz ve hesabın farklı değişiklikler içeriyor.';
+
+  @override
+  String get syncNow => 'Şimdi eşitle';
+
+  @override
+  String get signOut => 'Çıkış yap';
+
+  @override
+  String get signOutHint => 'Çıkış yapınca verilerin bu cihazda kalır.';
+
+  @override
+  String get deleteAccount => 'Hesabı sil';
+
+  @override
+  String get deleteAccountConfirmTitle => 'Hesap silinsin mi?';
+
+  @override
+  String get deleteAccountConfirmBody =>
+      'Hesabın ve sunucudaki bütün verilerin kalıcı olarak silinir; bu cihazdaki veriler de temizlenir. Bu işlem geri alınamaz.';
+
+  @override
+  String get deleteAccountConfirm => 'Hesabı kalıcı olarak sil';
+
+  @override
+  String get accountDeleted => 'Hesap silindi';
+
+  @override
+  String get conflictTitle => 'Hangi sürüm kullanılsın?';
+
+  @override
+  String get conflictBody =>
+      'Son eşitlemeden sonra hem bu cihazda hem hesabında farklı değişiklikler yapılmış. Seçtiğin tarafın planları ve ayarları kullanılır; iki taraftaki ilerleme kayıtları korunur.';
+
+  @override
+  String get conflictKeepDevice => 'Bu cihazdakini kullan';
+
+  @override
+  String get conflictKeepAccount => 'Hesaptakini kullan';
+
+  @override
+  String conflictUnmatched(String count) {
+    return '$count ilerleme kaydı, seçilen tarafta olmayan hedeflere ait olduğu için eklenemedi.';
+  }
+
+  @override
+  String get conflictResolved => 'Eşitleme tamamlandı';
+
+  @override
+  String get syncConflictBanner =>
+      'Eşitleme çakışması: hangi sürümün kullanılacağını seç.';
+
+  @override
+  String get chooseAction => 'Seç';
 }

@@ -6,7 +6,7 @@
 
 begin;
 create extension if not exists pgtap with schema extensions;
-select plan(20);
+select plan(21);
 
 -- ---------------------------------------------------------------------------
 -- Setup (as the database owner, RLS bypassed)
@@ -229,6 +229,16 @@ select throws_ok(
   '23514',
   null,
   'a closed period takes no new progress'
+);
+
+select lives_ok(
+  $$ insert into public.progress_entries
+       (id, goal_period_id, value_delta, source, occurred_at, local_date, idempotency_key)
+     values
+       ('50000000-0000-0000-0000-000000000007',
+        '30000000-0000-0000-0000-000000000001',
+        30, 'manual', '2026-09-28 08:00+00', '2026-09-28', 'e7') $$,
+  'work done before the close is still accepted (late sync)'
 );
 
 -- ---------------------------------------------------------------------------

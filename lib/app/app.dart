@@ -1,8 +1,11 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 
 import '../features/planning/presentation/planner_controller.dart';
 import '../features/reminders/data/reminder_scheduler.dart';
 import '../features/reminders/presentation/reminder_sync.dart';
+import '../features/sync/presentation/sync_service.dart';
 import 'home_shell.dart';
 import 'localization/app_localizations.dart';
 import 'theme/app_theme.dart';
@@ -11,11 +14,15 @@ class RotaApp extends StatefulWidget {
   const RotaApp({
     required this.controller,
     this.reminderScheduler = const NoopReminderScheduler(),
+    this.syncService,
     super.key,
   });
 
   final PlannerController controller;
   final ReminderScheduler reminderScheduler;
+
+  /// Null in tests and local-only builds: sync is shown as turned off.
+  final SyncService? syncService;
 
   @override
   State<RotaApp> createState() => _RotaAppState();
@@ -24,6 +31,9 @@ class RotaApp extends StatefulWidget {
 /// Rechecks the date whenever the app comes back to the foreground, so a
 /// phone left open overnight still starts the new day (and week) correctly.
 class _RotaAppState extends State<RotaApp> with WidgetsBindingObserver {
+  late final SyncService _sync =
+      widget.syncService ?? SyncService.disabled(controller: widget.controller);
+
   @override
   void initState() {
     super.initState();
@@ -38,23 +48,30 @@ class _RotaAppState extends State<RotaApp> with WidgetsBindingObserver {
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
-    if (state == AppLifecycleState.resumed) widget.controller.refreshDay();
+    if (state == AppLifecycleState.resumed) {
+      widget.controller.refreshDay();
+      // Another device may have changed something while we were away.
+      unawaited(_sync.sync());
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    return ReminderScope(
-      scheduler: widget.reminderScheduler,
-      child: PlannerScope(
-        controller: widget.controller,
-        child: MaterialApp(
-          onGenerateTitle: (context) => AppLocalizations.of(context).appTitle,
-          debugShowCheckedModeBanner: false,
-          theme: AppTheme.light(),
-          darkTheme: AppTheme.dark(),
-          localizationsDelegates: AppLocalizations.localizationsDelegates,
-          supportedLocales: AppLocalizations.supportedLocales,
-          home: const _StartupGate(),
+    return SyncScope(
+      service: _sync,
+      child: ReminderScope(
+        scheduler: widget.reminderScheduler,
+        child: PlannerScope(
+          controller: widget.controller,
+          child: MaterialApp(
+            onGenerateTitle: (context) => AppLocalizations.of(context).appTitle,
+            debugShowCheckedModeBanner: false,
+            theme: AppTheme.light(),
+            darkTheme: AppTheme.dark(),
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
+            home: const _StartupGate(),
+          ),
         ),
       ),
     );

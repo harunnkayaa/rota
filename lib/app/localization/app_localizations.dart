@@ -1657,6 +1657,222 @@ abstract class AppLocalizations {
   /// In tr, this message translates to:
   /// **'Tüm veriler silindi'**
   String get dataDeleted;
+
+  /// No description provided for @settingsAccount.
+  ///
+  /// In tr, this message translates to:
+  /// **'Hesap ve eşitleme'**
+  String get settingsAccount;
+
+  /// No description provided for @accountHint.
+  ///
+  /// In tr, this message translates to:
+  /// **'Giriş yaparsan hedeflerin telefonunda ve web\'de aynı olur. Hesap olmadan da her şey bu cihazda çalışır.'**
+  String get accountHint;
+
+  /// No description provided for @accountDisabled.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bu sürümde hesap ve eşitleme kapalı; veriler yalnızca bu cihazda.'**
+  String get accountDisabled;
+
+  /// No description provided for @emailLabel.
+  ///
+  /// In tr, this message translates to:
+  /// **'E-posta'**
+  String get emailLabel;
+
+  /// No description provided for @passwordLabel.
+  ///
+  /// In tr, this message translates to:
+  /// **'Şifre (en az 8 karakter)'**
+  String get passwordLabel;
+
+  /// No description provided for @signInAction.
+  ///
+  /// In tr, this message translates to:
+  /// **'Giriş yap'**
+  String get signInAction;
+
+  /// No description provided for @signUpAction.
+  ///
+  /// In tr, this message translates to:
+  /// **'Hesap oluştur'**
+  String get signUpAction;
+
+  /// No description provided for @authInvalidCredentials.
+  ///
+  /// In tr, this message translates to:
+  /// **'E-posta veya şifre hatalı.'**
+  String get authInvalidCredentials;
+
+  /// No description provided for @authEmailTaken.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bu e-postayla zaten bir hesap var; giriş yapmayı dene.'**
+  String get authEmailTaken;
+
+  /// No description provided for @authWeakPassword.
+  ///
+  /// In tr, this message translates to:
+  /// **'Şifre en az 8 karakter olmalı.'**
+  String get authWeakPassword;
+
+  /// No description provided for @authEmailNotConfirmed.
+  ///
+  /// In tr, this message translates to:
+  /// **'Giriş yapmadan önce e-postanı onaylaman gerekiyor.'**
+  String get authEmailNotConfirmed;
+
+  /// No description provided for @authNetwork.
+  ///
+  /// In tr, this message translates to:
+  /// **'Sunucuya ulaşılamadı. İnternet bağlantını kontrol et.'**
+  String get authNetwork;
+
+  /// No description provided for @authUnknown.
+  ///
+  /// In tr, this message translates to:
+  /// **'Giriş yapılamadı. Tekrar dene.'**
+  String get authUnknown;
+
+  /// No description provided for @errorEmailInvalid.
+  ///
+  /// In tr, this message translates to:
+  /// **'Geçerli bir e-posta adresi gir.'**
+  String get errorEmailInvalid;
+
+  /// No description provided for @signedInAs.
+  ///
+  /// In tr, this message translates to:
+  /// **'{email} olarak giriş yapıldı'**
+  String signedInAs(String email);
+
+  /// No description provided for @syncStatusSynced.
+  ///
+  /// In tr, this message translates to:
+  /// **'Eşitlendi · {time}'**
+  String syncStatusSynced(String time);
+
+  /// No description provided for @syncStatusSyncing.
+  ///
+  /// In tr, this message translates to:
+  /// **'Eşitleniyor…'**
+  String get syncStatusSyncing;
+
+  /// No description provided for @syncStatusOffline.
+  ///
+  /// In tr, this message translates to:
+  /// **'Çevrimdışı: değişiklikler bu cihazda bekliyor, bağlantı gelince gönderilecek.'**
+  String get syncStatusOffline;
+
+  /// No description provided for @syncStatusError.
+  ///
+  /// In tr, this message translates to:
+  /// **'Sunucu bir değişikliği kabul etmedi; değişikliklerin bu cihazda duruyor.'**
+  String get syncStatusError;
+
+  /// No description provided for @syncStatusConflict.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bu cihaz ve hesabın farklı değişiklikler içeriyor.'**
+  String get syncStatusConflict;
+
+  /// No description provided for @syncNow.
+  ///
+  /// In tr, this message translates to:
+  /// **'Şimdi eşitle'**
+  String get syncNow;
+
+  /// No description provided for @signOut.
+  ///
+  /// In tr, this message translates to:
+  /// **'Çıkış yap'**
+  String get signOut;
+
+  /// No description provided for @signOutHint.
+  ///
+  /// In tr, this message translates to:
+  /// **'Çıkış yapınca verilerin bu cihazda kalır.'**
+  String get signOutHint;
+
+  /// No description provided for @deleteAccount.
+  ///
+  /// In tr, this message translates to:
+  /// **'Hesabı sil'**
+  String get deleteAccount;
+
+  /// No description provided for @deleteAccountConfirmTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Hesap silinsin mi?'**
+  String get deleteAccountConfirmTitle;
+
+  /// No description provided for @deleteAccountConfirmBody.
+  ///
+  /// In tr, this message translates to:
+  /// **'Hesabın ve sunucudaki bütün verilerin kalıcı olarak silinir; bu cihazdaki veriler de temizlenir. Bu işlem geri alınamaz.'**
+  String get deleteAccountConfirmBody;
+
+  /// No description provided for @deleteAccountConfirm.
+  ///
+  /// In tr, this message translates to:
+  /// **'Hesabı kalıcı olarak sil'**
+  String get deleteAccountConfirm;
+
+  /// No description provided for @accountDeleted.
+  ///
+  /// In tr, this message translates to:
+  /// **'Hesap silindi'**
+  String get accountDeleted;
+
+  /// No description provided for @conflictTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Hangi sürüm kullanılsın?'**
+  String get conflictTitle;
+
+  /// No description provided for @conflictBody.
+  ///
+  /// In tr, this message translates to:
+  /// **'Son eşitlemeden sonra hem bu cihazda hem hesabında farklı değişiklikler yapılmış. Seçtiğin tarafın planları ve ayarları kullanılır; iki taraftaki ilerleme kayıtları korunur.'**
+  String get conflictBody;
+
+  /// No description provided for @conflictKeepDevice.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bu cihazdakini kullan'**
+  String get conflictKeepDevice;
+
+  /// No description provided for @conflictKeepAccount.
+  ///
+  /// In tr, this message translates to:
+  /// **'Hesaptakini kullan'**
+  String get conflictKeepAccount;
+
+  /// No description provided for @conflictUnmatched.
+  ///
+  /// In tr, this message translates to:
+  /// **'{count} ilerleme kaydı, seçilen tarafta olmayan hedeflere ait olduğu için eklenemedi.'**
+  String conflictUnmatched(String count);
+
+  /// No description provided for @conflictResolved.
+  ///
+  /// In tr, this message translates to:
+  /// **'Eşitleme tamamlandı'**
+  String get conflictResolved;
+
+  /// No description provided for @syncConflictBanner.
+  ///
+  /// In tr, this message translates to:
+  /// **'Eşitleme çakışması: hangi sürümün kullanılacağını seç.'**
+  String get syncConflictBanner;
+
+  /// No description provided for @chooseAction.
+  ///
+  /// In tr, this message translates to:
+  /// **'Seç'**
+  String get chooseAction;
 }
 
 class _AppLocalizationsDelegate

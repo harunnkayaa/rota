@@ -144,7 +144,47 @@ class PlannerController extends ChangeNotifier {
     super.dispose();
   }
 
+  int _revision = 0;
+
+  /// Goes up with every change to the data (not with status changes), so
+  /// sync can tell "the user changed something" from other notifications.
+  int get revision => _revision;
+
+  /// A copy of everything, for sync to send.
+  PlannerData snapshotData() => _currentData();
+
+  /// Replaces all data with [data] (a copy downloaded by sync), then
+  /// opens this week's periods if the copy is from an earlier week.
+  void replaceAllData(PlannerData data) {
+    _categories
+      ..clear()
+      ..addAll(data.categories);
+    _goals
+      ..clear()
+      ..addAll(data.goals);
+    _periods
+      ..clear()
+      ..addAll(data.periods);
+    _allocations
+      ..clear()
+      ..addAll(data.allocations);
+    _entries
+      ..clear()
+      ..addAll(data.entries);
+    _snapshots
+      ..clear()
+      ..addAll(data.snapshots);
+    _reviewed
+      ..clear()
+      ..addAll(data.reviewedPeriodIds);
+    _settings = data.settings;
+    _activeFocus = data.activeFocus;
+    _commit();
+    refreshDay();
+  }
+
   void _commit() {
+    _revision++;
     notifyListeners();
     if (_loadStatus != LoadStatus.ready) return;
     // Encode now, so the saved snapshot matches this exact change even if

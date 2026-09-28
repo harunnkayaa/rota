@@ -753,5 +753,62 @@
   "deleteConfirmTitle": "Tüm veriler silinsin mi?",
   "deleteConfirmBody": "Hedeflerin, planların, ilerleme kayıtların, sonuçların ve ayarların bu cihazdan kalıcı olarak silinir. Bu işlem geri alınamaz. İstersen önce verilerini dışa aktar.",
   "deleteConfirm": "Kalıcı olarak sil",
-  "dataDeleted": "Tüm veriler silindi"
+  "dataDeleted": "Tüm veriler silindi",
+  "settingsAccount": "Hesap ve eşitleme",
+  "accountHint": "Giriş yaparsan hedeflerin telefonunda ve web'de aynı olur. Hesap olmadan da her şey bu cihazda çalışır.",
+  "accountDisabled": "Bu sürümde hesap ve eşitleme kapalı; veriler yalnızca bu cihazda.",
+  "emailLabel": "E-posta",
+  "passwordLabel": "Şifre (en az 8 karakter)",
+  "signInAction": "Giriş yap",
+  "signUpAction": "Hesap oluştur",
+  "authInvalidCredentials": "E-posta veya şifre hatalı.",
+  "authEmailTaken": "Bu e-postayla zaten bir hesap var; giriş yapmayı dene.",
+  "authWeakPassword": "Şifre en az 8 karakter olmalı.",
+  "authEmailNotConfirmed": "Giriş yapmadan önce e-postanı onaylaman gerekiyor.",
+  "authNetwork": "Sunucuya ulaşılamadı. İnternet bağlantını kontrol et.",
+  "authUnknown": "Giriş yapılamadı. Tekrar dene.",
+  "errorEmailInvalid": "Geçerli bir e-posta adresi gir.",
+  "signedInAs": "{email} olarak giriş yapıldı",
+  "@signedInAs": {
+    "placeholders": {
+      "email": {
+        "type": "String"
+      }
+    }
+  },
+  "syncStatusSynced": "Eşitlendi · {time}",
+  "@syncStatusSynced": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "syncStatusSyncing": "Eşitleniyor…",
+  "syncStatusOffline": "Çevrimdışı: değişiklikler bu cihazda bekliyor, bağlantı gelince gönderilecek.",
+  "syncStatusError": "Sunucu bir değişikliği kabul etmedi; değişikliklerin bu cihazda duruyor.",
+  "syncStatusConflict": "Bu cihaz ve hesabın farklı değişiklikler içeriyor.",
+  "syncNow": "Şimdi eşitle",
+  "signOut": "Çıkış yap",
+  "signOutHint": "Çıkış yapınca verilerin bu cihazda kalır.",
+  "deleteAccount": "Hesabı sil",
+  "deleteAccountConfirmTitle": "Hesap silinsin mi?",
+  "deleteAccountConfirmBody": "Hesabın ve sunucudaki bütün verilerin kalıcı olarak silinir; bu cihazdaki veriler de temizlenir. Bu işlem geri alınamaz.",
+  "deleteAccountConfirm": "Hesabı kalıcı olarak sil",
+  "accountDeleted": "Hesap silindi",
+  "conflictTitle": "Hangi sürüm kullanılsın?",
+  "conflictBody": "Son eşitlemeden sonra hem bu cihazda hem hesabında farklı değişiklikler yapılmış. Seçtiğin tarafın planları ve ayarları kullanılır; iki taraftaki ilerleme kayıtları korunur.",
+  "conflictKeepDevice": "Bu cihazdakini kullan",
+  "conflictKeepAccount": "Hesaptakini kullan",
+  "conflictUnmatched": "{count} ilerleme kaydı, seçilen tarafta olmayan hedeflere ait olduğu için eklenemedi.",
+  "@conflictUnmatched": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "conflictResolved": "Eşitleme tamamlandı",
+  "syncConflictBanner": "Eşitleme çakışması: hangi sürümün kullanılacağını seç.",
+  "chooseAction": "Seç"
 }

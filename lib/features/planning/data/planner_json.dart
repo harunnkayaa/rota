@@ -20,97 +20,200 @@ import 'planner_data.dart';
 /// periods, settings and the active focus session were added.
 const plannerSchemaVersion = 2;
 
-/// Keys match the future SQL column names (CLAUDE.md §9), so the same
-/// mapping carries over to Supabase rows in Phase 2.
+// ---------------------------------------------------------------------------
+// Row mappers. Keys are the SQL column names (supabase/migrations), so the
+// save file and the database use exactly the same shape. Readers ignore
+// extra server columns (user_id, created_at, version, ...).
+// ---------------------------------------------------------------------------
+
+typedef Row = Map<String, Object?>;
+
+Row categoryToRow(GoalCategory c) => {
+  'id': c.id,
+  'name': c.name,
+  'icon_key': c.iconKey,
+  'preset': c.preset?.name,
+  'is_sensitive': c.isSensitive,
+  'is_archived': c.isArchived,
+};
+
+GoalCategory categoryFromRow(Row m) => GoalCategory(
+  id: m['id']! as String,
+  name: m['name']! as String,
+  iconKey: m['icon_key']! as String,
+  preset: _enumOrNull(PresetCategory.values, m['preset']),
+  isSensitive: m['is_sensitive']! as bool,
+  isArchived: m['is_archived']! as bool,
+);
+
+Row goalToRow(Goal g) => {
+  'id': g.id,
+  'category_id': g.categoryId,
+  'title': g.title,
+  'goal_type': g.goalType.name,
+  'measurement_type': g.measurementType.name,
+  'default_target_value': g.defaultTargetValue,
+  'is_sensitive': g.isSensitive,
+  'is_active': g.isActive,
+};
+
+Goal goalFromRow(Row m) => Goal(
+  id: m['id']! as String,
+  categoryId: m['category_id']! as String,
+  title: m['title']! as String,
+  goalType: GoalType.values.byName(m['goal_type']! as String),
+  measurementType: MeasurementType.values.byName(
+    m['measurement_type']! as String,
+  ),
+  defaultTargetValue: m['default_target_value'] as int?,
+  isSensitive: m['is_sensitive']! as bool,
+  isActive: m['is_active']! as bool,
+);
+
+Row periodToRow(GoalPeriod p) => {
+  'id': p.id,
+  'goal_template_id': p.goalId,
+  'period_type': p.periodType.name,
+  'start_date': p.range.start.toString(),
+  'end_date_exclusive': p.range.endExclusive.toString(),
+  'target_value': p.targetValue,
+  'carryover_from_period_id': p.carryoverFromPeriodId,
+  'closed_at': p.closedAt?.toIso8601String(),
+};
+
+GoalPeriod periodFromRow(Row m) {
+  final period = GoalPeriod(
+    id: m['id']! as String,
+    goalId: m['goal_template_id']! as String,
+    periodType: PeriodType.values.byName(m['period_type']! as String),
+    range: PeriodRange(
+      LocalDate.parse(m['start_date']! as String),
+      LocalDate.parse(m['end_date_exclusive']! as String),
+    ),
+    targetValue: m['target_value']! as int,
+    carryoverFromPeriodId: m['carryover_from_period_id'] as String?,
+  );
+  final closedAt = m['closed_at'] as String?;
+  // Re-closing goes through the same checks as closing did originally.
+  return closedAt == null ? period : period.close(DateTime.parse(closedAt));
+}
+
+Row allocationToRow(DailyAllocation a) => {
+  'id': a.id,
+  'goal_period_id': a.goalPeriodId,
+  'target_date': a.date.toString(),
+  'allocated_value': a.allocatedValue,
+};
+
+DailyAllocation allocationFromRow(Row m) => DailyAllocation(
+  id: m['id']! as String,
+  goalPeriodId: m['goal_period_id']! as String,
+  date: LocalDate.parse(m['target_date']! as String),
+  allocatedValue: m['allocated_value']! as int,
+);
+
+Row entryToRow(ProgressEntry e) => {
+  'id': e.id,
+  'goal_period_id': e.goalPeriodId,
+  'value_delta': e.valueDelta,
+  'source': e.source.name,
+  'occurred_at': e.occurredAt.toIso8601String(),
+  'local_date': e.localDate.toString(),
+  'idempotency_key': e.idempotencyKey,
+  'note': e.note,
+};
+
+ProgressEntry entryFromRow(Row m) => ProgressEntry(
+  id: m['id']! as String,
+  goalPeriodId: m['goal_period_id']! as String,
+  valueDelta: m['value_delta']! as int,
+  source: ProgressSource.values.byName(m['source']! as String),
+  occurredAt: DateTime.parse(m['occurred_at']! as String).toUtc(),
+  localDate: LocalDate.parse(m['local_date']! as String),
+  idempotencyKey: m['idempotency_key']! as String,
+  note: m['note'] as String?,
+);
+
+/// The settings part of a profile row / the save file.
+Row settingsToRow(PlannerSettings s) => {
+  'daily_capacity_minutes': s.dailyCapacityMinutes,
+  'weekday_capacity_minutes': {
+    for (final MapEntry(key: day, value: minutes)
+        in s.weekdayCapacityMinutes.entries)
+      '$day': minutes,
+  },
+  'week_start_day': s.weekStartDay,
+  'reminders': {
+    'enabled': s.reminders.enabled,
+    'daily_time_minutes': s.reminders.dailyTimeMinutes,
+    'quiet_start_minutes': s.reminders.quietStartMinutes,
+    'quiet_end_minutes': s.reminders.quietEndMinutes,
+    'daily_budget': s.reminders.dailyBudget,
+    'show_sensitive_details': s.reminders.showSensitiveDetails,
+  },
+};
+
+PlannerSettings settingsFromRow(Row m) => PlannerSettings(
+  dailyCapacityMinutes: m['daily_capacity_minutes']! as int,
+  weekdayCapacityMinutes: {
+    for (final MapEntry(key: day, value: minutes)
+        in (m['weekday_capacity_minutes']! as Map<String, Object?>).entries)
+      int.parse(day): minutes! as int,
+  },
+  weekStartDay: m['week_start_day']! as int,
+  // Missing or empty (older files, a fresh server profile): defaults.
+  reminders: switch (m['reminders']) {
+    final Map<String, Object?> r when r.isNotEmpty => ReminderSettings(
+      enabled: r['enabled']! as bool,
+      dailyTimeMinutes: r['daily_time_minutes']! as int,
+      quietStartMinutes: r['quiet_start_minutes']! as int,
+      quietEndMinutes: r['quiet_end_minutes']! as int,
+      dailyBudget: r['daily_budget']! as int,
+      showSensitiveDetails: r['show_sensitive_details']! as bool,
+    ),
+    null || Map<String, Object?>() => const ReminderSettings(),
+    _ => throw const FormatException('reminders'),
+  },
+);
+
+Row focusToRow(FocusSession f) => {
+  'id': f.id,
+  'goal_period_id': f.goalPeriodId,
+  'started_at': f.startedAt.toIso8601String(),
+  'paused_at': f.pausedAt?.toIso8601String(),
+  'paused_seconds': f.pausedSeconds,
+  'status': f.isPaused ? 'paused' : 'running',
+};
+
+FocusSession focusFromRow(Row m) => FocusSession(
+  id: m['id']! as String,
+  goalPeriodId: m['goal_period_id']! as String,
+  startedAt: DateTime.parse(m['started_at']! as String).toUtc(),
+  pausedAt: switch (m['paused_at']) {
+    null => null,
+    final String s => DateTime.parse(s).toUtc(),
+    _ => throw const FormatException('paused_at'),
+  },
+  pausedSeconds: m['paused_seconds']! as int,
+);
+
+// ---------------------------------------------------------------------------
+// Save file
+// ---------------------------------------------------------------------------
+
 String encodePlannerData(PlannerData data) => jsonEncode({
   'schema_version': plannerSchemaVersion,
-  'categories': [
-    for (final c in data.categories)
-      {
-        'id': c.id,
-        'name': c.name,
-        'icon_key': c.iconKey,
-        'preset': c.preset?.name,
-        'is_sensitive': c.isSensitive,
-        'is_archived': c.isArchived,
-      },
-  ],
-  'goals': [
-    for (final g in data.goals)
-      {
-        'id': g.id,
-        'category_id': g.categoryId,
-        'title': g.title,
-        'goal_type': g.goalType.name,
-        'measurement_type': g.measurementType.name,
-        'default_target_value': g.defaultTargetValue,
-        'is_sensitive': g.isSensitive,
-        'is_active': g.isActive,
-      },
-  ],
-  'goal_periods': [
-    for (final p in data.periods)
-      {
-        'id': p.id,
-        'goal_template_id': p.goalId,
-        'period_type': p.periodType.name,
-        'start_date': p.range.start.toString(),
-        'end_date_exclusive': p.range.endExclusive.toString(),
-        'target_value': p.targetValue,
-        'carryover_from_period_id': p.carryoverFromPeriodId,
-        'closed_at': p.closedAt?.toIso8601String(),
-      },
-  ],
-  'daily_allocations': [
-    for (final a in data.allocations)
-      {
-        'id': a.id,
-        'goal_period_id': a.goalPeriodId,
-        'target_date': a.date.toString(),
-        'allocated_value': a.allocatedValue,
-      },
-  ],
-  'progress_entries': [
-    for (final e in data.entries)
-      {
-        'id': e.id,
-        'goal_period_id': e.goalPeriodId,
-        'value_delta': e.valueDelta,
-        'source': e.source.name,
-        'occurred_at': e.occurredAt.toIso8601String(),
-        'local_date': e.localDate.toString(),
-        'idempotency_key': e.idempotencyKey,
-        'note': e.note,
-      },
-  ],
+  'categories': [for (final c in data.categories) categoryToRow(c)],
+  'goals': [for (final g in data.goals) goalToRow(g)],
+  'goal_periods': [for (final p in data.periods) periodToRow(p)],
+  'daily_allocations': [for (final a in data.allocations) allocationToRow(a)],
+  'progress_entries': [for (final e in data.entries) entryToRow(e)],
   'period_snapshots': [for (final s in data.snapshots) s.toJson()],
   'reviewed_period_ids': data.reviewedPeriodIds.toList()..sort(),
-  'settings': {
-    'daily_capacity_minutes': data.settings.dailyCapacityMinutes,
-    'weekday_capacity_minutes': {
-      for (final MapEntry(key: day, value: minutes)
-          in data.settings.weekdayCapacityMinutes.entries)
-        '$day': minutes,
-    },
-    'week_start_day': data.settings.weekStartDay,
-    'reminders': {
-      'enabled': data.settings.reminders.enabled,
-      'daily_time_minutes': data.settings.reminders.dailyTimeMinutes,
-      'quiet_start_minutes': data.settings.reminders.quietStartMinutes,
-      'quiet_end_minutes': data.settings.reminders.quietEndMinutes,
-      'daily_budget': data.settings.reminders.dailyBudget,
-      'show_sensitive_details': data.settings.reminders.showSensitiveDetails,
-    },
-  },
+  'settings': settingsToRow(data.settings),
   'active_focus': switch (data.activeFocus) {
     null => null,
-    final f => {
-      'id': f.id,
-      'goal_period_id': f.goalPeriodId,
-      'started_at': f.startedAt.toIso8601String(),
-      'paused_at': f.pausedAt?.toIso8601String(),
-      'paused_seconds': f.pausedSeconds,
-    },
+    final f => focusToRow(f),
   },
 });
 
@@ -125,44 +228,22 @@ PlannerData decodePlannerData(String source) {
     if (version < 1 || version > plannerSchemaVersion) {
       throw FormatException('Unsupported schema version $version');
     }
-    final periods = [for (final m in _list(root, 'goal_periods')) _period(m)];
-    final goals = [for (final m in _list(root, 'goals')) _goal(m)];
+    final periods = [
+      for (final m in _list(root, 'goal_periods')) periodFromRow(m),
+    ];
+    final goals = [for (final m in _list(root, 'goals')) goalFromRow(m)];
 
     return PlannerData(
       categories: [
-        for (final m in _list(root, 'categories'))
-          GoalCategory(
-            id: m['id'] as String,
-            name: m['name'] as String,
-            iconKey: m['icon_key'] as String,
-            preset: _enumOrNull(PresetCategory.values, m['preset']),
-            isSensitive: m['is_sensitive'] as bool,
-            isArchived: m['is_archived'] as bool,
-          ),
+        for (final m in _list(root, 'categories')) categoryFromRow(m),
       ],
       goals: version == 1 ? _migrateGoalsFromV1(goals, periods) : goals,
       periods: periods,
       allocations: [
-        for (final m in _list(root, 'daily_allocations'))
-          DailyAllocation(
-            id: m['id'] as String,
-            goalPeriodId: m['goal_period_id'] as String,
-            date: LocalDate.parse(m['target_date'] as String),
-            allocatedValue: m['allocated_value'] as int,
-          ),
+        for (final m in _list(root, 'daily_allocations')) allocationFromRow(m),
       ],
       entries: [
-        for (final m in _list(root, 'progress_entries'))
-          ProgressEntry(
-            id: m['id'] as String,
-            goalPeriodId: m['goal_period_id'] as String,
-            valueDelta: m['value_delta'] as int,
-            source: ProgressSource.values.byName(m['source'] as String),
-            occurredAt: DateTime.parse(m['occurred_at'] as String),
-            localDate: LocalDate.parse(m['local_date'] as String),
-            idempotencyKey: m['idempotency_key'] as String,
-            note: m['note'] as String?,
-          ),
+        for (final m in _list(root, 'progress_entries')) entryFromRow(m),
       ],
       snapshots: version == 1
           ? const []
@@ -178,20 +259,10 @@ PlannerData decodePlannerData(String source) {
             },
       settings: version == 1
           ? null
-          : _settings(root['settings'] as Map<String, Object?>),
+          : settingsFromRow(root['settings'] as Map<String, Object?>),
       activeFocus: switch (root['active_focus']) {
         null => null,
-        final Map<String, Object?> m => FocusSession(
-          id: m['id'] as String,
-          goalPeriodId: m['goal_period_id'] as String,
-          startedAt: DateTime.parse(m['started_at'] as String),
-          pausedAt: switch (m['paused_at']) {
-            null => null,
-            final String s => DateTime.parse(s),
-            _ => throw const FormatException('paused_at'),
-          },
-          pausedSeconds: m['paused_seconds'] as int,
-        ),
+        final Map<String, Object?> m => focusFromRow(m),
         _ => throw const FormatException('active_focus'),
       },
     );
@@ -217,61 +288,8 @@ List<Goal> _migrateGoalsFromV1(List<Goal> goals, List<GoalPeriod> periods) => [
     },
 ];
 
-Goal _goal(Map<String, Object?> m) => Goal(
-  id: m['id'] as String,
-  categoryId: m['category_id'] as String,
-  title: m['title'] as String,
-  goalType: GoalType.values.byName(m['goal_type'] as String),
-  measurementType: MeasurementType.values.byName(
-    m['measurement_type'] as String,
-  ),
-  defaultTargetValue: m['default_target_value'] as int?,
-  isSensitive: m['is_sensitive'] as bool,
-  isActive: m['is_active'] as bool,
-);
-
-PlannerSettings _settings(Map<String, Object?> m) => PlannerSettings(
-  dailyCapacityMinutes: m['daily_capacity_minutes'] as int,
-  weekdayCapacityMinutes: {
-    for (final MapEntry(key: day, value: minutes)
-        in (m['weekday_capacity_minutes'] as Map<String, Object?>).entries)
-      int.parse(day): minutes as int,
-  },
-  weekStartDay: m['week_start_day'] as int,
-  // Added within v2: files saved before reminders existed use defaults.
-  reminders: switch (m['reminders']) {
-    null => const ReminderSettings(),
-    final Map<String, Object?> r => ReminderSettings(
-      enabled: r['enabled'] as bool,
-      dailyTimeMinutes: r['daily_time_minutes'] as int,
-      quietStartMinutes: r['quiet_start_minutes'] as int,
-      quietEndMinutes: r['quiet_end_minutes'] as int,
-      dailyBudget: r['daily_budget'] as int,
-      showSensitiveDetails: r['show_sensitive_details'] as bool,
-    ),
-    _ => throw const FormatException('reminders'),
-  },
-);
-
-GoalPeriod _period(Map<String, Object?> m) {
-  final period = GoalPeriod(
-    id: m['id'] as String,
-    goalId: m['goal_template_id'] as String,
-    periodType: PeriodType.values.byName(m['period_type'] as String),
-    range: PeriodRange(
-      LocalDate.parse(m['start_date'] as String),
-      LocalDate.parse(m['end_date_exclusive'] as String),
-    ),
-    targetValue: m['target_value'] as int,
-    carryoverFromPeriodId: m['carryover_from_period_id'] as String?,
-  );
-  final closedAt = m['closed_at'] as String?;
-  // Re-closing goes through the same checks as closing did originally.
-  return closedAt == null ? period : period.close(DateTime.parse(closedAt));
-}
-
-List<Map<String, Object?>> _list(Map<String, Object?> root, String key) =>
-    (root[key] as List<Object?>).cast<Map<String, Object?>>();
+List<Row> _list(Map<String, Object?> root, String key) =>
+    (root[key] as List<Object?>).cast<Row>();
 
 T? _enumOrNull<T extends Enum>(List<T> values, Object? name) =>
     name == null ? null : values.byName(name as String);

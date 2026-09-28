@@ -9,6 +9,8 @@ import '../../categories/domain/category.dart';
 import '../../focus/presentation/focus_screen.dart';
 import '../../goals/presentation/create_goal_screen.dart';
 import '../../planning/presentation/planner_controller.dart';
+import '../../sync/presentation/account_section.dart';
+import '../../sync/presentation/sync_service.dart';
 import 'goal_card.dart';
 import 'week_review.dart';
 
@@ -39,6 +41,20 @@ class TodayScreen extends StatelessWidget {
               ),
             ),
           ),
+          if (SyncScope.maybeOf(context)?.status == SyncStatus.conflict)
+            const SliverToBoxAdapter(
+              child: ContentWidth(
+                child: Padding(
+                  padding: EdgeInsets.fromLTRB(
+                    AppSpacing.m,
+                    AppSpacing.m,
+                    AppSpacing.m,
+                    0,
+                  ),
+                  child: SyncConflictBanner(),
+                ),
+              ),
+            ),
           if (controller.activeFocus != null ||
               controller.pendingReviews.isNotEmpty)
             SliverToBoxAdapter(

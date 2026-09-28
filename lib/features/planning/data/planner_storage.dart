@@ -16,18 +16,25 @@ abstract interface class PlannerStorage {
 /// Neither is encrypted; acceptable for the local phase, revisited before
 /// sensitive (health/worship) data is synced (CLAUDE.md §17).
 class SharedPreferencesPlannerStorage implements PlannerStorage {
-  SharedPreferencesPlannerStorage({SharedPreferencesAsync? preferences})
-    : _preferences = preferences ?? SharedPreferencesAsync();
+  SharedPreferencesPlannerStorage({
+    SharedPreferencesAsync? preferences,
+    this.key = plannerKey,
+  }) : _preferences = preferences ?? SharedPreferencesAsync();
 
-  static const _key = 'rota.planner.v1';
+  /// The planner's own data.
+  static const plannerKey = 'rota.planner.v1';
 
+  /// Sync bookkeeping (last server marker, unsent changes).
+  static const syncStateKey = 'rota.sync.v1';
+
+  final String key;
   final SharedPreferencesAsync _preferences;
 
   @override
-  Future<String?> read() => _preferences.getString(_key);
+  Future<String?> read() => _preferences.getString(key);
 
   @override
-  Future<void> write(String data) => _preferences.setString(_key, data);
+  Future<void> write(String data) => _preferences.setString(key, data);
 }
 
 class InMemoryPlannerStorage implements PlannerStorage {
