@@ -3,6 +3,9 @@
 
 begin;
 create extension if not exists pgtap with schema extensions;
+-- The cloud test login does not inherit postgres rights; switch explicitly.
+set local role postgres;
+set local search_path = public, extensions;
 select plan(4);
 
 insert into auth.users (id, email) values
@@ -31,7 +34,7 @@ select lives_ok(
   'a signed-in user can delete their account'
 );
 
-reset role;
+set local role postgres;
 select is(
   (select count(*)::int from auth.users
     where id = '00000000-0000-0000-0000-00000000000a'),

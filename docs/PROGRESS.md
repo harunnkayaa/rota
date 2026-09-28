@@ -14,8 +14,9 @@ ilerleme (elle ve odak sayacıyla), eksik tespiti ve onaylı yeniden
 planlama, hafta kapanışı ve rapor, iPhone hatırlatmaları, telefon ↔ web
 eşitleme (yerel Supabase ile uçtan uca test edildi).
 
-Kalan: bulut Supabase projesi (kullanıcının supabase.com hesabı), iPhone 15
-fiziksel test, TestFlight/web yayını.
+Bulut Supabase projesi (`qhzbfivoffjumbaueygs`, Frankfurt) kuruldu: 3
+migration uygulandı, 25 güvenlik testi bulutta da geçti, girişsiz istekler
+401 ile reddediliyor. Kalan: iPhone 15 fiziksel test, TestFlight/web yayını.
 
 ## Tamamlanan aşamalar
 
@@ -36,7 +37,9 @@ fiziksel test, TestFlight/web yayını.
 | Supabase veritabanı (28.09) | ✅ | 3 migration: tablolar, her tabloda RLS, `(id, user_id)` bağlantılarıyla IDOR koruması, sadece eklenebilir ilerleme, kapanıştan önceki işin geç eşitlemesi, hesap silme fonksiyonu. 25 pgTAP testi. |
 | Hesap ve eşitleme (28.09) | ✅ | E-posta/şifre ile hesap; önce-yerel eşitleme (itme / çekme / çakışmada kullanıcı seçer, iki taraftaki ilerleme korunur); çevrimdışı değişiklikler bekler; çıkış, hesap silme. Gerçek yerel Supabase'e karşı uçtan uca test. |
 
-Doğrulama: 231 uygulama testi + 25 veritabanı testi geçiyor, `flutter analyze` temiz.
+| Bulut Supabase (28.09) | ✅ | `supabase link` + `db push`; `supabase test db --linked` 25/25. Kayıtta e-posta onayı açık; uygulama "onay bağlantısı gönderdik" der. |
+
+Doğrulama: 232 uygulama testi + 25 veritabanı testi geçiyor, `flutter analyze` temiz.
 
 ### Yerel çalıştırma
 
@@ -45,14 +48,17 @@ supabase start
 flutter run --dart-define-from-file=env/local.json
 ```
 
+Buluta bağlı çalıştırma: `flutter run --dart-define-from-file=env/prod.json`
+(`env/prod.json` yalnızca URL ve publishable key içerir, git'e girmez;
+yeniden üretmek için `supabase projects api-keys --project-ref <ref>`).
+
 `env/local.json` git'e girmez; yerel test hesabının bilgileri de oradadır.
 
 ## Sıradaki adımlar (öncelik sırasıyla)
 
-1. **Bulut Supabase** — kullanıcı supabase.com'da proje açar, sonra:
-   `supabase link --project-ref <ref>` ve `supabase db push` (migration'lar
-   aynen uygulanır), `env/prod.json` ile derleme. Auth'ta e-posta onayı
-   açılmalı.
+1. **Auth yönlendirme adresi** — web adresi belli olunca Supabase
+   panelinde Authentication → URL Configuration → Site URL ayarlanmalı
+   (şimdilik onay bağlantısı localhost'a gider; hesap yine onaylanır).
 2. **iPhone 15 fiziksel test** — hatırlatma teslimatı, odak sayacı, gerçek
    cihazdan buluta eşitleme (CLAUDE.md §20.4).
 3. **Yayın** — web hosting seçimi ve iOS TestFlight (Apple Developer hesabı).

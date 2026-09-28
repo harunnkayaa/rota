@@ -106,6 +106,15 @@ cp env/local.example.json env/local.json    # paste the Publishable key from `su
 flutter run --dart-define-from-file=env/local.json
 ```
 
+Against a hosted Supabase project, link it once and apply the migrations:
+
+```bash
+supabase login
+supabase link --project-ref <project-ref>
+supabase db push
+flutter run --dart-define-from-file=env/prod.json   # {"SUPABASE_URL": ..., "SUPABASE_PUBLISHABLE_KEY": ...}
+```
+
 Run the checks:
 
 ```bash
