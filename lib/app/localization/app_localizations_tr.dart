@@ -649,4 +649,207 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get planWeekPaceCovers => 'Plan bu haftanın temposunu karşılıyor.';
+
+  @override
+  String get navReports => 'Rapor';
+
+  @override
+  String get navSettings => 'Ayarlar';
+
+  @override
+  String get reviewTitle => 'Geçen hafta kapandı';
+
+  @override
+  String reviewBody(String count) {
+    return '$count hedefin sonucu hazır. Eksik kalan süre sen istemedikçe taşınmaz.';
+  }
+
+  @override
+  String get reviewOpen => 'Özeti gör';
+
+  @override
+  String get reviewSheetTitle => 'Hafta özeti';
+
+  @override
+  String reviewShortfall(String amount) {
+    return '$amount eksik kaldı';
+  }
+
+  @override
+  String carryOverAction(String amount) {
+    return '$amount bu haftaya ekle';
+  }
+
+  @override
+  String get carryOverDone => 'Bu haftaya eklendi';
+
+  @override
+  String get reviewAcknowledge => 'Tamam';
+
+  @override
+  String get moreActions => 'Diğer işlemler';
+
+  @override
+  String get archiveGoal => 'Hedefi arşivle';
+
+  @override
+  String get archiveConfirmTitle => 'Hedef arşivlensin mi?';
+
+  @override
+  String get archiveConfirmBody =>
+      'Hedef Bugün ve Hafta ekranlarından kalkar ve yeni haftalara açılmaz. Geçmiş sonuçları raporlarda kalır.';
+
+  @override
+  String get archiveConfirm => 'Arşivle';
+
+  @override
+  String get goalArchived => 'Hedef arşivlendi';
+
+  @override
+  String get settingsTitle => 'Ayarlar';
+
+  @override
+  String get settingsCapacity => 'Günlük kapasite';
+
+  @override
+  String get settingsCapacityHint =>
+      'Bir günde gerçekçi olarak planlayabileceğin süre. Plan bunu aşarsa uyarı alırsın.';
+
+  @override
+  String get settingsDefaultCapacity => 'Her gün';
+
+  @override
+  String get settingsWeekdayCapacity => 'Güne özel kapasite';
+
+  @override
+  String get settingsWeekdayHint =>
+      'Farklı olan günleri ayarla; diğerleri \"Her gün\" değerini kullanır.';
+
+  @override
+  String settingsResetDay(String day) {
+    return '$day için özel kapasiteyi kaldır';
+  }
+
+  @override
+  String get settingsWeekStart => 'Hafta başlangıcı';
+
+  @override
+  String get settingsWeekStartHint =>
+      'Değişiklik bir sonraki haftadan itibaren geçerli olur.';
+
+  @override
+  String get settingsDataTitle => 'Verilerin';
+
+  @override
+  String get settingsDataBody =>
+      'Veriler şu an yalnızca bu cihazda saklanıyor. Cihazlar arası senkronizasyon bir sonraki aşamada gelecek.';
+
+  @override
+  String get focusStart => 'Odaklan';
+
+  @override
+  String get focusTitle => 'Odak';
+
+  @override
+  String get focusPause => 'Duraklat';
+
+  @override
+  String get focusResume => 'Devam et';
+
+  @override
+  String get focusFinish => 'Bitir ve kaydet';
+
+  @override
+  String get focusCancel => 'Oturumu iptal et';
+
+  @override
+  String get focusPaused => 'Duraklatıldı';
+
+  @override
+  String focusRecorded(String amount) {
+    return '$amount kaydedildi';
+  }
+
+  @override
+  String get focusTooShort => '1 dakikadan kısa çalışma kaydedilmedi.';
+
+  @override
+  String get focusCancelConfirmTitle => 'Oturum iptal edilsin mi?';
+
+  @override
+  String get focusCancelConfirmBody => 'Bu oturumdaki süre kaydedilmez.';
+
+  @override
+  String get focusCancelConfirm => 'İptal et';
+
+  @override
+  String get focusRunning => 'Odak sürüyor';
+
+  @override
+  String get focusOpen => 'Aç';
+
+  @override
+  String get focusAnotherRunning => 'Başka bir hedefte odak oturumu sürüyor.';
+
+  @override
+  String get focusPeriodEnded =>
+      'Bu hedefin dönemi bitti; süre kaydedilemedi. Oturumu iptal edip ilerlemeyi yeni haftaya elle ekleyebilirsin.';
+
+  @override
+  String focusTimerSemantics(String time) {
+    return 'Geçen süre $time';
+  }
+
+  @override
+  String get reportsTitle => 'Rapor';
+
+  @override
+  String get reportsThisWeek => 'Bu hafta';
+
+  @override
+  String get reportsTarget => 'Hedef';
+
+  @override
+  String get reportsCompletion => 'Tamamlanma';
+
+  @override
+  String reportsPercent(String value) {
+    return '%$value';
+  }
+
+  @override
+  String get reportsByCategory => 'Kategoriye göre';
+
+  @override
+  String get reportsByCategoryHint =>
+      'Bu hafta çalıştığın sürenin alanlara dağılımı.';
+
+  @override
+  String get reportsNoWorkYet => 'Bu hafta henüz ilerleme kaydedilmedi.';
+
+  @override
+  String get reportsHistory => 'Geçmiş haftalar';
+
+  @override
+  String get reportsEmptyHistory =>
+      'Kapanan haftaların sonuçları burada görünecek.';
+
+  @override
+  String reportsChangeUp(String amount) {
+    return 'Önceki haftadan $amount fazla';
+  }
+
+  @override
+  String reportsChangeDown(String amount) {
+    return 'Önceki haftadan $amount az';
+  }
+
+  @override
+  String get reportsChangeSame => 'Önceki haftayla aynı';
+
+  @override
+  String get reportsDeadlines => 'Tarihli hedefler';
+
+  @override
+  String get weekPaceShort => 'tempo';
 }

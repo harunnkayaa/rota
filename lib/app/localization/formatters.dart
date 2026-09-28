@@ -41,6 +41,24 @@ String formatCompactMinutes(BuildContext context, int minutes) {
   return l.hoursCompact(hours.format(minutes / Duration.minutesPerHour));
 }
 
+/// Stopwatch style: "25:09", or "1:05:09" after an hour.
+String formatTimer(Duration duration) {
+  String two(int n) => n.toString().padLeft(2, '0');
+  final hours = duration.inHours;
+  final minutes = duration.inMinutes % Duration.minutesPerHour;
+  final seconds = duration.inSeconds % Duration.secondsPerMinute;
+  return hours > 0
+      ? '$hours:${two(minutes)}:${two(seconds)}'
+      : '${two(minutes)}:${two(seconds)}';
+}
+
+/// "Pazartesi" for an ISO weekday (1 = Monday).
+String formatWeekdayName(BuildContext context, int weekday) {
+  // 5 Jan 2026 is a Monday; any week works.
+  final date = DateTime(2026, 1, 4 + weekday);
+  return DateFormat('EEEE', _locale(context)).format(date);
+}
+
 /// "Pzt"
 String formatWeekdayShort(BuildContext context, LocalDate date) =>
     DateFormat('EEE', _locale(context)).format(_asDateTime(date));

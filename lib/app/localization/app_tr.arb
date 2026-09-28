@@ -584,5 +584,127 @@
       }
     }
   },
-  "planWeekPaceCovers": "Plan bu haftanın temposunu karşılıyor."
+  "planWeekPaceCovers": "Plan bu haftanın temposunu karşılıyor.",
+  "navReports": "Rapor",
+  "navSettings": "Ayarlar",
+  "reviewTitle": "Geçen hafta kapandı",
+  "reviewBody": "{count} hedefin sonucu hazır. Eksik kalan süre sen istemedikçe taşınmaz.",
+  "@reviewBody": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "reviewOpen": "Özeti gör",
+  "reviewSheetTitle": "Hafta özeti",
+  "reviewShortfall": "{amount} eksik kaldı",
+  "@reviewShortfall": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "carryOverAction": "{amount} bu haftaya ekle",
+  "@carryOverAction": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "carryOverDone": "Bu haftaya eklendi",
+  "reviewAcknowledge": "Tamam",
+  "moreActions": "Diğer işlemler",
+  "archiveGoal": "Hedefi arşivle",
+  "archiveConfirmTitle": "Hedef arşivlensin mi?",
+  "archiveConfirmBody": "Hedef Bugün ve Hafta ekranlarından kalkar ve yeni haftalara açılmaz. Geçmiş sonuçları raporlarda kalır.",
+  "archiveConfirm": "Arşivle",
+  "goalArchived": "Hedef arşivlendi",
+  "settingsTitle": "Ayarlar",
+  "settingsCapacity": "Günlük kapasite",
+  "settingsCapacityHint": "Bir günde gerçekçi olarak planlayabileceğin süre. Plan bunu aşarsa uyarı alırsın.",
+  "settingsDefaultCapacity": "Her gün",
+  "settingsWeekdayCapacity": "Güne özel kapasite",
+  "settingsWeekdayHint": "Farklı olan günleri ayarla; diğerleri \"Her gün\" değerini kullanır.",
+  "settingsResetDay": "{day} için özel kapasiteyi kaldır",
+  "@settingsResetDay": {
+    "placeholders": {
+      "day": {
+        "type": "String"
+      }
+    }
+  },
+  "settingsWeekStart": "Hafta başlangıcı",
+  "settingsWeekStartHint": "Değişiklik bir sonraki haftadan itibaren geçerli olur.",
+  "settingsDataTitle": "Verilerin",
+  "settingsDataBody": "Veriler şu an yalnızca bu cihazda saklanıyor. Cihazlar arası senkronizasyon bir sonraki aşamada gelecek.",
+  "focusStart": "Odaklan",
+  "focusTitle": "Odak",
+  "focusPause": "Duraklat",
+  "focusResume": "Devam et",
+  "focusFinish": "Bitir ve kaydet",
+  "focusCancel": "Oturumu iptal et",
+  "focusPaused": "Duraklatıldı",
+  "focusRecorded": "{amount} kaydedildi",
+  "@focusRecorded": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "focusTooShort": "1 dakikadan kısa çalışma kaydedilmedi.",
+  "focusCancelConfirmTitle": "Oturum iptal edilsin mi?",
+  "focusCancelConfirmBody": "Bu oturumdaki süre kaydedilmez.",
+  "focusCancelConfirm": "İptal et",
+  "focusRunning": "Odak sürüyor",
+  "focusOpen": "Aç",
+  "focusAnotherRunning": "Başka bir hedefte odak oturumu sürüyor.",
+  "focusPeriodEnded": "Bu hedefin dönemi bitti; süre kaydedilemedi. Oturumu iptal edip ilerlemeyi yeni haftaya elle ekleyebilirsin.",
+  "focusTimerSemantics": "Geçen süre {time}",
+  "@focusTimerSemantics": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "reportsTitle": "Rapor",
+  "reportsThisWeek": "Bu hafta",
+  "reportsTarget": "Hedef",
+  "reportsCompletion": "Tamamlanma",
+  "reportsPercent": "%{value}",
+  "@reportsPercent": {
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "reportsByCategory": "Kategoriye göre",
+  "reportsByCategoryHint": "Bu hafta çalıştığın sürenin alanlara dağılımı.",
+  "reportsNoWorkYet": "Bu hafta henüz ilerleme kaydedilmedi.",
+  "reportsHistory": "Geçmiş haftalar",
+  "reportsEmptyHistory": "Kapanan haftaların sonuçları burada görünecek.",
+  "reportsChangeUp": "Önceki haftadan {amount} fazla",
+  "@reportsChangeUp": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "reportsChangeDown": "Önceki haftadan {amount} az",
+  "@reportsChangeDown": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "reportsChangeSame": "Önceki haftayla aynı",
+  "reportsDeadlines": "Tarihli hedefler",
+  "weekPaceShort": "tempo"
 }

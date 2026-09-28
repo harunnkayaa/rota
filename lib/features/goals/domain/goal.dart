@@ -34,6 +34,7 @@ class Goal {
     required String title,
     required this.goalType,
     required this.measurementType,
+    this.defaultTargetValue,
     this.isSensitive = false,
     this.isActive = true,
   }) : title = title.trim() {
@@ -44,6 +45,9 @@ class Goal {
         goalType != GoalType.fixedTimeCritical) {
       throw ArgumentError('Dose goals must be fixed-time critical routines.');
     }
+    if (defaultTargetValue case final value? when value <= 0) {
+      throw ArgumentError.value(value, 'defaultTargetValue', 'Must be > 0');
+    }
   }
 
   final String id;
@@ -51,6 +55,27 @@ class Goal {
   final String title;
   final GoalType goalType;
   final MeasurementType measurementType;
+
+  /// Target each new week starts with ("10 sa per week"). A carry-over adds
+  /// to one week only and never changes this value.
+  final int? defaultTargetValue;
   final bool isSensitive;
+
+  /// False once archived: no new weeks are opened, history stays.
   final bool isActive;
+
+  Goal withDefaultTarget(int value) => _copy(defaultTargetValue: value);
+
+  Goal archived() => _copy(isActive: false);
+
+  Goal _copy({int? defaultTargetValue, bool? isActive}) => Goal(
+    id: id,
+    categoryId: categoryId,
+    title: title,
+    goalType: goalType,
+    measurementType: measurementType,
+    defaultTargetValue: defaultTargetValue ?? this.defaultTargetValue,
+    isSensitive: isSensitive,
+    isActive: isActive ?? this.isActive,
+  );
 }

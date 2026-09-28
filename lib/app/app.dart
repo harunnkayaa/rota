@@ -5,15 +5,39 @@ import 'home_shell.dart';
 import 'localization/app_localizations.dart';
 import 'theme/app_theme.dart';
 
-class RotaApp extends StatelessWidget {
+class RotaApp extends StatefulWidget {
   const RotaApp({required this.controller, super.key});
 
   final PlannerController controller;
 
   @override
+  State<RotaApp> createState() => _RotaAppState();
+}
+
+/// Rechecks the date whenever the app comes back to the foreground, so a
+/// phone left open overnight still starts the new day (and week) correctly.
+class _RotaAppState extends State<RotaApp> with WidgetsBindingObserver {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) widget.controller.refreshDay();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return PlannerScope(
-      controller: controller,
+      controller: widget.controller,
       child: MaterialApp(
         onGenerateTitle: (context) => AppLocalizations.of(context).appTitle,
         debugShowCheckedModeBanner: false,

@@ -1,3 +1,4 @@
+import '../../../core/time/local_date.dart';
 import '../../../core/time/period_range.dart';
 import '../../goals/domain/daily_allocation.dart';
 import '../../goals/domain/goal.dart';
@@ -15,7 +16,9 @@ class PeriodSnapshot {
   const PeriodSnapshot({
     required this.periodId,
     required this.goalId,
+    required this.categoryId,
     required this.goalTitle,
+    required this.goalType,
     required this.measurementType,
     required this.range,
     required this.target,
@@ -24,11 +27,34 @@ class PeriodSnapshot {
     required this.closedAt,
   });
 
+  /// Reads what [toJson] wrote. Throws on malformed input; the storage
+  /// layer turns that into "unreadable data".
+  factory PeriodSnapshot.fromJson(Map<String, Object?> json) => PeriodSnapshot(
+    periodId: json['period_id']! as String,
+    goalId: json['goal_id']! as String,
+    categoryId: json['category_id']! as String,
+    goalTitle: json['goal_title']! as String,
+    goalType: GoalType.values.byName(json['goal_type']! as String),
+    measurementType: MeasurementType.values.byName(
+      json['measurement_type']! as String,
+    ),
+    range: PeriodRange(
+      LocalDate.parse(json['start_date']! as String),
+      LocalDate.parse(json['end_date_exclusive']! as String),
+    ),
+    target: json['target']! as int,
+    achieved: json['achieved']! as int,
+    allocated: json['allocated']! as int,
+    closedAt: DateTime.parse(json['closed_at']! as String),
+  );
+
   static const int schemaVersion = 1;
 
   final String periodId;
   final String goalId;
+  final String categoryId;
   final String goalTitle;
+  final GoalType goalType;
   final MeasurementType measurementType;
   final PeriodRange range;
   final int target;
@@ -49,7 +75,9 @@ class PeriodSnapshot {
     'schema_version': schemaVersion,
     'period_id': periodId,
     'goal_id': goalId,
+    'category_id': categoryId,
     'goal_title': goalTitle,
+    'goal_type': goalType.name,
     'measurement_type': measurementType.name,
     'start_date': range.start.toString(),
     'end_date_exclusive': range.endExclusive.toString(),
@@ -84,7 +112,9 @@ PeriodCloseResult closePeriod({
     PeriodSnapshot(
       periodId: period.id,
       goalId: goal.id,
+      categoryId: goal.categoryId,
       goalTitle: goal.title,
+      goalType: goal.goalType,
       measurementType: goal.measurementType,
       range: period.range,
       target: period.targetValue,
@@ -132,5 +162,49 @@ GoalPeriod createCarryOver({
     range: nextRange,
     targetValue: amount,
     carryoverFromPeriodId: closedPeriod.id,
+  );
+}
+
+/// Explicit carry-over into a week that already exists (the usual case: the
+/// new week was opened by the rollover). The week keeps its id and plan;
+/// its target grows by [amount] and it records where the extra came from.
+///
+/// A week can take one carry-over, and a closed period can be carried over
+/// only once.
+GoalPeriod carryOverIntoWeek({
+  required GoalPeriod week,
+  required PeriodSnapshot snapshot,
+  required int amount,
+  required Iterable<GoalPeriod> existingPeriods,
+}) {
+  if (week.isClosed) throw StateError('Cannot carry over into a closed week.');
+  if (week.goalId != snapshot.goalId) {
+    throw ArgumentError('Carry-over must stay within the same goal.');
+  }
+  if (week.carryoverFromPeriodId != null) {
+    throw StateError('Week ${week.id} already has a carry-over.');
+  }
+  if (existingPeriods.any(
+    (p) => p.carryoverFromPeriodId == snapshot.periodId,
+  )) {
+    throw StateError('Period ${snapshot.periodId} was already carried over.');
+  }
+  if (amount <= 0 || amount > snapshot.shortfall) {
+    throw ArgumentError.value(
+      amount,
+      'amount',
+      'Must be 1..${snapshot.shortfall}',
+    );
+  }
+  if (week.range.start.isBefore(snapshot.range.endExclusive)) {
+    throw ArgumentError('Carry-over must go into a later week.');
+  }
+  return GoalPeriod(
+    id: week.id,
+    goalId: week.goalId,
+    periodType: week.periodType,
+    range: week.range,
+    targetValue: week.targetValue + amount,
+    carryoverFromPeriodId: snapshot.periodId,
   );
 }

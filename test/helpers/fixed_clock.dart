@@ -6,17 +6,26 @@ import 'package:rota/core/time/local_date.dart';
 import 'package:rota/features/planning/data/planner_storage.dart';
 import 'package:rota/features/planning/presentation/planner_controller.dart';
 
-/// A clock frozen on [day] at noon UTC.
+/// A clock that only moves when a test moves it. Starts on [day] at noon
+/// UTC; setting [day] jumps to noon of that day, [advance] moves forward.
 class FixedClock implements Clock {
-  FixedClock(this.day);
+  FixedClock(LocalDate day) : _now = _noon(day);
 
-  LocalDate day;
+  DateTime _now;
+
+  LocalDate get day => LocalDate.fromDateTime(_now);
+  set day(LocalDate value) => _now = _noon(value);
+
+  void advance(Duration duration) => _now = _now.add(duration);
 
   @override
-  DateTime nowUtc() => DateTime.utc(day.year, day.month, day.day, 12);
+  DateTime nowUtc() => _now;
 
   @override
   LocalDate today() => day;
+
+  static DateTime _noon(LocalDate d) =>
+      DateTime.utc(d.year, d.month, d.day, 12);
 }
 
 /// Pumps the whole app on a phone-sized screen.

@@ -7,21 +7,23 @@ import '../../../core/time/local_date.dart';
 import '../../../core/time/period_range.dart';
 import '../../../core/utils/uuid.dart';
 import '../../categories/domain/category.dart';
+import '../../focus/domain/focus_session.dart';
 import '../../goals/domain/daily_allocation.dart';
 import '../../goals/domain/goal.dart';
 import '../../goals/domain/goal_period.dart';
 import '../../goals/domain/progress_entry.dart';
+import '../../reports/domain/weekly_report.dart';
+import '../../settings/domain/planner_settings.dart';
 import '../data/planner_data.dart';
 import '../data/planner_json.dart';
 import '../data/planner_storage.dart';
 import '../domain/capacity.dart';
 import '../domain/deadline_pace.dart';
+import '../domain/period_closing.dart';
 import '../domain/plan_editing.dart';
 import '../domain/progress_calculator.dart';
 import '../domain/redistribution.dart';
-
-/// Until settings exist, every day offers 4 hours of plannable time.
-const defaultDailyCapacityMinutes = 240;
+import '../domain/week_rollover.dart';
 
 enum LoadStatus { loading, ready, failed }
 
@@ -34,20 +36,21 @@ enum SaveStatus { saved, saving, failed }
 /// adds Supabase sync behind the same public methods, so screens don't
 /// change.
 class PlannerController extends ChangeNotifier {
-  PlannerController({
-    required this.clock,
-    PlannerStorage? storage,
-    CapacityModel? capacity,
-    this.weekStartDay = DateTime.monday,
-  }) : storage = storage ?? InMemoryPlannerStorage(),
-       capacity =
-           capacity ??
-           CapacityModel(defaultDailyMinutes: defaultDailyCapacityMinutes);
+  PlannerController({required this.clock, PlannerStorage? storage})
+    : storage = storage ?? InMemoryPlannerStorage();
 
   final Clock clock;
   final PlannerStorage storage;
-  final CapacityModel capacity;
-  final int weekStartDay;
+
+  PlannerSettings _settings = PlannerSettings();
+  PlannerSettings get settings => _settings;
+
+  CapacityModel get capacity => CapacityModel(
+    defaultDailyMinutes: _settings.dailyCapacityMinutes,
+    weekdayMinutes: _settings.weekdayCapacityMinutes,
+  );
+
+  int get weekStartDay => _settings.weekStartDay;
 
   LoadStatus _loadStatus = LoadStatus.ready;
   SaveStatus _saveStatus = SaveStatus.saved;
@@ -63,7 +66,7 @@ class PlannerController extends ChangeNotifier {
     notifyListeners();
     try {
       final raw = await storage.read();
-      final data = raw == null ? const PlannerData() : decodePlannerData(raw);
+      final data = raw == null ? PlannerData() : decodePlannerData(raw);
       _categories
         ..clear()
         ..addAll(data.categories);
@@ -79,6 +82,14 @@ class PlannerController extends ChangeNotifier {
       _entries
         ..clear()
         ..addAll(data.entries);
+      _snapshots
+        ..clear()
+        ..addAll(data.snapshots);
+      _reviewed
+        ..clear()
+        ..addAll(data.reviewedPeriodIds);
+      _settings = data.settings;
+      _activeFocus = data.activeFocus;
       _loadStatus = LoadStatus.ready;
     } on Object catch (e) {
       // Type only: the saved content may contain personal goal titles.
@@ -86,6 +97,35 @@ class PlannerController extends ChangeNotifier {
       _loadStatus = LoadStatus.failed;
     }
     notifyListeners();
+    if (_loadStatus == LoadStatus.ready) refreshDay();
+  }
+
+  /// Call when the app comes back to the foreground or the day may have
+  /// changed: closes ended periods and opens this week's periods.
+  void refreshDay() {
+    if (_loadStatus != LoadStatus.ready) return;
+    final plan = planWeekRollover(
+      goals: _goals,
+      periods: _periods,
+      allocations: _allocations,
+      entries: _entries,
+      today: today,
+      currentWeek: currentWeek,
+      nowUtc: clock.nowUtc(),
+      newId: generateUuidV4,
+    );
+    if (plan.isEmpty) {
+      notifyListeners();
+      return;
+    }
+    for (final result in plan.closed) {
+      final index = _periods.indexWhere((p) => p.id == result.closedPeriod.id);
+      _periods[index] = result.closedPeriod;
+      _snapshots.add(result.snapshot);
+    }
+    _periods.addAll(plan.opened);
+    _allocations.addAll(plan.openedAllocations);
+    _commit();
   }
 
   /// Completes when every change made so far has been written.
@@ -114,6 +154,10 @@ class PlannerController extends ChangeNotifier {
         periods: List.of(_periods),
         allocations: List.of(_allocations),
         entries: List.of(_entries),
+        snapshots: List.of(_snapshots),
+        reviewedPeriodIds: Set.of(_reviewed),
+        settings: _settings,
+        activeFocus: _activeFocus,
       ),
     );
     _saveChain = _saveChain.then((_) => _write(snapshot));
@@ -136,6 +180,9 @@ class PlannerController extends ChangeNotifier {
   final _periods = <GoalPeriod>[];
   final _allocations = <DailyAllocation>[];
   final _entries = <ProgressEntry>[];
+  final _snapshots = <PeriodSnapshot>[];
+  final _reviewed = <String>{};
+  FocusSession? _activeFocus;
 
   LocalDate get today => clock.today();
 
@@ -184,6 +231,7 @@ class PlannerController extends ChangeNotifier {
       title: title,
       goalType: GoalType.flexibleQuota,
       measurementType: MeasurementType.durationMinutes,
+      defaultTargetValue: targetMinutes,
       isSensitive: category.isSensitive,
     );
     final period = GoalPeriod(
@@ -271,11 +319,174 @@ class PlannerController extends ChangeNotifier {
         plannedOnExcluding(day, excludePeriodId: periodId),
   );
 
-  /// Changes a goal's total target; progress is kept and every derived
-  /// number (pace, remaining, debt) follows automatically.
+  /// Changes a goal's target; progress is kept and every derived number
+  /// (pace, remaining, debt) follows automatically. For a weekly goal the
+  /// new value also becomes the target of the weeks that follow.
   void updateTarget(String periodId, int targetMinutes) {
     final index = _periods.indexWhere((p) => p.id == periodId);
-    _periods[index] = _periods[index].withTarget(targetMinutes);
+    final period = _periods[index];
+    _periods[index] = period.withTarget(targetMinutes);
+    final goalIndex = _goals.indexWhere((g) => g.id == period.goalId);
+    if (_goals[goalIndex].goalType == GoalType.flexibleQuota) {
+      _goals[goalIndex] = _goals[goalIndex].withDefaultTarget(targetMinutes);
+    }
+    _commit();
+  }
+
+  /// Stops a goal: it leaves Today and Week and no new weeks are opened.
+  /// Its history stays in reports.
+  void archiveGoal(String goalId) {
+    final index = _goals.indexWhere((g) => g.id == goalId);
+    _goals[index] = _goals[index].archived();
+    _commit();
+  }
+
+  /// Name of any category, including archived ones (reports keep history).
+  String categoryName(String categoryId) {
+    for (final c in _categories) {
+      if (c.id == categoryId) return c.name;
+    }
+    return '';
+  }
+
+  GoalCategory? categoryById(String categoryId) {
+    for (final c in _categories) {
+      if (c.id == categoryId) return c;
+    }
+    return null;
+  }
+
+  /// This week so far: weekly goals against their target, deadline goals
+  /// against this week's pace share.
+  WeekSummary currentWeekSummary() => WeekSummary(
+    range: currentWeek,
+    lines: [
+      for (final v in activeGoals())
+        GoalWeekLine(
+          goalId: v.goal.id,
+          title: v.goal.title,
+          categoryId: v.goal.categoryId,
+          target: v.pace?.requiredThisWeek ?? v.period.targetValue,
+          done: v.pace?.doneThisWeek ?? v.periodDone,
+        ),
+    ],
+  );
+
+  /// Every frozen result of a closed period, newest week first.
+  List<PeriodSnapshot> get snapshots {
+    final sorted = List<PeriodSnapshot>.of(_snapshots)
+      ..sort((a, b) => b.range.start.compareTo(a.range.start));
+    return List.unmodifiable(sorted);
+  }
+
+  /// Results the user hasn't looked at yet (shown once, on Today).
+  List<PeriodSnapshot> get pendingReviews => [
+    for (final s in snapshots)
+      if (!_reviewed.contains(s.periodId)) s,
+  ];
+
+  void markReviewed() {
+    _reviewed.addAll(_snapshots.map((s) => s.periodId));
+    _commit();
+  }
+
+  /// This week's open period of [goalId], if the goal is still running.
+  GoalPeriod? currentPeriodOf(String goalId) {
+    for (final p in _periods) {
+      if (p.goalId == goalId && !p.isClosed && p.range.contains(today)) {
+        return p;
+      }
+    }
+    return null;
+  }
+
+  /// Whether [snapshot]'s shortfall can still be added to this week.
+  bool canCarryOver(PeriodSnapshot snapshot) {
+    final week = currentPeriodOf(snapshot.goalId);
+    return snapshot.shortfall > 0 &&
+        snapshot.goalType == GoalType.flexibleQuota &&
+        week != null &&
+        week.carryoverFromPeriodId == null &&
+        !_periods.any((p) => p.carryoverFromPeriodId == snapshot.periodId);
+  }
+
+  /// Adds last week's shortfall to this week's target — only when the
+  /// user asks for it (CLAUDE.md §4.3).
+  void carryOver(PeriodSnapshot snapshot) {
+    final week = currentPeriodOf(snapshot.goalId)!;
+    final updated = carryOverIntoWeek(
+      week: week,
+      snapshot: snapshot,
+      amount: snapshot.shortfall,
+      existingPeriods: _periods,
+    );
+    _periods[_periods.indexWhere((p) => p.id == week.id)] = updated;
+    _commit();
+  }
+
+  /// New capacity or week start. Existing weeks keep their dates; a new
+  /// week start applies from the next week that is opened.
+  void updateSettings(PlannerSettings settings) {
+    _settings = settings;
+    _commit();
+  }
+
+  /// The running or paused focus timer, if any.
+  FocusSession? get activeFocus => _activeFocus;
+
+  void startFocus(String periodId) {
+    if (_activeFocus != null) {
+      throw StateError('A focus session is already running.');
+    }
+    _activeFocus = FocusSession(
+      id: generateUuidV4(),
+      goalPeriodId: periodId,
+      startedAt: clock.nowUtc(),
+    );
+    _commit();
+  }
+
+  void pauseFocus() {
+    _activeFocus = _activeFocus?.pause(clock.nowUtc());
+    _commit();
+  }
+
+  void resumeFocus() {
+    _activeFocus = _activeFocus?.resume(clock.nowUtc());
+    _commit();
+  }
+
+  /// Ends the timer and records the worked minutes as progress. Returns the
+  /// minutes recorded (0 when less than a minute was worked). Throws
+  /// [ProgressRejectedException] if the goal's period no longer accepts
+  /// progress; the session is then kept so nothing is lost.
+  int finishFocus({String? note}) {
+    final session = _activeFocus;
+    if (session == null) return 0;
+    final minutes = session.workedMinutes(clock.nowUtc());
+    if (minutes > 0) {
+      final period = _period(session.goalPeriodId);
+      final entry = ProgressEntry(
+        id: generateUuidV4(),
+        goalPeriodId: period.id,
+        valueDelta: minutes,
+        source: ProgressSource.focusTimer,
+        occurredAt: clock.nowUtc(),
+        localDate: today,
+        idempotencyKey: session.idempotencyKey,
+        note: note,
+      );
+      validateNewEntry(period, entry, _entries);
+      _entries.add(entry);
+    }
+    _activeFocus = null;
+    _commit();
+    return minutes;
+  }
+
+  /// Throws the timer away without recording anything.
+  void cancelFocus() {
+    _activeFocus = null;
     _commit();
   }
 
@@ -394,7 +605,8 @@ class PlannerController extends ChangeNotifier {
   /// Open periods that include today, in creation order.
   List<GoalProgressView> activeGoals() => [
     for (final p in _periods)
-      if (!p.isClosed && p.range.contains(today)) _view(p),
+      if (!p.isClosed && p.range.contains(today) && _goal(p.goalId).isActive)
+        _view(p),
   ];
 
   /// Planned minutes vs. capacity for [date], across all time-based goals.

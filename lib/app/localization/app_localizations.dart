@@ -1141,6 +1141,360 @@ abstract class AppLocalizations {
   /// In tr, this message translates to:
   /// **'Plan bu haftanın temposunu karşılıyor.'**
   String get planWeekPaceCovers;
+
+  /// No description provided for @navReports.
+  ///
+  /// In tr, this message translates to:
+  /// **'Rapor'**
+  String get navReports;
+
+  /// No description provided for @navSettings.
+  ///
+  /// In tr, this message translates to:
+  /// **'Ayarlar'**
+  String get navSettings;
+
+  /// No description provided for @reviewTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Geçen hafta kapandı'**
+  String get reviewTitle;
+
+  /// No description provided for @reviewBody.
+  ///
+  /// In tr, this message translates to:
+  /// **'{count} hedefin sonucu hazır. Eksik kalan süre sen istemedikçe taşınmaz.'**
+  String reviewBody(String count);
+
+  /// No description provided for @reviewOpen.
+  ///
+  /// In tr, this message translates to:
+  /// **'Özeti gör'**
+  String get reviewOpen;
+
+  /// No description provided for @reviewSheetTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Hafta özeti'**
+  String get reviewSheetTitle;
+
+  /// No description provided for @reviewShortfall.
+  ///
+  /// In tr, this message translates to:
+  /// **'{amount} eksik kaldı'**
+  String reviewShortfall(String amount);
+
+  /// No description provided for @carryOverAction.
+  ///
+  /// In tr, this message translates to:
+  /// **'{amount} bu haftaya ekle'**
+  String carryOverAction(String amount);
+
+  /// No description provided for @carryOverDone.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bu haftaya eklendi'**
+  String get carryOverDone;
+
+  /// No description provided for @reviewAcknowledge.
+  ///
+  /// In tr, this message translates to:
+  /// **'Tamam'**
+  String get reviewAcknowledge;
+
+  /// No description provided for @moreActions.
+  ///
+  /// In tr, this message translates to:
+  /// **'Diğer işlemler'**
+  String get moreActions;
+
+  /// No description provided for @archiveGoal.
+  ///
+  /// In tr, this message translates to:
+  /// **'Hedefi arşivle'**
+  String get archiveGoal;
+
+  /// No description provided for @archiveConfirmTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Hedef arşivlensin mi?'**
+  String get archiveConfirmTitle;
+
+  /// No description provided for @archiveConfirmBody.
+  ///
+  /// In tr, this message translates to:
+  /// **'Hedef Bugün ve Hafta ekranlarından kalkar ve yeni haftalara açılmaz. Geçmiş sonuçları raporlarda kalır.'**
+  String get archiveConfirmBody;
+
+  /// No description provided for @archiveConfirm.
+  ///
+  /// In tr, this message translates to:
+  /// **'Arşivle'**
+  String get archiveConfirm;
+
+  /// No description provided for @goalArchived.
+  ///
+  /// In tr, this message translates to:
+  /// **'Hedef arşivlendi'**
+  String get goalArchived;
+
+  /// No description provided for @settingsTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Ayarlar'**
+  String get settingsTitle;
+
+  /// No description provided for @settingsCapacity.
+  ///
+  /// In tr, this message translates to:
+  /// **'Günlük kapasite'**
+  String get settingsCapacity;
+
+  /// No description provided for @settingsCapacityHint.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bir günde gerçekçi olarak planlayabileceğin süre. Plan bunu aşarsa uyarı alırsın.'**
+  String get settingsCapacityHint;
+
+  /// No description provided for @settingsDefaultCapacity.
+  ///
+  /// In tr, this message translates to:
+  /// **'Her gün'**
+  String get settingsDefaultCapacity;
+
+  /// No description provided for @settingsWeekdayCapacity.
+  ///
+  /// In tr, this message translates to:
+  /// **'Güne özel kapasite'**
+  String get settingsWeekdayCapacity;
+
+  /// No description provided for @settingsWeekdayHint.
+  ///
+  /// In tr, this message translates to:
+  /// **'Farklı olan günleri ayarla; diğerleri \"Her gün\" değerini kullanır.'**
+  String get settingsWeekdayHint;
+
+  /// No description provided for @settingsResetDay.
+  ///
+  /// In tr, this message translates to:
+  /// **'{day} için özel kapasiteyi kaldır'**
+  String settingsResetDay(String day);
+
+  /// No description provided for @settingsWeekStart.
+  ///
+  /// In tr, this message translates to:
+  /// **'Hafta başlangıcı'**
+  String get settingsWeekStart;
+
+  /// No description provided for @settingsWeekStartHint.
+  ///
+  /// In tr, this message translates to:
+  /// **'Değişiklik bir sonraki haftadan itibaren geçerli olur.'**
+  String get settingsWeekStartHint;
+
+  /// No description provided for @settingsDataTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Verilerin'**
+  String get settingsDataTitle;
+
+  /// No description provided for @settingsDataBody.
+  ///
+  /// In tr, this message translates to:
+  /// **'Veriler şu an yalnızca bu cihazda saklanıyor. Cihazlar arası senkronizasyon bir sonraki aşamada gelecek.'**
+  String get settingsDataBody;
+
+  /// No description provided for @focusStart.
+  ///
+  /// In tr, this message translates to:
+  /// **'Odaklan'**
+  String get focusStart;
+
+  /// No description provided for @focusTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Odak'**
+  String get focusTitle;
+
+  /// No description provided for @focusPause.
+  ///
+  /// In tr, this message translates to:
+  /// **'Duraklat'**
+  String get focusPause;
+
+  /// No description provided for @focusResume.
+  ///
+  /// In tr, this message translates to:
+  /// **'Devam et'**
+  String get focusResume;
+
+  /// No description provided for @focusFinish.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bitir ve kaydet'**
+  String get focusFinish;
+
+  /// No description provided for @focusCancel.
+  ///
+  /// In tr, this message translates to:
+  /// **'Oturumu iptal et'**
+  String get focusCancel;
+
+  /// No description provided for @focusPaused.
+  ///
+  /// In tr, this message translates to:
+  /// **'Duraklatıldı'**
+  String get focusPaused;
+
+  /// No description provided for @focusRecorded.
+  ///
+  /// In tr, this message translates to:
+  /// **'{amount} kaydedildi'**
+  String focusRecorded(String amount);
+
+  /// No description provided for @focusTooShort.
+  ///
+  /// In tr, this message translates to:
+  /// **'1 dakikadan kısa çalışma kaydedilmedi.'**
+  String get focusTooShort;
+
+  /// No description provided for @focusCancelConfirmTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Oturum iptal edilsin mi?'**
+  String get focusCancelConfirmTitle;
+
+  /// No description provided for @focusCancelConfirmBody.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bu oturumdaki süre kaydedilmez.'**
+  String get focusCancelConfirmBody;
+
+  /// No description provided for @focusCancelConfirm.
+  ///
+  /// In tr, this message translates to:
+  /// **'İptal et'**
+  String get focusCancelConfirm;
+
+  /// No description provided for @focusRunning.
+  ///
+  /// In tr, this message translates to:
+  /// **'Odak sürüyor'**
+  String get focusRunning;
+
+  /// No description provided for @focusOpen.
+  ///
+  /// In tr, this message translates to:
+  /// **'Aç'**
+  String get focusOpen;
+
+  /// No description provided for @focusAnotherRunning.
+  ///
+  /// In tr, this message translates to:
+  /// **'Başka bir hedefte odak oturumu sürüyor.'**
+  String get focusAnotherRunning;
+
+  /// No description provided for @focusPeriodEnded.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bu hedefin dönemi bitti; süre kaydedilemedi. Oturumu iptal edip ilerlemeyi yeni haftaya elle ekleyebilirsin.'**
+  String get focusPeriodEnded;
+
+  /// No description provided for @focusTimerSemantics.
+  ///
+  /// In tr, this message translates to:
+  /// **'Geçen süre {time}'**
+  String focusTimerSemantics(String time);
+
+  /// No description provided for @reportsTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Rapor'**
+  String get reportsTitle;
+
+  /// No description provided for @reportsThisWeek.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bu hafta'**
+  String get reportsThisWeek;
+
+  /// No description provided for @reportsTarget.
+  ///
+  /// In tr, this message translates to:
+  /// **'Hedef'**
+  String get reportsTarget;
+
+  /// No description provided for @reportsCompletion.
+  ///
+  /// In tr, this message translates to:
+  /// **'Tamamlanma'**
+  String get reportsCompletion;
+
+  /// No description provided for @reportsPercent.
+  ///
+  /// In tr, this message translates to:
+  /// **'%{value}'**
+  String reportsPercent(String value);
+
+  /// No description provided for @reportsByCategory.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kategoriye göre'**
+  String get reportsByCategory;
+
+  /// No description provided for @reportsByCategoryHint.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bu hafta çalıştığın sürenin alanlara dağılımı.'**
+  String get reportsByCategoryHint;
+
+  /// No description provided for @reportsNoWorkYet.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bu hafta henüz ilerleme kaydedilmedi.'**
+  String get reportsNoWorkYet;
+
+  /// No description provided for @reportsHistory.
+  ///
+  /// In tr, this message translates to:
+  /// **'Geçmiş haftalar'**
+  String get reportsHistory;
+
+  /// No description provided for @reportsEmptyHistory.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kapanan haftaların sonuçları burada görünecek.'**
+  String get reportsEmptyHistory;
+
+  /// No description provided for @reportsChangeUp.
+  ///
+  /// In tr, this message translates to:
+  /// **'Önceki haftadan {amount} fazla'**
+  String reportsChangeUp(String amount);
+
+  /// No description provided for @reportsChangeDown.
+  ///
+  /// In tr, this message translates to:
+  /// **'Önceki haftadan {amount} az'**
+  String reportsChangeDown(String amount);
+
+  /// No description provided for @reportsChangeSame.
+  ///
+  /// In tr, this message translates to:
+  /// **'Önceki haftayla aynı'**
+  String get reportsChangeSame;
+
+  /// No description provided for @reportsDeadlines.
+  ///
+  /// In tr, this message translates to:
+  /// **'Tarihli hedefler'**
+  String get reportsDeadlines;
+
+  /// No description provided for @weekPaceShort.
+  ///
+  /// In tr, this message translates to:
+  /// **'tempo'**
+  String get weekPaceShort;
 }
 
 class _AppLocalizationsDelegate

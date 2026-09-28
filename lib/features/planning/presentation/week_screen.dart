@@ -10,6 +10,7 @@ import '../../../shared/widgets/progress_line.dart';
 import '../../categories/presentation/category_style.dart';
 import '../domain/capacity.dart';
 import 'deadline_pace_section.dart';
+import 'goal_actions_menu.dart';
 import 'plan_editor_sheet.dart';
 import 'planner_controller.dart';
 import 'redistribution_sheet.dart';
@@ -243,6 +244,7 @@ class _WeekGoalCard extends StatelessWidget {
                       showPlanEditorSheet(context, periodId: view.period.id),
                   icon: const Icon(Icons.edit_calendar_outlined),
                 ),
+                GoalActionsMenu(view: view),
               ],
             ),
             const SizedBox(height: AppSpacing.m),

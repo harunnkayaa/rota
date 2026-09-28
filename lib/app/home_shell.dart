@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import '../features/goals/presentation/create_goal_screen.dart';
 import '../features/planning/presentation/planner_controller.dart';
 import '../features/planning/presentation/week_screen.dart';
+import '../features/reports/presentation/reports_screen.dart';
+import '../features/settings/presentation/settings_screen.dart';
 import '../features/today/presentation/today_screen.dart';
 import 'localization/app_localizations.dart';
 import 'theme/app_theme.dart';
@@ -18,7 +20,15 @@ class HomeShell extends StatefulWidget {
 class _HomeShellState extends State<HomeShell> {
   var _index = 0;
 
-  static const _pages = [TodayScreen(), WeekScreen()];
+  static const _pages = [
+    TodayScreen(),
+    WeekScreen(),
+    ReportsScreen(),
+    SettingsScreen(),
+  ];
+
+  /// "Add goal" belongs to the planning screens only.
+  bool get _showAddGoal => _index <= 1;
 
   @override
   Widget build(BuildContext context) {
@@ -31,6 +41,12 @@ class _HomeShellState extends State<HomeShell> {
         Expanded(child: _pages[_index]),
       ],
     );
+    final destinations = [
+      (Icons.today_outlined, Icons.today, l.navToday),
+      (Icons.view_week_outlined, Icons.view_week, l.navWeek),
+      (Icons.insights_outlined, Icons.insights, l.navReports),
+      (Icons.tune_outlined, Icons.tune, l.navSettings),
+    ];
 
     if (isWide) {
       return Scaffold(
@@ -49,16 +65,12 @@ class _HomeShellState extends State<HomeShell> {
                 ),
               ),
               destinations: [
-                NavigationRailDestination(
-                  icon: const Icon(Icons.today_outlined),
-                  selectedIcon: const Icon(Icons.today),
-                  label: Text(l.navToday),
-                ),
-                NavigationRailDestination(
-                  icon: const Icon(Icons.view_week_outlined),
-                  selectedIcon: const Icon(Icons.view_week),
-                  label: Text(l.navWeek),
-                ),
+                for (final (icon, selected, label) in destinations)
+                  NavigationRailDestination(
+                    icon: Icon(icon),
+                    selectedIcon: Icon(selected),
+                    label: Text(label),
+                  ),
               ],
             ),
             const VerticalDivider(width: 1),
@@ -70,25 +82,23 @@ class _HomeShellState extends State<HomeShell> {
 
     return Scaffold(
       body: page,
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => openCreateGoal(context),
-        icon: const Icon(Icons.add),
-        label: Text(l.addGoal),
-      ),
+      floatingActionButton: _showAddGoal
+          ? FloatingActionButton.extended(
+              onPressed: () => openCreateGoal(context),
+              icon: const Icon(Icons.add),
+              label: Text(l.addGoal),
+            )
+          : null,
       bottomNavigationBar: NavigationBar(
         selectedIndex: _index,
         onDestinationSelected: (i) => setState(() => _index = i),
         destinations: [
-          NavigationDestination(
-            icon: const Icon(Icons.today_outlined),
-            selectedIcon: const Icon(Icons.today),
-            label: l.navToday,
-          ),
-          NavigationDestination(
-            icon: const Icon(Icons.view_week_outlined),
-            selectedIcon: const Icon(Icons.view_week),
-            label: l.navWeek,
-          ),
+          for (final (icon, selected, label) in destinations)
+            NavigationDestination(
+              icon: Icon(icon),
+              selectedIcon: Icon(selected),
+              label: label,
+            ),
         ],
       ),
     );

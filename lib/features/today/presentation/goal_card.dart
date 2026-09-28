@@ -6,7 +6,9 @@ import '../../../app/theme/app_theme.dart';
 import '../../../shared/widgets/debt_notice.dart';
 import '../../../shared/widgets/progress_line.dart';
 import '../../categories/presentation/category_style.dart';
+import '../../focus/presentation/focus_screen.dart';
 import '../../planning/presentation/deadline_pace_section.dart';
+import '../../planning/presentation/goal_actions_menu.dart';
 import '../../planning/presentation/plan_editor_sheet.dart';
 import '../../planning/presentation/planner_controller.dart';
 import '../../planning/presentation/redistribution_sheet.dart';
@@ -46,13 +48,18 @@ class GoalCard extends StatelessWidget {
                           color: scheme.onSurfaceVariant,
                         ),
                       ),
+                      if (view.todayRemaining > 0) ...[
+                        const SizedBox(height: AppSpacing.xs),
+                        _RemainingBadge(
+                          text: l.remainingToday(
+                            l.minutes(view.todayRemaining),
+                          ),
+                        ),
+                      ],
                     ],
                   ),
                 ),
-                if (view.todayRemaining > 0)
-                  _RemainingBadge(
-                    text: l.remainingToday(l.minutes(view.todayRemaining)),
-                  ),
+                GoalActionsMenu(view: view),
               ],
             ),
             const SizedBox(height: AppSpacing.m),
@@ -101,6 +108,14 @@ class GoalCard extends StatelessWidget {
                   onPressed: () => showAddProgressSheet(context, view),
                   icon: const Icon(Icons.add),
                   label: Text(l.addProgress),
+                ),
+                FilledButton.icon(
+                  style: FilledButton.styleFrom(
+                    minimumSize: const Size(64, 44),
+                  ),
+                  onPressed: () => openFocus(context, view.period.id),
+                  icon: const Icon(Icons.timer_outlined),
+                  label: Text(l.focusStart),
                 ),
               ],
             ),

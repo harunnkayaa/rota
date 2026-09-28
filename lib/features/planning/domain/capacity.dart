@@ -7,9 +7,15 @@ import '../../goals/domain/daily_allocation.dart';
 class CapacityModel {
   CapacityModel({
     required this.defaultDailyMinutes,
+    Map<int, int> weekdayMinutes = const {},
     Map<LocalDate, int> overrides = const {},
-  }) : overrides = Map.unmodifiable(overrides) {
-    for (final minutes in [defaultDailyMinutes, ...overrides.values]) {
+  }) : weekdayMinutes = Map.unmodifiable(weekdayMinutes),
+       overrides = Map.unmodifiable(overrides) {
+    for (final minutes in [
+      defaultDailyMinutes,
+      ...weekdayMinutes.values,
+      ...overrides.values,
+    ]) {
       if (minutes < 0 || minutes > Duration.minutesPerDay) {
         throw ArgumentError.value(minutes, 'minutes', 'Must be 0..1440');
       }
@@ -18,10 +24,15 @@ class CapacityModel {
 
   final int defaultDailyMinutes;
 
+  /// Regular weekly rhythm by ISO weekday: "Saturdays I have 6 hours".
+  final Map<int, int> weekdayMinutes;
+
   /// Per-date exceptions: a class day, travel, an appointment.
   final Map<LocalDate, int> overrides;
 
-  int capacityOn(LocalDate date) => overrides[date] ?? defaultDailyMinutes;
+  /// Most specific rule wins: date, then weekday, then the default.
+  int capacityOn(LocalDate date) =>
+      overrides[date] ?? weekdayMinutes[date.weekday] ?? defaultDailyMinutes;
 }
 
 /// Planned minutes vs. capacity for one day.

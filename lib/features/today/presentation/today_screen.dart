@@ -6,9 +6,11 @@ import '../../../app/theme/app_theme.dart';
 import '../../../shared/widgets/content_width.dart';
 import '../../../shared/widgets/progress_ring.dart';
 import '../../categories/domain/category.dart';
+import '../../focus/presentation/focus_screen.dart';
 import '../../goals/presentation/create_goal_screen.dart';
 import '../../planning/presentation/planner_controller.dart';
 import 'goal_card.dart';
+import 'week_review.dart';
 
 /// The first screen: what to do today and how it feeds the week.
 class TodayScreen extends StatelessWidget {
@@ -37,6 +39,33 @@ class TodayScreen extends StatelessWidget {
               ),
             ),
           ),
+          if (controller.activeFocus != null ||
+              controller.pendingReviews.isNotEmpty)
+            SliverToBoxAdapter(
+              child: ContentWidth(
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(
+                    AppSpacing.m,
+                    AppSpacing.m,
+                    AppSpacing.m,
+                    0,
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      if (controller.activeFocus != null)
+                        const FocusRunningBanner(),
+                      if (controller.pendingReviews case final pending
+                          when pending.isNotEmpty) ...[
+                        if (controller.activeFocus != null)
+                          const SizedBox(height: AppSpacing.m),
+                        WeekReviewBanner(pending: pending),
+                      ],
+                    ],
+                  ),
+                ),
+              ),
+            ),
           if (goals.isEmpty)
             const SliverFillRemaining(
               hasScrollBody: false,

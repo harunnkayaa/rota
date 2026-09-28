@@ -1,7 +1,10 @@
 # Rota — Nerede kaldık?
 
-> Son güncelleme: 2026-09-26. Yeni bir oturuma başlarken önce bu dosyayı,
+> Son güncelleme: 2026-09-28. Yeni bir oturuma başlarken önce bu dosyayı,
 > sonra [CLAUDE.md](../CLAUDE.md)'yi oku.
+>
+> Çalışma dalı: `feat/deadline-route` (GitHub'da). `main`'e birleştirme
+> kullanıcı tarafından PR ile yapılacak.
 
 ## Tamamlanan aşamalar
 
@@ -12,35 +15,29 @@
 | Kullanıcı istekleri (26.09) | ✅ | Her güne ayrı süre; planı Bugün ve Hafta ekranından düzenleme; geçmiş günler kilitli; eksik gün sonradan telafi edilince "fazla planlandı" denmiyor (kalan plan ↔ kalan hedef). |
 | Hedef tarihi rotası (28.09) | ✅ | Tarihli hedef (sınav/mülakat/teslim): kalan süre, haftalık tempo, bu haftanın payı, kapasiteye göre yetişme riski. Geride kalınca "Tempoyu yakala": önce boş zamandan, yetmezse **kullanıcının seçtiği** hedeflerden süre alır; toplam hedef değiştirilebilir. Motor: `planning/domain/deadline_pace.dart`. |
 
-Doğrulama: 148 test geçiyor, `flutter analyze` temiz.
+| Hafta geçişi ve kapanış (28.09) | ✅ | Yeni hafta başlayınca biten dönemler kapanır (snapshot), aktif haftalık hedefler aynı varsayılan hedefle yeni haftaya açılır, gün dağılımı bugünden itibaren kopyalanır. Eksik süre yalnızca kullanıcı "bu haftaya ekle" derse taşınır. Hedef arşivleme. Uygulama öne gelince tarih yeniden kontrol edilir. |
+| Ayarlar (28.09) | ✅ | Günlük kapasite, güne özel kapasite, hafta başlangıcı. |
+| Odak sayacı (28.09) | ✅ | Başlat / duraklat / devam / bitir; süre zaman damgalarından hesaplanır, uygulama kapanınca kaybolmaz; bitirince tek ilerleme kaydı (`focus:<id>` idempotency). |
+| Raporlar (28.09) | ✅ | Bu hafta planlanan–gerçekleşen, kategori dağılımı, geçmiş haftalar (snapshot'lardan), önceki haftayla fark, biten tarihli hedefler. |
+| Kayıt şeması v2 | ✅ | v1 dosyaları otomatik taşınır (varsayılan haftalık hedef son haftadan alınır). |
 
-## ⚠️ Önce çözülmesi gereken eksik: haftalık hedefler yeni haftaya geçmiyor
-
-Haftalık hedef bir `calendarWeek` dönemi olarak oluşturuluyor; hafta bitince
-yeni dönem açılmıyor ve hedef Bugün ekranından kayboluyor (28.09'da
-görüldü). Önerilen çözüm: yeni hafta başladığında her aktif haftalık hedef
-için aynı haftalık hedefle yeni dönem açmak ve geçen haftanın gün dağılımını
-öneri olarak kopyalamak. Eksik kalan süre **otomatik taşınmaz** (CLAUDE.md
-§4.3); geçen haftanın sonucu snapshot olarak kapanır. Kullanıcı kararı:
-gün dağılımı kopyalansın mı, boş mu başlasın?
+Doğrulama: 183 test geçiyor, `flutter analyze` temiz.
 
 ## Sıradaki adımlar (öncelik sırasıyla)
 
-1. **Phase 2 — Supabase (giriş + telefon/web senkronizasyonu)**
-   - Kullanıcının yapacağı: `brew install supabase/tap/supabase`
-   - Karar bekliyor: önce **yerel** Supabase (Docker kurulu) mı, yoksa
-     supabase.com bulut projesi mi? Öneri: önce yerel.
-   - JSON alan adları SQL sütun adlarıyla aynı tutuldu
-     (`lib/features/planning/data/planner_json.dart`), migration'lar buna
-     göre yazılacak. RLS zorunlu.
-2. **Phase 4 — Bildirimler.** Kurallar hazır:
+1. **Bildirimler (iOS yerel).** Kurallar:
    [docs/product/notification-rules.md](product/notification-rules.md)
-   (her zaman *henüz çalışılmamış* süre üzerinden). iOS yerel bildirimler
-   hesap gerektirmez; uzaktan bildirim için Apple Developer hesabı gerekir.
-3. **Phase 3 — Odak sayacı ve offline kuyruk.**
-4. Ayarlar ekranı (kapasite şu an sabit 240 dk/gün, hafta başlangıcı
-   Pazartesi, timezone = cihaz).
-5. Raporlar ve dönem kapanışı ekranı (domain hazır, UI yok).
+   (her zaman *henüz çalışılmamış* süre; sessiz saatler; günlük bütçe;
+   hassas hedeflerde gizli metin). Web'de yerel bildirim yok.
+2. **Phase 2 — Supabase (giriş + telefon/web senkronizasyonu)** —
+   kullanıcı gerektiriyor:
+   - `brew install supabase/tap/supabase` kurulumu
+   - Karar: önce **yerel** Supabase (Docker kurulu) mı, yoksa supabase.com
+     bulut projesi mi? Öneri: önce yerel.
+   - JSON alan adları SQL sütun adlarıyla aynı tutuldu
+     (`lib/features/planning/data/planner_json.dart`); RLS zorunlu.
+3. Offline kuyruk ve çakışma yönetimi (Supabase ile birlikte).
+4. Veri dışa aktarma / hesap-veri silme (CLAUDE.md §4.6).
 
 ## Ürün yönü (kullanıcının 26.09 isteği)
 
