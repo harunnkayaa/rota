@@ -1,4 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:rota/core/time/local_date.dart';
+import 'package:rota/features/categories/domain/category.dart';
 import 'package:rota/features/goals/domain/progress_entry.dart';
 import 'package:rota/features/planning/data/planner_data.dart';
 import 'package:rota/features/sync/domain/sync_policy.dart';
@@ -99,4 +101,84 @@ void main() {
       expect(result.unmatchedEntries, 1);
     });
   });
+
+  group('mergeThreeWay', () {
+    final category = GoalCategory(
+      id: 'cat-project',
+      name: 'Proje',
+      iconKey: 'code',
+    );
+    PlannerData data({
+      List<DailyAllocationLike> allocations = const [],
+      int target = 600,
+      bool withGoal = true,
+      List<ProgressEntry> entries = const [],
+    }) => PlannerData(
+      categories: [category],
+      goals: [if (withGoal) projectGoal()],
+      periods: [if (withGoal) weekPeriod(target: target)],
+      allocations: [for (final a in allocations) allocation(a.$1, a.$2)],
+      entries: entries,
+    );
+
+    test('a removal on one side and an addition on the other both apply', () {
+      final base = data(allocations: [(monday, 120), (tuesday, 60)]);
+      final local = data(allocations: [(monday, 120)]); // Tuesday removed
+      final server = data(
+        allocations: [(monday, 120), (tuesday, 60), (friday, 30)],
+      );
+      final merged = mergeThreeWay(base: base, local: local, server: server)!;
+      expect(
+        {for (final a in merged.allocations) a.date: a.allocatedValue},
+        {monday: 120, friday: 30},
+      );
+    });
+
+    test('entries from both sides are kept once', () {
+      final shared = entry(monday, 30, id: 'shared');
+      final base = data(entries: [shared]);
+      final local = data(
+        entries: [
+          shared,
+          entry(monday, 15, id: 'here'),
+        ],
+      );
+      final server = data(
+        entries: [
+          shared,
+          entry(monday, 45, id: 'there'),
+        ],
+      );
+      final merged = mergeThreeWay(base: base, local: local, server: server)!;
+      expect(merged.entries.map((e) => e.id).toSet(), {
+        'shared',
+        'here',
+        'there',
+      });
+    });
+
+    test('the same record changed differently → null (ask the user)', () {
+      expect(
+        mergeThreeWay(
+          base: data(),
+          local: data(target: 480),
+          server: data(target: 720),
+        ),
+        isNull,
+      );
+    });
+
+    test('work logged on a goal the other side removed → null', () {
+      expect(
+        mergeThreeWay(
+          base: data(),
+          local: data(entries: [entry(monday, 30)]),
+          server: data(withGoal: false),
+        ),
+        isNull,
+      );
+    });
+  });
 }
+
+typedef DailyAllocationLike = (LocalDate, int);

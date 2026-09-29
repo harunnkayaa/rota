@@ -5,6 +5,7 @@ import 'package:flutter/widgets.dart';
 import 'package:supabase_flutter/supabase_flutter.dart' show PostgrestException;
 
 import '../../planning/data/planner_data.dart';
+import '../../planning/data/planner_json.dart';
 import '../../planning/data/planner_storage.dart';
 import '../../planning/presentation/planner_controller.dart';
 import '../data/auth_gateway.dart';
@@ -37,6 +38,7 @@ class _SyncState {
     this.lastMarker,
     this.dirty = false,
     this.lastSyncedAt,
+    this.base,
   });
 
   factory _SyncState.fromJson(Map<String, Object?> json) => _SyncState(
@@ -47,6 +49,7 @@ class _SyncState {
       final String s => DateTime.parse(s),
       _ => null,
     },
+    base: json['base'] as String?,
   );
 
   String? userId;
@@ -54,11 +57,16 @@ class _SyncState {
   bool dirty;
   DateTime? lastSyncedAt;
 
+  /// The data both sides had after the last sync (encoded): the common
+  /// ancestor for merging changes made on two devices.
+  String? base;
+
   Map<String, Object?> toJson() => {
     'user_id': userId,
     'last_marker': lastMarker,
     'dirty': dirty,
     'last_synced_at': lastSyncedAt?.toIso8601String(),
+    'base': base,
   };
 }
 
@@ -195,7 +203,8 @@ class SyncService extends ChangeNotifier {
         _state
           ..userId = userId
           ..lastMarker = null
-          ..lastSyncedAt = null;
+          ..lastSyncedAt = null
+          ..base = null;
       }
       final server = await remote!.fetch();
       if (previousUser != null && previousUser != userId) {
@@ -203,7 +212,7 @@ class SyncService extends ChangeNotifier {
         // that account's server copy). Never hand it to this one: show this
         // account's own data instead.
         _adopt(server.data);
-        await _markSynced(server.marker);
+        await _markSynced(server.marker, base: server.data);
         _setStatus(SyncStatus.synced);
         return;
       }
@@ -218,13 +227,30 @@ class SyncService extends ChangeNotifier {
       switch (action) {
         case SyncAction.none:
           _state.lastMarker ??= server.marker;
-          await _markSynced(_state.lastMarker);
+          await _markSynced(
+            _state.lastMarker,
+            base: _state.base == null ? local : null,
+          );
         case SyncAction.push:
-          await _markSynced(await remote!.push(local));
+          await _markSynced(await remote!.push(local), base: local);
         case SyncAction.pull:
           _adopt(server.data);
-          await _markSynced(server.marker);
+          await _markSynced(server.marker, base: server.data);
         case SyncAction.conflict:
+          // Changes that don't touch the same thing are simply combined.
+          final merged = switch (_state.base) {
+            final base? => mergeThreeWay(
+              base: decodePlannerData(base),
+              local: local,
+              server: server.data,
+            ),
+            null => null,
+          };
+          if (merged != null) {
+            _adopt(merged);
+            await _markSynced(await remote!.push(merged), base: merged);
+            break;
+          }
           _pendingConflict = server;
           await _saveState();
           _setStatus(SyncStatus.conflict);
@@ -263,7 +289,8 @@ class SyncService extends ChangeNotifier {
     _setStatus(SyncStatus.syncing);
     try {
       _adopt(resolution.data);
-      await _markSynced(await remote!.push(controller.snapshotData()));
+      final resolved = controller.snapshotData();
+      await _markSynced(await remote!.push(resolved), base: resolved);
       _setStatus(SyncStatus.synced);
     } on Object catch (e) {
       debugPrint('Conflict resolution failed: ${e.runtimeType}');
@@ -312,11 +339,12 @@ class SyncService extends ChangeNotifier {
     _seenRevision = controller.userRevision;
   }
 
-  Future<void> _markSynced(String? marker) async {
+  Future<void> _markSynced(String? marker, {PlannerData? base}) async {
     _state
       ..lastMarker = marker
       ..dirty = false
       ..lastSyncedAt = DateTime.now().toUtc();
+    if (base != null) _state.base = encodePlannerData(base);
     await _saveState();
   }
 

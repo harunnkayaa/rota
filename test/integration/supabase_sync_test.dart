@@ -155,6 +155,50 @@ void main() {
       await stranger.dispose();
     });
 
+    test(
+      'separate changes on phone and web merge on the real server',
+      () async {
+        if (!up) {
+          markTestSkipped('local Supabase is not running');
+          return;
+        }
+        final email = 'rota-${Random().nextInt(1 << 32)}@example.test';
+        const password = 'integration-test-1';
+        final phone = _Device(config!);
+        await phone.start();
+        final category = phone.controller.addCategory('Proje');
+        final periodId = phone.controller
+            .createWeeklyDurationGoal(
+              categoryId: category.id,
+              title: 'Rota MVP',
+              targetMinutes: 600,
+              dailyPlan: {monday: 120},
+            )
+            .id;
+        await phone.sync.signUp(email: email, password: password);
+        await phone.sync.sync();
+        final web = _Device(config);
+        await web.start();
+        await web.sync.signIn(email: email, password: password);
+        await web.sync.sync();
+
+        phone.controller.addProgress(periodId, 45);
+        await phone.sync.sync();
+        web.controller.updatePlan(periodId, {tuesday: 90});
+        await web.sync.sync();
+
+        expect(web.sync.status, SyncStatus.synced);
+        await phone.sync.sync();
+        final view = phone.controller.activeGoals().single;
+        expect(view.todayDone, 45);
+        expect(view.days.firstWhere((d) => d.date == tuesday).allocated, 90);
+
+        await phone.sync.deleteAccount();
+        await phone.dispose();
+        await web.dispose();
+      },
+    );
+
     test('a taken-back entry syncs as an adjustment', () async {
       if (!up) {
         markTestSkipped('local Supabase is not running');

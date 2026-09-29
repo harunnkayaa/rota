@@ -1,5 +1,8 @@
+import 'dart:convert';
+
 import '../../goals/domain/progress_entry.dart';
 import '../../planning/data/planner_data.dart';
+import '../../planning/data/planner_json.dart';
 
 enum SyncAction {
   /// Both sides are the same as after the last sync.
@@ -89,6 +92,172 @@ ConflictResolution resolveConflict({
     ),
     unmatchedEntries: unmatched,
   );
+}
+
+/// Combines two devices' changes made since their common [base] (the data
+/// of the last sync on this device). Returns null when both changed the
+/// same record differently: that is a real conflict and the user decides.
+///
+/// Per record (by id): changed on one side only → that side; same change on
+/// both → either; different changes → conflict. Progress entries are
+/// append-only, so both sides' entries are kept. A closed week keeps the
+/// server's snapshot: each device closes it on its own, with only the
+/// closing time differing.
+PlannerData? mergeThreeWay({
+  required PlannerData base,
+  required PlannerData local,
+  required PlannerData server,
+}) {
+  final categories = _mergeRecords(
+    base.categories,
+    local.categories,
+    server.categories,
+    id: (c) => c.id,
+    row: categoryToRow,
+  );
+  final goals = _mergeRecords(
+    base.goals,
+    local.goals,
+    server.goals,
+    id: (g) => g.id,
+    row: goalToRow,
+  );
+  final periods = _mergeRecords(
+    base.periods,
+    local.periods,
+    server.periods,
+    id: (p) => p.id,
+    row: periodToRow,
+    // Both closed it: the same week result, closed at different moments.
+    bothChanged: (l, s) => l.isClosed && s.isClosed ? s : null,
+  );
+  final allocations = _mergeRecords(
+    base.allocations,
+    local.allocations,
+    server.allocations,
+    id: (a) => a.id,
+    row: allocationToRow,
+  );
+  final snapshots = _mergeRecords(
+    base.snapshots,
+    local.snapshots,
+    server.snapshots,
+    id: (x) => x.periodId,
+    row: (x) => x.toJson(),
+    bothChanged: (l, s) => s,
+  );
+  final settings = _mergeValue(
+    base.settings,
+    local.settings,
+    server.settings,
+    settingsToRow,
+  );
+  final focus = _mergeValue(
+    base.activeFocus,
+    local.activeFocus,
+    server.activeFocus,
+    (f) => f == null ? null : focusToRow(f),
+  );
+  if (categories == null ||
+      goals == null ||
+      periods == null ||
+      allocations == null ||
+      snapshots == null ||
+      settings == null ||
+      focus == null) {
+    return null;
+  }
+
+  final keys = <String>{};
+  final entries = [
+    for (final e in [...server.entries, ...local.entries])
+      if (keys.add(e.idempotencyKey)) e,
+  ];
+
+  // Everything must still point at something that exists; otherwise one
+  // side removed what the other built on, and the user should decide.
+  final categoryIds = {for (final c in categories) c.id};
+  final goalIds = {for (final g in goals) g.id};
+  final periodIds = {for (final p in periods) p.id};
+  final consistent =
+      goals.every((g) => categoryIds.contains(g.categoryId)) &&
+      periods.every((p) => goalIds.contains(p.goalId)) &&
+      allocations.every((a) => periodIds.contains(a.goalPeriodId)) &&
+      entries.every((e) => periodIds.contains(e.goalPeriodId)) &&
+      (focus.value == null || periodIds.contains(focus.value!.goalPeriodId));
+  if (!consistent) return null;
+
+  return PlannerData(
+    categories: categories,
+    goals: goals,
+    periods: periods,
+    allocations: allocations,
+    entries: entries,
+    snapshots: snapshots,
+    reviewedPeriodIds: {
+      ...local.reviewedPeriodIds,
+      ...server.reviewedPeriodIds,
+    },
+    settings: settings.value,
+    activeFocus: focus.value,
+  );
+}
+
+/// Null: conflict. Order: the server's records, then ones only added here.
+List<T>? _mergeRecords<T>(
+  List<T> base,
+  List<T> local,
+  List<T> server, {
+  required String Function(T) id,
+  required Map<String, Object?> Function(T) row,
+  T? Function(T local, T server)? bothChanged,
+}) {
+  String key(T x) => jsonEncode(row(x));
+  final b = {for (final x in base) id(x): x};
+  final l = {for (final x in local) id(x): x};
+  final s = {for (final x in server) id(x): x};
+  final result = <T>[];
+  for (final recordId in {...s.keys, ...l.keys, ...b.keys}) {
+    final inBase = b[recordId];
+    final inLocal = l[recordId];
+    final inServer = s[recordId];
+    final baseKey = inBase == null ? null : key(inBase);
+    final localKey = inLocal == null ? null : key(inLocal);
+    final serverKey = inServer == null ? null : key(inServer);
+
+    final T? chosen;
+    if (localKey == serverKey) {
+      chosen = inServer;
+    } else if (localKey == baseKey) {
+      chosen = inServer; // only the server changed (or removed) it
+    } else if (serverKey == baseKey) {
+      chosen = inLocal; // only this device changed (or removed) it
+    } else if (inLocal != null && inServer != null && bothChanged != null) {
+      final picked = bothChanged(inLocal, inServer);
+      if (picked == null) return null;
+      chosen = picked;
+    } else {
+      return null;
+    }
+    if (chosen != null) result.add(chosen);
+  }
+  return result;
+}
+
+/// Wraps the result so that "no active focus" (null) differs from
+/// "conflict" (null wrapper).
+({T value})? _mergeValue<T>(
+  T base,
+  T local,
+  T server,
+  Map<String, Object?>? Function(T) row,
+) {
+  final b = jsonEncode(row(base));
+  final l = jsonEncode(row(local));
+  final s = jsonEncode(row(server));
+  if (l == s || l == b) return (value: server);
+  if (s == b) return (value: local);
+  return null;
 }
 
 bool isPlannerDataEmpty(PlannerData d) =>

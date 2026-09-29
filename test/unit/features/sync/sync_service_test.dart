@@ -117,19 +117,22 @@ void main() {
     await web.start();
     await web.signIn();
 
-    phone.controller.addProgress(periodId, 30);
+    phone.controller
+      ..addProgress(periodId, 30)
+      ..updateTarget(periodId, 540);
     await phone.sync.sync();
-    web.controller.addProgress(periodId, 60);
-    web.controller.updateTarget(periodId, 480);
+    web.controller
+      ..addProgress(periodId, 60)
+      ..updateTarget(periodId, 480);
     await web.sync.sync();
 
     expect(web.sync.status, SyncStatus.conflict);
 
-    // Keep the phone's plan (600), but the web's 60 min must survive.
+    // Keep the phone's plan (540), but the web's 60 min must survive.
     final unmatched = await web.sync.chooseSide(keepThisDevice: false);
     final view = web.controller.activeGoals().single;
     expect(unmatched, 0);
-    expect(view.period.targetValue, 600);
+    expect(view.period.targetValue, 540);
     expect(view.todayDone, 90);
 
     await phone.sync.sync();
@@ -239,6 +242,49 @@ void main() {
     // The rollover went up with that change: old week closed, new one open.
     expect(server.data!.periods, hasLength(2));
     expect(phone.sync.status, SyncStatus.synced);
+  });
+
+  test('separate changes on two devices merge without asking', () async {
+    final phone = _Device(server);
+    await phone.start();
+    final periodId = phone.addGoal('Rota MVP');
+    await phone.signIn();
+    final web = _Device(server);
+    await web.start();
+    await web.signIn();
+
+    // Phone logs work; the web tab, still open, changes the plan before
+    // it has seen that.
+    phone.controller.addProgress(periodId, 45);
+    await phone.sync.sync();
+    web.controller.updatePlan(periodId, {tuesday: 90});
+    await web.sync.sync();
+
+    expect(web.sync.status, SyncStatus.synced);
+    final merged = web.controller.activeGoals().single;
+    expect(merged.todayDone, 45);
+    expect(merged.days.firstWhere((d) => d.date == tuesday).allocated, 90);
+
+    await phone.sync.sync();
+    final onPhone = phone.controller.activeGoals().single;
+    expect(onPhone.days.firstWhere((d) => d.date == tuesday).allocated, 90);
+  });
+
+  test('the same thing changed on both devices still asks', () async {
+    final phone = _Device(server);
+    await phone.start();
+    final periodId = phone.addGoal('Rota MVP');
+    await phone.signIn();
+    final web = _Device(server);
+    await web.start();
+    await web.signIn();
+
+    phone.controller.updateTarget(periodId, 480);
+    await phone.sync.sync();
+    web.controller.updateTarget(periodId, 720);
+    await web.sync.sync();
+
+    expect(web.sync.status, SyncStatus.conflict);
   });
 
   test('a build without a server stays local only', () async {
