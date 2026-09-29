@@ -93,6 +93,12 @@ class FakeRemote implements RemotePlannerStore {
   String get _user => auth?.userId ?? FakeServer.primaryUser;
 
   @override
+  Future<String?> fetchMarker() async {
+    server._check();
+    return server.markerOf(_user);
+  }
+
+  @override
   Future<RemoteState> fetch() async {
     server._check();
     final data = server.accounts[_user];

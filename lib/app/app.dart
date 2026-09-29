@@ -49,6 +49,7 @@ class _RotaAppState extends State<RotaApp> with WidgetsBindingObserver {
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
+    _sync.appInForeground = state == AppLifecycleState.resumed;
     if (state == AppLifecycleState.resumed) {
       widget.controller.refreshDay();
       // Another device may have changed something while we were away.

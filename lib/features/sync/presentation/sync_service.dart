@@ -80,6 +80,7 @@ class SyncService extends ChangeNotifier {
     required RemotePlannerStore this.remote,
     required this.stateStorage,
     this.debounce = const Duration(seconds: 2),
+    this.pollInterval = const Duration(minutes: 1),
   }) : _status = SyncStatus.signedOut;
 
   /// A build without a server: sync is off, the app is local only.
@@ -88,6 +89,7 @@ class SyncService extends ChangeNotifier {
       remote = null,
       stateStorage = InMemoryPlannerStorage(),
       debounce = Duration.zero,
+      pollInterval = null,
       _status = SyncStatus.disabled;
 
   final PlannerController controller;
@@ -95,6 +97,14 @@ class SyncService extends ChangeNotifier {
   final RemotePlannerStore? remote;
   final PlannerStorage stateStorage;
   final Duration debounce;
+
+  /// How often an open app looks for another device's changes (null: never).
+  /// A browser tab can stay open all day without ever being "resumed".
+  final Duration? pollInterval;
+  Timer? _poll;
+
+  /// Set by the app from its lifecycle: no checks while in the background.
+  bool appInForeground = true;
 
   SyncStatus _status;
   SyncStatus get status => _status;
@@ -133,10 +143,31 @@ class SyncService extends ChangeNotifier {
     } else {
       _setStatus(SyncStatus.signedOut);
     }
+    if (pollInterval case final interval?) {
+      _poll = Timer.periodic(interval, (_) => unawaited(checkForChanges()));
+    }
+  }
+
+  /// Pulls only when the server's marker moved (or local changes wait), so
+  /// an idle app costs one tiny query per interval. Skipped in background.
+  Future<void> checkForChanges() async {
+    if (!appInForeground ||
+        !isSignedIn ||
+        _current != null ||
+        _status == SyncStatus.conflict) {
+      return;
+    }
+    try {
+      final marker = await remote!.fetchMarker();
+      if (marker != _state.lastMarker || _state.dirty) await sync();
+    } on Object catch (e) {
+      debugPrint('Change check failed: ${e.runtimeType}');
+    }
   }
 
   @override
   void dispose() {
+    _poll?.cancel();
     _timer?.cancel();
     unawaited(_userSub?.cancel());
     controller.removeListener(_onPlannerChanged);

@@ -20,6 +20,9 @@ class RemoteState {
 abstract interface class RemotePlannerStore {
   Future<RemoteState> fetch();
 
+  /// Only the change marker: a cheap "did another device push?" check.
+  Future<String?> fetchMarker();
+
   /// Makes the server hold exactly [data] (progress is only ever added),
   /// and returns the new marker.
   Future<String> push(PlannerData data);
@@ -39,6 +42,15 @@ class SupabaseRemotePlannerStore implements RemotePlannerStore {
     final id = _client.auth.currentUser?.id;
     if (id == null) throw StateError('Not signed in.');
     return id;
+  }
+
+  @override
+  Future<String?> fetchMarker() async {
+    final rows = await _client
+        .from('profiles')
+        .select('updated_at')
+        .eq('user_id', _userId);
+    return rows.isEmpty ? null : rows.single['updated_at'] as String?;
   }
 
   @override

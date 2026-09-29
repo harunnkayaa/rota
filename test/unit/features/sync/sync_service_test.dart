@@ -287,6 +287,22 @@ void main() {
     expect(web.sync.status, SyncStatus.conflict);
   });
 
+  test('an open app notices another device\'s change on its own', () async {
+    final phone = _Device(server);
+    await phone.start();
+    final periodId = phone.addGoal('Rota MVP');
+    await phone.signIn();
+    final web = _Device(server);
+    await web.start();
+    await web.signIn();
+
+    phone.controller.addProgress(periodId, 25);
+    await phone.sync.sync();
+    await web.sync.checkForChanges();
+
+    expect(web.controller.activeGoals().single.todayDone, 25);
+  });
+
   test('a build without a server stays local only', () async {
     final controller = PlannerController(clock: FixedClock(monday));
     final sync = SyncService.disabled(controller: controller);
