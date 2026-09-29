@@ -1832,11 +1832,11 @@ abstract class AppLocalizations {
   /// **'{email} adresine bir onay bağlantısı gönderdik. Bağlantıya tıkladıktan sonra buradan giriş yap.'**
   String authConfirmationSent(String email);
 
-  /// No description provided for @authCodeInvalid.
+  /// No description provided for @authSamePassword.
   ///
   /// In tr, this message translates to:
-  /// **'Kod hatalı ya da süresi dolmuş. Yeni bir kod isteyebilirsin.'**
-  String get authCodeInvalid;
+  /// **'Yeni şifre eskisiyle aynı olamaz.'**
+  String get authSamePassword;
 
   /// No description provided for @authTooManyRequests.
   ///
@@ -1859,26 +1859,20 @@ abstract class AppLocalizations {
   /// No description provided for @resetIntro.
   ///
   /// In tr, this message translates to:
-  /// **'E-posta adresine tek kullanımlık bir kod göndereceğiz. Kodu buraya yazıp yeni şifreni belirleyeceksin.'**
+  /// **'E-posta adresine bir sıfırlama bağlantısı göndereceğiz. Bağlantı Rota\'nın web sayfasını açar; yeni şifreni orada belirlersin.'**
   String get resetIntro;
 
   /// No description provided for @resetSendCode.
   ///
   /// In tr, this message translates to:
-  /// **'Kod gönder'**
+  /// **'Bağlantı gönder'**
   String get resetSendCode;
 
   /// No description provided for @resetCodeSent.
   ///
   /// In tr, this message translates to:
-  /// **'{email} adresine bir kod gönderdik. Gelmediyse gereksiz (spam) klasörüne de bak.'**
+  /// **'{email} adresine bir bağlantı gönderdik. Maildeki \"Reset password\" bağlantısına tıkla, açılan sayfada yeni şifreni belirle. Gelmediyse gereksiz (spam) klasörüne de bak.'**
   String resetCodeSent(String email);
-
-  /// No description provided for @resetCodeLabel.
-  ///
-  /// In tr, this message translates to:
-  /// **'E-postadaki kod'**
-  String get resetCodeLabel;
 
   /// No description provided for @resetNewPasswordLabel.
   ///
@@ -1889,13 +1883,13 @@ abstract class AppLocalizations {
   /// No description provided for @resetConfirm.
   ///
   /// In tr, this message translates to:
-  /// **'Şifreyi değiştir'**
+  /// **'Şifreyi kaydet'**
   String get resetConfirm;
 
   /// No description provided for @resetResend.
   ///
   /// In tr, this message translates to:
-  /// **'Kodu tekrar gönder'**
+  /// **'Tekrar gönder'**
   String get resetResend;
 
   /// No description provided for @resetDone.
@@ -1903,6 +1897,18 @@ abstract class AppLocalizations {
   /// In tr, this message translates to:
   /// **'Şifren değiştirildi.'**
   String get resetDone;
+
+  /// No description provided for @newPasswordTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Yeni şifreni belirle'**
+  String get newPasswordTitle;
+
+  /// No description provided for @newPasswordBody.
+  ///
+  /// In tr, this message translates to:
+  /// **'Sıfırlama bağlantısıyla geldin. Yeni şifreni kaydettikten sonra uygulamaya (telefonda da) bu şifreyle girersin.'**
+  String get newPasswordBody;
 
   /// No description provided for @authNetwork.
   ///

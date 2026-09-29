@@ -9,8 +9,8 @@ enum AuthFailure {
   weakPassword,
   emailNotConfirmed,
 
-  /// The reset code is wrong or has expired.
-  codeInvalid,
+  /// The new password is the same as the old one.
+  samePassword,
 
   /// Too many emails in a short time; try again later.
   tooManyRequests,
@@ -43,22 +43,28 @@ abstract interface class AuthGateway {
   Future<bool> signUp({required String email, required String password});
   Future<void> signOut();
 
-  /// Emails a one-time code for choosing a new password. Works the same on
-  /// phone and web: no link has to open in the app.
+  /// Emails a link that opens the web app, signed in for choosing a new
+  /// password ([passwordRecoveries] fires there).
   Future<void> sendPasswordReset(String email);
 
-  /// Checks [code] and sets [newPassword]; the user is signed in after.
-  Future<void> resetPassword({
-    required String email,
-    required String code,
-    required String newPassword,
-  });
+  /// Fires when the app was opened from a password reset link.
+  Stream<void> get passwordRecoveries;
+
+  /// True when this launch came from a reset link, in case the event above
+  /// fired before anyone listened.
+  bool get openedFromResetLink;
+
+  /// Sets a new password for the signed-in user.
+  Future<void> updatePassword(String newPassword);
 }
 
 class SupabaseAuthGateway implements AuthGateway {
-  SupabaseAuthGateway(this._auth);
+  SupabaseAuthGateway(this._auth, {this.openedFromResetLink = false});
 
   final GoTrueClient _auth;
+
+  @override
+  final bool openedFromResetLink;
 
   @override
   String? get userId => _auth.currentUser?.id;
@@ -98,14 +104,13 @@ class SupabaseAuthGateway implements AuthGateway {
       _guard(() => _auth.resetPasswordForEmail(email));
 
   @override
-  Future<void> resetPassword({
-    required String email,
-    required String code,
-    required String newPassword,
-  }) => _guard(() async {
-    await _auth.verifyOTP(email: email, token: code, type: OtpType.recovery);
-    return _auth.updateUser(UserAttributes(password: newPassword));
-  });
+  Stream<void> get passwordRecoveries => _auth.onAuthStateChange
+      .where((state) => state.event == AuthChangeEvent.passwordRecovery)
+      .map((_) {});
+
+  @override
+  Future<void> updatePassword(String newPassword) =>
+      _guard(() => _auth.updateUser(UserAttributes(password: newPassword)));
 
   /// Maps Supabase errors to [AuthFailure]; the raw message may contain
   /// the email address, so it is never shown or logged.
@@ -117,8 +122,8 @@ class SupabaseAuthGateway implements AuthGateway {
         'invalid_credentials' => AuthFailure.invalidCredentials,
         'user_already_exists' || 'email_exists' => AuthFailure.emailTaken,
         'weak_password' => AuthFailure.weakPassword,
+        'same_password' => AuthFailure.samePassword,
         'email_not_confirmed' => AuthFailure.emailNotConfirmed,
-        'otp_expired' || 'otp_disabled' => AuthFailure.codeInvalid,
         'over_email_send_rate_limit' ||
         'over_request_rate_limit' => AuthFailure.tooManyRequests,
         _ => AuthFailure.unknown,

@@ -27,14 +27,27 @@ Future<void> main() async {
   // Account and sync only when this build knows where the server is.
   final SyncService sync;
   if (BackendConfig.isConfigured) {
+    // Read before Supabase consumes the link from the address bar.
+    final openedFromResetLink =
+        kIsWeb && Uri.base.fragment.contains('type=recovery');
     await Supabase.initialize(
       url: BackendConfig.url,
       publishableKey: BackendConfig.publishableKey,
+      // Email links (confirm, reset password) open the web app, often on
+      // another device than the one that asked. The implicit flow carries
+      // the session in the link itself; PKCE would need a secret kept by
+      // the asking device. We only use email + password, no OAuth.
+      authOptions: const FlutterAuthClientOptions(
+        authFlowType: AuthFlowType.implicit,
+      ),
     );
     final client = Supabase.instance.client;
     sync = SyncService(
       controller: controller,
-      auth: SupabaseAuthGateway(client.auth),
+      auth: SupabaseAuthGateway(
+        client.auth,
+        openedFromResetLink: openedFromResetLink,
+      ),
       remote: SupabaseRemotePlannerStore(client),
       stateStorage: SharedPreferencesPlannerStorage(
         key: SharedPreferencesPlannerStorage.syncStateKey,

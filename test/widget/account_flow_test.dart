@@ -3,7 +3,6 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:rota/app/app.dart';
 import 'package:rota/features/planning/data/planner_storage.dart';
 import 'package:rota/features/planning/presentation/planner_controller.dart';
-import 'package:rota/features/sync/presentation/password_reset_sheet.dart';
 import 'package:rota/features/sync/presentation/sync_service.dart';
 
 import '../helpers/builders.dart';
@@ -133,37 +132,40 @@ void main() {
     sync.dispose();
   });
 
-  testWidgets('forgot password: code by email, new password, signed in', (
+  testWidgets('forgot password: link by email, then a new password', (
     tester,
   ) async {
     final server = FakeServer()..passwords[_email] = 'old-password';
     final (_, sync, _) = await _pump(tester, server: server);
+    final auth = sync.auth! as FakeAuth;
 
     await tester.enterText(find.widgetWithText(TextField, 'E-posta'), _email);
     await tester.tap(find.text('Şifremi unuttum'));
     await tester.pumpAndSettle();
     // The email typed on the sign-in screen is carried over.
-    await tester.tap(find.text('Kod gönder'));
+    await tester.tap(find.text('Bağlantı gönder'));
     await tester.pumpAndSettle();
-    expect(find.textContaining('adresine bir kod gönderdik'), findsOneWidget);
-
-    await tester.enterText(
-      find.byKey(PasswordResetSheet.codeFieldKey),
-      '000000',
+    expect(auth.resetRequests, [_email]);
+    expect(
+      find.textContaining('adresine bir bağlantı gönderdik'),
+      findsOneWidget,
     );
-    await tester.enterText(
-      find.byKey(PasswordResetSheet.passwordFieldKey),
-      'brand-new-pass',
-    );
-    await tester.tap(find.text('Şifreyi değiştir'));
+    await tester.tapAt(const Offset(195, 40));
     await tester.pumpAndSettle();
-    expect(find.textContaining('Kod hatalı'), findsOneWidget);
 
-    await tester.enterText(
-      find.byKey(PasswordResetSheet.codeFieldKey),
-      FakeAuth.resetCode,
-    );
-    await tester.tap(find.text('Şifreyi değiştir'));
+    // The link opens the app signed in, asking for a new password first.
+    await auth.openResetLink(_email);
+    await tester.pumpAndSettle();
+    expect(find.text('Yeni şifreni belirle'), findsOneWidget);
+    expect(_home, findsNothing);
+
+    await tester.enterText(find.byType(TextField), 'old-password');
+    await tester.tap(find.text('Şifreyi kaydet'));
+    await tester.pumpAndSettle();
+    expect(find.text('Yeni şifre eskisiyle aynı olamaz.'), findsOneWidget);
+
+    await tester.enterText(find.byType(TextField), 'brand-new-pass');
+    await tester.tap(find.text('Şifreyi kaydet'));
     await tester.pumpAndSettle();
     await tester.runAsync(sync.sync);
     await tester.pumpAndSettle();

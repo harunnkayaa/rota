@@ -82,9 +82,8 @@ class FakeAuth implements AuthGateway {
     _changes.add(null);
   }
 
-  /// The code a reset email would contain.
-  static const resetCode = '123456';
   final resetRequests = <String>[];
+  final _recoveries = StreamController<void>.broadcast();
 
   @override
   Future<void> sendPasswordReset(String email) async {
@@ -92,18 +91,26 @@ class FakeAuth implements AuthGateway {
     resetRequests.add(email);
   }
 
+  /// What opening the emailed link does: signed in, asked for a password.
+  Future<void> openResetLink(String email) async {
+    _email = email;
+    _changes.add(userId);
+    _recoveries.add(null);
+  }
+
   @override
-  Future<void> resetPassword({
-    required String email,
-    required String code,
-    required String newPassword,
-  }) async {
+  Stream<void> get passwordRecoveries => _recoveries.stream;
+
+  @override
+  bool openedFromResetLink = false;
+
+  @override
+  Future<void> updatePassword(String newPassword) async {
     server._check();
-    if (code != resetCode || !resetRequests.contains(email)) {
-      throw const SignInException(AuthFailure.codeInvalid);
+    if (server.passwords[_email!] == newPassword) {
+      throw const SignInException(AuthFailure.samePassword);
     }
-    server.passwords[email] = newPassword;
-    await signIn(email: email, password: newPassword);
+    server.passwords[_email!] = newPassword;
   }
 }
 

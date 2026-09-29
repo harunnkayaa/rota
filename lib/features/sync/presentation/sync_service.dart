@@ -123,6 +123,7 @@ class SyncService extends ChangeNotifier {
   bool _again = false;
   Timer? _timer;
   StreamSubscription<String?>? _userSub;
+  StreamSubscription<void>? _recoverySub;
   RemoteState? _pendingConflict;
 
   Future<void> start() async {
@@ -138,6 +139,11 @@ class SyncService extends ChangeNotifier {
     _seenRevision = controller.userRevision;
     controller.addListener(_onPlannerChanged);
     _userSub = auth!.userChanges.listen((_) => unawaited(sync()));
+    if (auth!.openedFromResetLink && isSignedIn) _needsNewPassword = true;
+    _recoverySub = auth!.passwordRecoveries.listen((_) {
+      _needsNewPassword = true;
+      notifyListeners();
+    });
     if (isSignedIn) {
       unawaited(sync());
     } else {
@@ -170,6 +176,7 @@ class SyncService extends ChangeNotifier {
     _poll?.cancel();
     _timer?.cancel();
     unawaited(_userSub?.cancel());
+    unawaited(_recoverySub?.cancel());
     controller.removeListener(_onPlannerChanged);
     super.dispose();
   }
@@ -342,11 +349,16 @@ class SyncService extends ChangeNotifier {
   Future<void> sendPasswordReset(String email) =>
       auth!.sendPasswordReset(email);
 
-  Future<void> resetPassword({
-    required String email,
-    required String code,
-    required String newPassword,
-  }) => auth!.resetPassword(email: email, code: code, newPassword: newPassword);
+  /// True after the app was opened from a reset link: the user is signed
+  /// in only to choose a new password, which the app asks for first.
+  bool get needsNewPassword => _needsNewPassword;
+  bool _needsNewPassword = false;
+
+  Future<void> setNewPassword(String password) async {
+    await auth!.updatePassword(password);
+    _needsNewPassword = false;
+    notifyListeners();
+  }
 
   /// Signs out; the data stays on this device.
   Future<void> signOut() async {

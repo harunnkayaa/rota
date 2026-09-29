@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import '../features/planning/presentation/planner_controller.dart';
 import '../features/reminders/data/reminder_scheduler.dart';
 import '../features/reminders/presentation/reminder_sync.dart';
+import '../features/sync/presentation/password_reset_sheet.dart';
 import '../features/sync/presentation/sign_in_screen.dart';
 import '../features/sync/presentation/sync_service.dart';
 import 'home_shell.dart';
@@ -92,6 +93,7 @@ class _StartupGate extends StatelessWidget {
     final needsSignIn = sync.status != SyncStatus.disabled && !sync.isSignedIn;
     return switch (controller.loadStatus) {
       LoadStatus.ready when needsSignIn => const SignInScreen(),
+      LoadStatus.ready when sync.needsNewPassword => const NewPasswordScreen(),
       LoadStatus.ready => const HomeShell(),
       LoadStatus.loading => const _LoadingScreen(),
       LoadStatus.failed => _LoadFailedScreen(onRetry: controller.load),

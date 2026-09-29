@@ -1048,8 +1048,7 @@ class AppLocalizationsTr extends AppLocalizations {
   }
 
   @override
-  String get authCodeInvalid =>
-      'Kod hatalı ya da süresi dolmuş. Yeni bir kod isteyebilirsin.';
+  String get authSamePassword => 'Yeni şifre eskisiyle aynı olamaz.';
 
   @override
   String get authTooManyRequests =>
@@ -1063,30 +1062,34 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get resetIntro =>
-      'E-posta adresine tek kullanımlık bir kod göndereceğiz. Kodu buraya yazıp yeni şifreni belirleyeceksin.';
+      'E-posta adresine bir sıfırlama bağlantısı göndereceğiz. Bağlantı Rota\'nın web sayfasını açar; yeni şifreni orada belirlersin.';
 
   @override
-  String get resetSendCode => 'Kod gönder';
+  String get resetSendCode => 'Bağlantı gönder';
 
   @override
   String resetCodeSent(String email) {
-    return '$email adresine bir kod gönderdik. Gelmediyse gereksiz (spam) klasörüne de bak.';
+    return '$email adresine bir bağlantı gönderdik. Maildeki \"Reset password\" bağlantısına tıkla, açılan sayfada yeni şifreni belirle. Gelmediyse gereksiz (spam) klasörüne de bak.';
   }
-
-  @override
-  String get resetCodeLabel => 'E-postadaki kod';
 
   @override
   String get resetNewPasswordLabel => 'Yeni şifre (en az 8 karakter)';
 
   @override
-  String get resetConfirm => 'Şifreyi değiştir';
+  String get resetConfirm => 'Şifreyi kaydet';
 
   @override
-  String get resetResend => 'Kodu tekrar gönder';
+  String get resetResend => 'Tekrar gönder';
 
   @override
   String get resetDone => 'Şifren değiştirildi.';
+
+  @override
+  String get newPasswordTitle => 'Yeni şifreni belirle';
+
+  @override
+  String get newPasswordBody =>
+      'Sıfırlama bağlantısıyla geldin. Yeni şifreni kaydettikten sonra uygulamaya (telefonda da) bu şifreyle girersin.';
 
   @override
   String get authNetwork =>
