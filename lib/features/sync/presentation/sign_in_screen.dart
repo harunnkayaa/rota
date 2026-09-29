@@ -23,7 +23,7 @@ class _SignInScreenState extends State<SignInScreen> {
   bool _busy = false;
 
   static const _minPasswordLength = 8;
-  static const _logoSize = 72.0;
+  static const _logoSize = 88.0;
   static final _emailPattern = RegExp(r'^[^@\s]+@[^@\s]+\.[^@\s]+$');
 
   @override
@@ -108,19 +108,15 @@ class _SignInScreenState extends State<SignInScreen> {
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     Center(
-                      child: Container(
-                        width: _logoSize,
-                        height: _logoSize,
-                        decoration: BoxDecoration(
-                          color: scheme.primaryContainer,
-                          borderRadius: BorderRadius.circular(
-                            AppLayout.cardRadius,
-                          ),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(
+                          AppLayout.cardRadius,
                         ),
-                        child: Icon(
-                          Icons.route,
-                          size: _logoSize / 2,
-                          color: scheme.onPrimaryContainer,
+                        child: Image.asset(
+                          'assets/brand/rota_logo.png',
+                          width: _logoSize,
+                          height: _logoSize,
+                          excludeFromSemantics: true,
                         ),
                       ),
                     ),

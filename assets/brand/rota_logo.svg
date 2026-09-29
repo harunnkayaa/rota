@@ -1,0 +1,28 @@
+<!-- Rota app icon: a route from where you are (ring) through the days
+     (dots) to the goal (amber). Master for every icon size. -->
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0E1B2E"/>
+      <stop offset="1" stop-color="#062A2A"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="0.72" cy="0.26" r="0.55">
+      <stop offset="0" stop-color="#14B8A6" stop-opacity="0.35"/>
+      <stop offset="1" stop-color="#14B8A6" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="route" x1="0" y1="1" x2="1" y2="0">
+      <stop offset="0" stop-color="#14B8A6"/>
+      <stop offset="1" stop-color="#5EEAD4"/>
+    </linearGradient>
+  </defs>
+  <rect width="1024" height="1024" fill="url(#bg)"/>
+  <rect width="1024" height="1024" fill="url(#glow)"/>
+    <path d="M296 776 C296 500 728 540 728 264" fill="none" stroke="url(#route)" stroke-width="84" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="400" cy="585" r="14" fill="#0E1B2E"/>
+  <circle cx="512" cy="520" r="14" fill="#0E1B2E"/>
+  <circle cx="624" cy="455" r="14" fill="#0E1B2E"/>
+  <circle cx="296" cy="776" r="70" fill="#0E1B2E" stroke="#5EEAD4" stroke-width="30"/>
+  <circle cx="728" cy="264" r="104" fill="#FBBF24" opacity="0.22"/>
+  <circle cx="728" cy="264" r="74" fill="#FBBF24"/>
+  <circle cx="728" cy="264" r="26" fill="#0E1B2E"/>
+</svg>
