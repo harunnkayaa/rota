@@ -339,6 +339,15 @@ class SyncService extends ChangeNotifier {
   Future<bool> signUp({required String email, required String password}) =>
       auth!.signUp(email: email, password: password);
 
+  Future<void> sendPasswordReset(String email) =>
+      auth!.sendPasswordReset(email);
+
+  Future<void> resetPassword({
+    required String email,
+    required String code,
+    required String newPassword,
+  }) => auth!.resetPassword(email: email, code: code, newPassword: newPassword);
+
   /// Signs out; the data stays on this device.
   Future<void> signOut() async {
     await auth!.signOut();

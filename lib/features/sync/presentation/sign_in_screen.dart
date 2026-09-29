@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../app/localization/app_localizations.dart';
 import '../../../app/theme/app_theme.dart';
 import '../data/auth_gateway.dart';
+import 'password_reset_sheet.dart';
 import 'sync_service.dart';
 
 /// The first screen when the build has a server and nobody is signed in.
@@ -76,14 +77,7 @@ class _SignInScreenState extends State<SignInScreen> {
       setState(() {
         // An existing account: offer signing in with the same email.
         if (e.failure == AuthFailure.emailTaken) _createAccount = false;
-        _error = switch (e.failure) {
-          AuthFailure.invalidCredentials => l.authInvalidCredentials,
-          AuthFailure.emailTaken => l.authEmailTaken,
-          AuthFailure.weakPassword => l.authWeakPassword,
-          AuthFailure.emailNotConfirmed => l.authEmailNotConfirmed,
-          AuthFailure.network => l.authNetwork,
-          AuthFailure.unknown => l.authUnknown,
-        };
+        _error = authFailureText(l, e.failure);
       });
     } finally {
       if (mounted) setState(() => _busy = false);
@@ -205,7 +199,16 @@ class _SignInScreenState extends State<SignInScreen> {
                               _createAccount ? l.signUpAction : l.signInAction,
                             ),
                     ),
-                    const SizedBox(height: AppSpacing.s),
+                    if (!_createAccount)
+                      TextButton(
+                        onPressed: _busy
+                            ? null
+                            : () => showPasswordResetSheet(
+                                context,
+                                email: _email.text.trim(),
+                              ),
+                        child: Text(l.forgotPassword),
+                      ),
                     TextButton(
                       onPressed: _busy ? null : _switchMode,
                       child: Text(
@@ -232,3 +235,17 @@ class _SignInScreenState extends State<SignInScreen> {
     );
   }
 }
+
+/// What to tell the user for each failure; never a raw server message
+/// (it may contain the email address).
+String authFailureText(AppLocalizations l, AuthFailure failure) =>
+    switch (failure) {
+      AuthFailure.invalidCredentials => l.authInvalidCredentials,
+      AuthFailure.emailTaken => l.authEmailTaken,
+      AuthFailure.weakPassword => l.authWeakPassword,
+      AuthFailure.emailNotConfirmed => l.authEmailNotConfirmed,
+      AuthFailure.codeInvalid => l.authCodeInvalid,
+      AuthFailure.tooManyRequests => l.authTooManyRequests,
+      AuthFailure.network => l.authNetwork,
+      AuthFailure.unknown => l.authUnknown,
+    };

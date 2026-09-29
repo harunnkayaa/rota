@@ -81,6 +81,30 @@ class FakeAuth implements AuthGateway {
     _email = null;
     _changes.add(null);
   }
+
+  /// The code a reset email would contain.
+  static const resetCode = '123456';
+  final resetRequests = <String>[];
+
+  @override
+  Future<void> sendPasswordReset(String email) async {
+    server._check();
+    resetRequests.add(email);
+  }
+
+  @override
+  Future<void> resetPassword({
+    required String email,
+    required String code,
+    required String newPassword,
+  }) async {
+    server._check();
+    if (code != resetCode || !resetRequests.contains(email)) {
+      throw const SignInException(AuthFailure.codeInvalid);
+    }
+    server.passwords[email] = newPassword;
+    await signIn(email: email, password: newPassword);
+  }
 }
 
 class FakeRemote implements RemotePlannerStore {

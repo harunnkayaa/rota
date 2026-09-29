@@ -796,6 +796,21 @@
   "@authConfirmationSent": {
     "placeholders": { "email": { "type": "String" } }
   },
+  "authCodeInvalid": "Kod hatalı ya da süresi dolmuş. Yeni bir kod isteyebilirsin.",
+  "authTooManyRequests": "Kısa sürede çok fazla deneme oldu. Birkaç dakika sonra tekrar dene.",
+  "forgotPassword": "Şifremi unuttum",
+  "resetTitle": "Şifreni sıfırla",
+  "resetIntro": "E-posta adresine tek kullanımlık bir kod göndereceğiz. Kodu buraya yazıp yeni şifreni belirleyeceksin.",
+  "resetSendCode": "Kod gönder",
+  "resetCodeSent": "{email} adresine bir kod gönderdik. Gelmediyse gereksiz (spam) klasörüne de bak.",
+  "@resetCodeSent": {
+    "placeholders": { "email": { "type": "String" } }
+  },
+  "resetCodeLabel": "E-postadaki kod",
+  "resetNewPasswordLabel": "Yeni şifre (en az 8 karakter)",
+  "resetConfirm": "Şifreyi değiştir",
+  "resetResend": "Kodu tekrar gönder",
+  "resetDone": "Şifren değiştirildi.",
   "authNetwork": "Sunucuya ulaşılamadı. İnternet bağlantını kontrol et.",
   "authUnknown": "Giriş yapılamadı. Tekrar dene.",
   "errorEmailInvalid": "Geçerli bir e-posta adresi gir.",

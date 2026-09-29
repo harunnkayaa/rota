@@ -1048,6 +1048,47 @@ class AppLocalizationsTr extends AppLocalizations {
   }
 
   @override
+  String get authCodeInvalid =>
+      'Kod hatalı ya da süresi dolmuş. Yeni bir kod isteyebilirsin.';
+
+  @override
+  String get authTooManyRequests =>
+      'Kısa sürede çok fazla deneme oldu. Birkaç dakika sonra tekrar dene.';
+
+  @override
+  String get forgotPassword => 'Şifremi unuttum';
+
+  @override
+  String get resetTitle => 'Şifreni sıfırla';
+
+  @override
+  String get resetIntro =>
+      'E-posta adresine tek kullanımlık bir kod göndereceğiz. Kodu buraya yazıp yeni şifreni belirleyeceksin.';
+
+  @override
+  String get resetSendCode => 'Kod gönder';
+
+  @override
+  String resetCodeSent(String email) {
+    return '$email adresine bir kod gönderdik. Gelmediyse gereksiz (spam) klasörüne de bak.';
+  }
+
+  @override
+  String get resetCodeLabel => 'E-postadaki kod';
+
+  @override
+  String get resetNewPasswordLabel => 'Yeni şifre (en az 8 karakter)';
+
+  @override
+  String get resetConfirm => 'Şifreyi değiştir';
+
+  @override
+  String get resetResend => 'Kodu tekrar gönder';
+
+  @override
+  String get resetDone => 'Şifren değiştirildi.';
+
+  @override
   String get authNetwork =>
       'Sunucuya ulaşılamadı. İnternet bağlantını kontrol et.';
 

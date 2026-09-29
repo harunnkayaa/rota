@@ -8,6 +8,12 @@ enum AuthFailure {
   emailTaken,
   weakPassword,
   emailNotConfirmed,
+
+  /// The reset code is wrong or has expired.
+  codeInvalid,
+
+  /// Too many emails in a short time; try again later.
+  tooManyRequests,
   network,
   unknown,
 }
@@ -36,6 +42,17 @@ abstract interface class AuthGateway {
   /// before anyone can sign in with it.
   Future<bool> signUp({required String email, required String password});
   Future<void> signOut();
+
+  /// Emails a one-time code for choosing a new password. Works the same on
+  /// phone and web: no link has to open in the app.
+  Future<void> sendPasswordReset(String email);
+
+  /// Checks [code] and sets [newPassword]; the user is signed in after.
+  Future<void> resetPassword({
+    required String email,
+    required String code,
+    required String newPassword,
+  });
 }
 
 class SupabaseAuthGateway implements AuthGateway {
@@ -76,6 +93,20 @@ class SupabaseAuthGateway implements AuthGateway {
   @override
   Future<void> signOut() => _auth.signOut();
 
+  @override
+  Future<void> sendPasswordReset(String email) =>
+      _guard(() => _auth.resetPasswordForEmail(email));
+
+  @override
+  Future<void> resetPassword({
+    required String email,
+    required String code,
+    required String newPassword,
+  }) => _guard(() async {
+    await _auth.verifyOTP(email: email, token: code, type: OtpType.recovery);
+    return _auth.updateUser(UserAttributes(password: newPassword));
+  });
+
   /// Maps Supabase errors to [AuthFailure]; the raw message may contain
   /// the email address, so it is never shown or logged.
   Future<void> _guard(Future<Object?> Function() call) async {
@@ -87,6 +118,9 @@ class SupabaseAuthGateway implements AuthGateway {
         'user_already_exists' || 'email_exists' => AuthFailure.emailTaken,
         'weak_password' => AuthFailure.weakPassword,
         'email_not_confirmed' => AuthFailure.emailNotConfirmed,
+        'otp_expired' || 'otp_disabled' => AuthFailure.codeInvalid,
+        'over_email_send_rate_limit' ||
+        'over_request_rate_limit' => AuthFailure.tooManyRequests,
         _ => AuthFailure.unknown,
       });
     } on AuthRetryableFetchException {
