@@ -43,7 +43,7 @@ RolloverPlan planWeekRollover({
   required LocalDate today,
   required PeriodRange currentWeek,
   required DateTime nowUtc,
-  required String Function() newId,
+  required String Function(String name) idFor,
 }) {
   final goalById = {for (final g in goals) g.id: g};
 
@@ -74,8 +74,10 @@ RolloverPlan planWeekRollover({
     final latest = own.last;
     if (latest.periodType != PeriodType.calendarWeek) continue;
 
+    // Ids come from what the record is, not from chance: every device that
+    // opens this week for this goal creates the same rows.
     final period = GoalPeriod(
-      id: newId(),
+      id: idFor('period:${goal.id}:${currentWeek.start}'),
       goalId: goal.id,
       periodType: PeriodType.calendarWeek,
       range: currentWeek,
@@ -92,7 +94,7 @@ RolloverPlan planWeekRollover({
       if (day.isBefore(today) || minutes == null || minutes == 0) continue;
       openedAllocations.add(
         DailyAllocation(
-          id: newId(),
+          id: idFor('allocation:${period.id}:$day'),
           goalPeriodId: period.id,
           date: day,
           allocatedValue: minutes,

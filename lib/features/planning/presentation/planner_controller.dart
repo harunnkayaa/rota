@@ -115,7 +115,7 @@ class PlannerController extends ChangeNotifier {
       today: today,
       currentWeek: currentWeek,
       nowUtc: clock.nowUtc(),
-      newId: generateUuidV4,
+      idFor: uuidFromName,
     );
     if (plan.isEmpty) {
       notifyListeners();
@@ -128,14 +128,16 @@ class PlannerController extends ChangeNotifier {
     }
     _periods.addAll(plan.opened);
     _allocations.addAll(plan.openedAllocations);
-    _commit();
+    // Derived from the calendar, not made by the user: every device reaches
+    // the same result on its own, so this alone is nothing to sync.
+    _commit(byUser: false);
   }
 
   /// Completes when every change made so far has been written.
   Future<void> flush() => _saveChain;
 
   /// Writes the full current state again after a failed save.
-  void retrySave() => _commit();
+  void retrySave() => _commit(byUser: false);
 
   bool _disposed = false;
 
@@ -146,10 +148,14 @@ class PlannerController extends ChangeNotifier {
   }
 
   int _revision = 0;
+  int _userRevision = 0;
 
-  /// Goes up with every change to the data (not with status changes), so
-  /// sync can tell "the user changed something" from other notifications.
+  /// Goes up with every change to the data (not with status changes).
   int get revision => _revision;
+
+  /// Goes up only with changes the user made, so sync can tell them from
+  /// data every device derives by itself (the Monday rollover, a download).
+  int get userRevision => _userRevision;
 
   /// A copy of everything, for sync to send.
   PlannerData snapshotData() => _currentData();
@@ -180,12 +186,13 @@ class PlannerController extends ChangeNotifier {
       ..addAll(data.reviewedPeriodIds);
     _settings = data.settings;
     _activeFocus = data.activeFocus;
-    _commit();
+    _commit(byUser: false);
     refreshDay();
   }
 
-  void _commit() {
+  void _commit({bool byUser = true}) {
     _revision++;
+    if (byUser) _userRevision++;
     notifyListeners();
     if (_loadStatus != LoadStatus.ready) return;
     // Encode now, so the saved snapshot matches this exact change even if

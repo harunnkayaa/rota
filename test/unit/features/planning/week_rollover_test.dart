@@ -33,7 +33,6 @@ RolloverPlan _roll({
   List<ProgressEntry> entries = const [],
   required LocalDate today,
 }) {
-  var ids = 0;
   return planWeekRollover(
     goals: goals,
     periods: periods ?? [weekPeriod()],
@@ -45,7 +44,7 @@ RolloverPlan _roll({
       weekStartDay: DateTime.monday,
     ),
     nowUtc: DateTime.utc(2026, 10, 5),
-    newId: () => 'new-${ids++}',
+    idFor: (name) => name,
   );
 }
 

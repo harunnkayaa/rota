@@ -117,7 +117,7 @@ class SyncService extends ChangeNotifier {
     } on Object catch (e) {
       debugPrint('Sync state unreadable: ${e.runtimeType}');
     }
-    _seenRevision = controller.revision;
+    _seenRevision = controller.userRevision;
     controller.addListener(_onPlannerChanged);
     _userSub = auth!.userChanges.listen((_) => unawaited(sync()));
     if (isSignedIn) {
@@ -136,8 +136,8 @@ class SyncService extends ChangeNotifier {
   }
 
   void _onPlannerChanged() {
-    if (controller.revision == _seenRevision) return;
-    _seenRevision = controller.revision;
+    if (controller.userRevision == _seenRevision) return;
+    _seenRevision = controller.userRevision;
     if (_applyingRemote) return;
     _localChanges++;
     if (!_state.dirty) {
@@ -307,8 +307,9 @@ class SyncService extends ChangeNotifier {
     } finally {
       _applyingRemote = false;
     }
-    // A rollover right after adopting is a real local change.
-    _seenRevision = controller.revision;
+    // Downloaded data (and the rollover it may trigger) is not a change
+    // made on this device.
+    _seenRevision = controller.userRevision;
   }
 
   Future<void> _markSynced(String? marker) async {

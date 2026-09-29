@@ -13,8 +13,9 @@ const _password = 'correct-horse';
 /// A phone or a browser: its own local data, its own session.
 class _Device {
   _Device(FakeServer server, {this.stateStorage})
-    : controller = PlannerController(clock: FixedClock(monday)),
+    : clock = FixedClock(monday),
       auth = FakeAuth(server) {
+    controller = PlannerController(clock: clock);
     sync = SyncService(
       controller: controller,
       auth: auth,
@@ -24,7 +25,8 @@ class _Device {
     );
   }
 
-  final PlannerController controller;
+  final FixedClock clock;
+  late final PlannerController controller;
   final FakeAuth auth;
   final InMemoryPlannerStorage? stateStorage;
   late final SyncService sync;
@@ -200,6 +202,44 @@ void main() {
       expect(server.accounts['user-$_email']!.goals.single.title, 'Rota MVP');
     },
   );
+
+  test('a new week opened on both devices is not a conflict', () async {
+    final phone = _Device(server);
+    await phone.start();
+    final periodId = phone.addGoal('Rota MVP');
+    phone.controller.addProgress(periodId, 60);
+    await phone.signIn();
+    final web = _Device(server);
+    await web.start();
+    await web.signIn();
+
+    // Both apps stay open over the weekend; on Monday each rolls over.
+    final nextMonday = monday.addDays(7);
+    phone.clock.day = nextMonday;
+    web.clock.day = nextMonday;
+    phone.controller.refreshDay();
+    await phone.sync.sync();
+    web.controller.refreshDay();
+    await web.sync.sync();
+
+    expect(web.sync.status, SyncStatus.synced);
+    expect(
+      phone.controller.activeGoals().single.period.id,
+      web.controller.activeGoals().single.period.id,
+    );
+
+    // Work on the new week from either device lands on the same week.
+    web.controller.addProgress(
+      web.controller.activeGoals().single.period.id,
+      30,
+    );
+    await web.sync.sync();
+    await phone.sync.sync();
+    expect(phone.controller.activeGoals().single.periodDone, 30);
+    // The rollover went up with that change: old week closed, new one open.
+    expect(server.data!.periods, hasLength(2));
+    expect(phone.sync.status, SyncStatus.synced);
+  });
 
   test('a build without a server stays local only', () async {
     final controller = PlannerController(clock: FixedClock(monday));
