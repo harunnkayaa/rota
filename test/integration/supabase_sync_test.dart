@@ -182,8 +182,11 @@ void main() {
         await web.sync.signIn(email: email, password: password);
         await web.sync.sync();
 
+        final store = SupabaseRemotePlannerStore(web.client);
+        final before = await store.fetchMarker();
         phone.controller.addProgress(periodId, 45);
         await phone.sync.sync();
+        expect(await store.fetchMarker(), isNot(before));
         web.controller.updatePlan(periodId, {tuesday: 90});
         await web.sync.sync();
 
