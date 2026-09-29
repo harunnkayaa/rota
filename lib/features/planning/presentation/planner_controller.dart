@@ -376,6 +376,15 @@ class PlannerController extends ChangeNotifier {
     _commit();
   }
 
+  /// Renames a goal everywhere, past weeks included (it is the same goal).
+  void renameGoal(String goalId, String title) {
+    final trimmed = title.trim();
+    if (trimmed.isEmpty) throw ArgumentError.value(title, 'title');
+    final index = _goals.indexWhere((g) => g.id == goalId);
+    _goals[index] = _goals[index].withTitle(trimmed);
+    _commit();
+  }
+
   /// Stops a goal: it leaves Today and Week and no new weeks are opened.
   /// Its history stays in reports.
   void archiveGoal(String goalId) {
@@ -650,7 +659,9 @@ class PlannerController extends ChangeNotifier {
 
   /// Records work done today. Throws [ProgressRejectedException] when a
   /// domain rule forbids it; the UI turns the reason into a message.
-  void addProgress(String periodId, int minutes, {String? note}) {
+  /// Records work done today. Returns the new entry's id, so the UI can
+  /// offer to take it back ([undoProgress]).
+  String addProgress(String periodId, int minutes, {String? note}) {
     final period = _period(periodId);
     final entry = ProgressEntry(
       id: generateUuidV4(),
@@ -663,6 +674,48 @@ class PlannerController extends ChangeNotifier {
     );
     validateNewEntry(period, entry, _entries);
     _entries.add(entry);
+    _commit();
+    return entry.id;
+  }
+
+  static const _undoKeyPrefix = 'undo:';
+
+  /// Today's entries of a goal that can still be taken back, newest first.
+  List<ProgressEntry> undoableEntries(String periodId) {
+    final undone = {
+      for (final e in _entries)
+        if (e.idempotencyKey.startsWith(_undoKeyPrefix))
+          e.idempotencyKey.substring(_undoKeyPrefix.length),
+    };
+    return [
+      for (final e in _entries.reversed)
+        if (e.goalPeriodId == periodId &&
+            e.valueDelta > 0 &&
+            e.localDate == today &&
+            !undone.contains(e.id))
+          e,
+    ];
+  }
+
+  /// Takes back a mistaken entry. Entries are append-only (CLAUDE.md §16),
+  /// so this adds a matching negative adjustment on the same day; taking
+  /// the same entry back twice changes nothing.
+  void undoProgress(String entryId) {
+    final entry = _entries.firstWhere((e) => e.id == entryId);
+    final key = '$_undoKeyPrefix${entry.id}';
+    if (_entries.any((e) => e.idempotencyKey == key)) return;
+    final period = _period(entry.goalPeriodId);
+    final adjustment = ProgressEntry(
+      id: generateUuidV4(),
+      goalPeriodId: period.id,
+      valueDelta: -entry.valueDelta,
+      source: ProgressSource.adjustment,
+      occurredAt: clock.nowUtc(),
+      localDate: entry.localDate,
+      idempotencyKey: key,
+    );
+    validateNewEntry(period, adjustment, _entries);
+    _entries.add(adjustment);
     _commit();
   }
 

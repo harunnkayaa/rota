@@ -1244,6 +1244,66 @@ abstract class AppLocalizations {
   /// **'Hedef arşivlendi'**
   String get goalArchived;
 
+  /// No description provided for @undo.
+  ///
+  /// In tr, this message translates to:
+  /// **'Geri al'**
+  String get undo;
+
+  /// No description provided for @editGoal.
+  ///
+  /// In tr, this message translates to:
+  /// **'Hedefi düzenle'**
+  String get editGoal;
+
+  /// No description provided for @goalUpdated.
+  ///
+  /// In tr, this message translates to:
+  /// **'Hedef güncellendi'**
+  String get goalUpdated;
+
+  /// No description provided for @todayEntries.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bugünkü kayıtlar'**
+  String get todayEntries;
+
+  /// No description provided for @todayEntriesHint.
+  ///
+  /// In tr, this message translates to:
+  /// **'Yanlış girdiğin bir kaydı geri alabilirsin. Kayıt silinmez; geçmişte düzeltme olarak görünür.'**
+  String get todayEntriesHint;
+
+  /// No description provided for @todayEntriesEmpty.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bugün bu hedefe henüz kayıt girilmedi.'**
+  String get todayEntriesEmpty;
+
+  /// No description provided for @entrySourceManual.
+  ///
+  /// In tr, this message translates to:
+  /// **'Elle'**
+  String get entrySourceManual;
+
+  /// No description provided for @entrySourceFocus.
+  ///
+  /// In tr, this message translates to:
+  /// **'Odak sayacı'**
+  String get entrySourceFocus;
+
+  /// No description provided for @entryLine.
+  ///
+  /// In tr, this message translates to:
+  /// **'{time} · {amount} · {source}'**
+  String entryLine(String time, String amount, String source);
+
+  /// No description provided for @entryTakenBack.
+  ///
+  /// In tr, this message translates to:
+  /// **'{amount} geri alındı'**
+  String entryTakenBack(String amount);
+
   /// No description provided for @settingsTitle.
   ///
   /// In tr, this message translates to:

@@ -49,6 +49,54 @@ void main() {
     expect(view.period.targetValue, 600);
   });
 
+  group('taking back a mistaken entry', () {
+    test('adds a negative adjustment; totals drop, history stays', () {
+      final periodId = createProjectGoal();
+      controller.addProgress(periodId, 30);
+      final wrong = controller.addProgress(periodId, 90);
+
+      controller.undoProgress(wrong);
+
+      final view = controller.activeGoals().single;
+      expect(view.todayDone, 30);
+      expect(view.periodDone, 30);
+      final data = controller.snapshotData();
+      expect(data.entries, hasLength(3), reason: 'append-only');
+      expect(data.entries.last.valueDelta, -90);
+      expect(controller.undoableEntries(periodId).single.valueDelta, 30);
+    });
+
+    test('taking back twice counts once', () {
+      final periodId = createProjectGoal();
+      final id = controller.addProgress(periodId, 90);
+      controller
+        ..undoProgress(id)
+        ..undoProgress(id);
+      expect(controller.activeGoals().single.periodDone, 0);
+      expect(controller.snapshotData().entries, hasLength(2));
+    });
+
+    test('only today\'s entries can be taken back from the list', () {
+      final periodId = createProjectGoal();
+      controller.addProgress(periodId, 60);
+      clock.day = tuesday;
+      expect(controller.undoableEntries(periodId), isEmpty);
+    });
+  });
+
+  test('renaming a goal keeps its progress and target', () {
+    final periodId = createProjectGoal();
+    controller.addProgress(periodId, 45);
+    final goalId = controller.activeGoals().single.goal.id;
+
+    controller.renameGoal(goalId, '  Rota v1  ');
+
+    final view = controller.activeGoals().single;
+    expect(view.goal.title, 'Rota v1');
+    expect(view.periodDone, 45);
+    expect(() => controller.renameGoal(goalId, ' '), throwsArgumentError);
+  });
+
   test('a missed Monday shows up as debt on Tuesday and can be re-planned', () {
     final periodId = createProjectGoal();
     controller.addProgress(periodId, 60);

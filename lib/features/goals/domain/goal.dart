@@ -68,10 +68,12 @@ class Goal {
 
   Goal archived() => _copy(isActive: false);
 
-  Goal _copy({int? defaultTargetValue, bool? isActive}) => Goal(
+  Goal withTitle(String value) => _copy(title: value);
+
+  Goal _copy({String? title, int? defaultTargetValue, bool? isActive}) => Goal(
     id: id,
     categoryId: categoryId,
-    title: title,
+    title: title ?? this.title,
     goalType: goalType,
     measurementType: measurementType,
     defaultTargetValue: defaultTargetValue ?? this.defaultTargetValue,

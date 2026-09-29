@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 
 import '../../../app/localization/app_localizations.dart';
+import 'goal_edit_sheets.dart';
 import 'planner_controller.dart';
 
-enum _GoalAction { archive }
+enum _GoalAction { edit, entries, archive }
 
-/// The "⋮" menu on a goal card. Archiving asks for confirmation because
-/// the goal leaves every daily screen.
+/// The "⋮" menu on a goal card: edit, today's entries (to take a mistake
+/// back), archive. Archiving asks for confirmation because the goal leaves
+/// every daily screen.
 class GoalActionsMenu extends StatelessWidget {
   const GoalActionsMenu({required this.view, super.key});
 
@@ -44,9 +46,27 @@ class GoalActionsMenu extends StatelessWidget {
     return PopupMenuButton<_GoalAction>(
       tooltip: l.moreActions,
       onSelected: (action) => switch (action) {
+        _GoalAction.edit => showGoalEditSheet(context, view),
+        _GoalAction.entries => showTodayEntriesSheet(context, view),
         _GoalAction.archive => _archive(context),
       },
       itemBuilder: (context) => [
+        PopupMenuItem(
+          value: _GoalAction.edit,
+          child: ListTile(
+            contentPadding: EdgeInsets.zero,
+            leading: const Icon(Icons.edit_outlined),
+            title: Text(l.editGoal),
+          ),
+        ),
+        PopupMenuItem(
+          value: _GoalAction.entries,
+          child: ListTile(
+            contentPadding: EdgeInsets.zero,
+            leading: const Icon(Icons.history),
+            title: Text(l.todayEntries),
+          ),
+        ),
         PopupMenuItem(
           value: _GoalAction.archive,
           child: ListTile(

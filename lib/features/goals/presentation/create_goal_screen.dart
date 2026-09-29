@@ -20,15 +20,18 @@ Future<void> openCreateGoal(BuildContext context) {
 }
 
 /// Longest weekly target the form accepts: the whole week.
-const _maxWeeklyMinutes = Duration.minutesPerDay * DateTime.daysPerWeek;
+const maxWeeklyTargetMinutes = Duration.minutesPerDay * DateTime.daysPerWeek;
+const _maxWeeklyMinutes = maxWeeklyTargetMinutes;
 
 /// The weekly target moves in whole hours; days move in half hours.
-const _weeklyStep = Duration.minutesPerHour;
+const targetStepMinutes = Duration.minutesPerHour;
+const _weeklyStep = targetStepMinutes;
 
 const double _chipRowHeight = 48;
 
 /// Upper bound for a deadline goal's total: 1000 hours.
-const _maxDeadlineMinutes = 1000 * Duration.minutesPerHour;
+const maxDeadlineTargetMinutes = 1000 * Duration.minutesPerHour;
+const _maxDeadlineMinutes = maxDeadlineTargetMinutes;
 
 /// How far ahead a due date can be picked.
 const _maxDueDateDays = 730;

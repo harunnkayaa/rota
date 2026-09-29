@@ -623,6 +623,26 @@
   "archiveConfirmBody": "Hedef Bugün ve Hafta ekranlarından kalkar ve yeni haftalara açılmaz. Geçmiş sonuçları raporlarda kalır.",
   "archiveConfirm": "Arşivle",
   "goalArchived": "Hedef arşivlendi",
+  "undo": "Geri al",
+  "editGoal": "Hedefi düzenle",
+  "goalUpdated": "Hedef güncellendi",
+  "todayEntries": "Bugünkü kayıtlar",
+  "todayEntriesHint": "Yanlış girdiğin bir kaydı geri alabilirsin. Kayıt silinmez; geçmişte düzeltme olarak görünür.",
+  "todayEntriesEmpty": "Bugün bu hedefe henüz kayıt girilmedi.",
+  "entrySourceManual": "Elle",
+  "entrySourceFocus": "Odak sayacı",
+  "entryLine": "{time} · {amount} · {source}",
+  "@entryLine": {
+    "placeholders": {
+      "time": { "type": "String" },
+      "amount": { "type": "String" },
+      "source": { "type": "String" }
+    }
+  },
+  "entryTakenBack": "{amount} geri alındı",
+  "@entryTakenBack": {
+    "placeholders": { "amount": { "type": "String" } }
+  },
   "settingsTitle": "Ayarlar",
   "settingsCapacity": "Günlük kapasite",
   "settingsCapacityHint": "Bir günde gerçekçi olarak planlayabileceğin süre. Plan bunu aşarsa uyarı alırsın.",

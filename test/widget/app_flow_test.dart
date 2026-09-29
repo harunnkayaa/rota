@@ -214,4 +214,46 @@ void main() {
     expect(find.byType(NavigationRail), findsOneWidget);
     expect(find.byType(NavigationBar), findsNothing);
   });
+
+  testWidgets('a mistaken entry is taken back from the snackbar', (
+    tester,
+  ) async {
+    final controller = await pumpRota(tester, today: wednesday);
+    await tester.tap(find.text('Örnek haftayı yükle'));
+    await tester.pumpAndSettle();
+    final before = controller.activeGoals().first.todayDone;
+
+    await tapVisible(tester, find.text('İlerleme ekle').first);
+    await tester.enterText(find.byType(TextField), '90');
+    await tester.tap(find.text('Kaydet'));
+    await tester.pumpAndSettle();
+    expect(controller.activeGoals().first.todayDone, before + 90);
+
+    await tester.tap(find.text('Geri al'));
+    await tester.pumpAndSettle();
+    expect(controller.activeGoals().first.todayDone, before);
+  });
+
+  testWidgets('a goal is renamed and its target changed from the menu', (
+    tester,
+  ) async {
+    final controller = await pumpRota(tester, today: wednesday);
+    await tester.tap(find.text('Örnek haftayı yükle'));
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byTooltip('Diğer işlemler').first);
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Hedefi düzenle'));
+    await tester.pumpAndSettle();
+    await tester.enterText(find.byType(TextField), 'Rota v1');
+    await tester.tap(find.byTooltip('1 sa artır'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Kaydet'));
+    await tester.pumpAndSettle();
+
+    final view = controller.activeGoals().first;
+    expect(view.goal.title, 'Rota v1');
+    expect(view.period.targetValue, 660);
+    expect(find.text('Rota v1'), findsOneWidget);
+  });
 }

@@ -46,8 +46,10 @@ class _AddProgressSheetState extends State<AddProgressSheet> {
       setState(() => _error = l.errorMinutesInvalid);
       return;
     }
+    final controller = PlannerScope.of(context);
+    final String entryId;
     try {
-      PlannerScope.of(context).addProgress(widget.view.period.id, minutes);
+      entryId = controller.addProgress(widget.view.period.id, minutes);
     } on ProgressRejectedException catch (e) {
       setState(
         () => _error = switch (e.reason) {
@@ -61,7 +63,13 @@ class _AddProgressSheetState extends State<AddProgressSheet> {
     final messenger = ScaffoldMessenger.of(context);
     Navigator.of(context).pop();
     messenger.showSnackBar(
-      SnackBar(content: Text(l.progressAdded(l.minutes(minutes)))),
+      SnackBar(
+        content: Text(l.progressAdded(l.minutes(minutes))),
+        action: SnackBarAction(
+          label: l.undo,
+          onPressed: () => controller.undoProgress(entryId),
+        ),
+      ),
     );
   }
 

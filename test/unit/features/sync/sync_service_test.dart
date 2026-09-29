@@ -181,22 +181,25 @@ void main() {
     expect(phone.sync.status, SyncStatus.signedOut);
   });
 
-  test('another account on the same device never gets the first one\'s data', () async {
-    const otherEmail = 'someone@example.test';
-    server.passwords[otherEmail] = _password;
-    final phone = _Device(server);
-    await phone.start();
-    phone.addGoal('Rota MVP');
-    await phone.signIn();
-    await phone.sync.signOut();
+  test(
+    'another account on the same device never gets the first one\'s data',
+    () async {
+      const otherEmail = 'someone@example.test';
+      server.passwords[otherEmail] = _password;
+      final phone = _Device(server);
+      await phone.start();
+      phone.addGoal('Rota MVP');
+      await phone.signIn();
+      await phone.sync.signOut();
 
-    await phone.auth.signIn(email: otherEmail, password: _password);
-    await phone.sync.sync();
+      await phone.auth.signIn(email: otherEmail, password: _password);
+      await phone.sync.sync();
 
-    expect(phone.titles, isEmpty);
-    expect(server.accounts['user-$otherEmail']?.goals ?? [], isEmpty);
-    expect(server.accounts['user-$_email']!.goals.single.title, 'Rota MVP');
-  });
+      expect(phone.titles, isEmpty);
+      expect(server.accounts['user-$otherEmail']?.goals ?? [], isEmpty);
+      expect(server.accounts['user-$_email']!.goals.single.title, 'Rota MVP');
+    },
+  );
 
   test('a build without a server stays local only', () async {
     final controller = PlannerController(clock: FixedClock(monday));

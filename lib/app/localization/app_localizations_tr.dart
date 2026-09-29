@@ -709,6 +709,41 @@ class AppLocalizationsTr extends AppLocalizations {
   String get goalArchived => 'Hedef arşivlendi';
 
   @override
+  String get undo => 'Geri al';
+
+  @override
+  String get editGoal => 'Hedefi düzenle';
+
+  @override
+  String get goalUpdated => 'Hedef güncellendi';
+
+  @override
+  String get todayEntries => 'Bugünkü kayıtlar';
+
+  @override
+  String get todayEntriesHint =>
+      'Yanlış girdiğin bir kaydı geri alabilirsin. Kayıt silinmez; geçmişte düzeltme olarak görünür.';
+
+  @override
+  String get todayEntriesEmpty => 'Bugün bu hedefe henüz kayıt girilmedi.';
+
+  @override
+  String get entrySourceManual => 'Elle';
+
+  @override
+  String get entrySourceFocus => 'Odak sayacı';
+
+  @override
+  String entryLine(String time, String amount, String source) {
+    return '$time · $amount · $source';
+  }
+
+  @override
+  String entryTakenBack(String amount) {
+    return '$amount geri alındı';
+  }
+
+  @override
   String get settingsTitle => 'Ayarlar';
 
   @override
