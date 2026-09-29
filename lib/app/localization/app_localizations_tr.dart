@@ -1054,7 +1054,18 @@ class AppLocalizationsTr extends AppLocalizations {
   String get signOut => 'Çıkış yap';
 
   @override
-  String get signOutHint => 'Çıkış yapınca verilerin bu cihazda kalır.';
+  String get signOutHint =>
+      'Verilerin hesabında durur; tekrar giriş yapınca geri gelir.';
+
+  @override
+  String get signOutUnsentTitle => 'Gönderilmemiş değişiklikler var';
+
+  @override
+  String get signOutUnsentBody =>
+      'Bu cihazdaki son değişikliklerin henüz hesabına ulaşmadı (bağlantı yok). Çıkış yaparsan, aynı hesapla yeniden girdiğinde gönderilirler; başka bir hesapla girilirse bu değişiklikler kaybolur.';
+
+  @override
+  String get signOutAnyway => 'Yine de çıkış yap';
 
   @override
   String get deleteAccount => 'Hesabı sil';

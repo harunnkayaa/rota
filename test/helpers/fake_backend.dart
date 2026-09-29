@@ -5,15 +5,32 @@ import 'package:rota/features/planning/data/planner_json.dart';
 import 'package:rota/features/sync/data/auth_gateway.dart';
 import 'package:rota/features/sync/data/remote_planner_store.dart';
 
-/// One account on a pretend server, shared by several pretend devices.
+/// A pretend server, shared by several pretend devices. Each account has
+/// its own data, like rows filtered by RLS on the real one.
 class FakeServer {
-  PlannerData? data;
-  int _version = 0;
+  /// The account most tests use; [data] is its data.
+  static const primaryUser = 'user-harun@example.test';
+
+  final accounts = <String, PlannerData>{};
+  final _versions = <String, int>{};
   bool offline = false;
   bool requireEmailConfirmation = false;
   final passwords = <String, String>{};
 
-  String? get marker => data == null ? null : 'v$_version';
+  PlannerData? get data => accounts[primaryUser];
+  set data(PlannerData? value) => _put(primaryUser, value);
+
+  String? markerOf(String user) =>
+      accounts[user] == null ? null : 'v${_versions[user] ?? 0}';
+  String? get marker => markerOf(primaryUser);
+
+  void _put(String user, PlannerData? value) {
+    if (value == null) {
+      accounts.remove(user);
+    } else {
+      accounts[user] = value;
+    }
+  }
 
   void _check() {
     if (offline) throw StateError('no connection');
@@ -67,57 +84,65 @@ class FakeAuth implements AuthGateway {
 }
 
 class FakeRemote implements RemotePlannerStore {
-  FakeRemote(this.server);
+  /// Without [auth], acts for [FakeServer.primaryUser].
+  FakeRemote(this.server, [this.auth]);
 
   final FakeServer server;
+  final FakeAuth? auth;
+
+  String get _user => auth?.userId ?? FakeServer.primaryUser;
 
   @override
   Future<RemoteState> fetch() async {
     server._check();
+    final data = server.accounts[_user];
     return RemoteState(
-      data: server.data == null
+      data: data == null
           ? PlannerData()
           // Round-trip through JSON, like a real server would.
-          : decodePlannerData(encodePlannerData(server.data!)),
-      marker: server.marker,
+          : decodePlannerData(encodePlannerData(data)),
+      marker: server.markerOf(_user),
     );
   }
 
   @override
   Future<String> push(PlannerData data) async {
     server._check();
-    final existing = server.data;
+    final existing = server.accounts[_user];
     // Progress is append-only on the real server too: keep anything the
     // server already had.
     final keys = {for (final e in data.entries) e.idempotencyKey};
-    server.data = decodePlannerData(
-      encodePlannerData(
-        PlannerData(
-          categories: data.categories,
-          goals: data.goals,
-          periods: data.periods,
-          allocations: data.allocations,
-          entries: [
-            ...data.entries,
-            if (existing != null)
-              for (final e in existing.entries)
-                if (!keys.contains(e.idempotencyKey)) e,
-          ],
-          snapshots: data.snapshots,
-          reviewedPeriodIds: data.reviewedPeriodIds,
-          settings: data.settings,
-          activeFocus: data.activeFocus,
+    server._put(
+      _user,
+      decodePlannerData(
+        encodePlannerData(
+          PlannerData(
+            categories: data.categories,
+            goals: data.goals,
+            periods: data.periods,
+            allocations: data.allocations,
+            entries: [
+              ...data.entries,
+              if (existing != null)
+                for (final e in existing.entries)
+                  if (!keys.contains(e.idempotencyKey)) e,
+            ],
+            snapshots: data.snapshots,
+            reviewedPeriodIds: data.reviewedPeriodIds,
+            settings: data.settings,
+            activeFocus: data.activeFocus,
+          ),
         ),
       ),
     );
-    server._version++;
-    return server.marker!;
+    server._versions[_user] = (server._versions[_user] ?? 0) + 1;
+    return server.markerOf(_user)!;
   }
 
   @override
   Future<void> deleteAccount() async {
     server._check();
-    server.data = null;
-    server.passwords.clear();
+    server._put(_user, null);
+    server.passwords.remove(auth?.email ?? 'harun@example.test');
   }
 }

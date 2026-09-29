@@ -13,6 +13,36 @@ class AccountSection extends StatefulWidget {
 }
 
 class _AccountSectionState extends State<AccountSection> {
+  /// Sends what is still on this device first; if that fails, asks, since
+  /// signing in with another account afterwards would drop those changes.
+  Future<void> _signOut() async {
+    final l = AppLocalizations.of(context);
+    final sync = SyncScope.of(context);
+    if (sync.hasUnsentChanges) await sync.sync();
+    if (!mounted) return;
+    if (sync.hasUnsentChanges) {
+      final confirmed = await showDialog<bool>(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: Text(l.signOutUnsentTitle),
+          content: Text(l.signOutUnsentBody),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(false),
+              child: Text(l.cancel),
+            ),
+            FilledButton(
+              onPressed: () => Navigator.of(context).pop(true),
+              child: Text(l.signOutAnyway),
+            ),
+          ],
+        ),
+      );
+      if (confirmed != true) return;
+    }
+    await sync.signOut();
+  }
+
   Future<void> _deleteAccount() async {
     final l = AppLocalizations.of(context);
     final sync = SyncScope.of(context);
@@ -104,7 +134,7 @@ class _AccountSectionState extends State<AccountSection> {
               label: Text(l.syncNow),
             ),
             TextButton.icon(
-              onPressed: sync.signOut,
+              onPressed: _signOut,
               icon: const Icon(Icons.logout),
               label: Text(l.signOut),
             ),

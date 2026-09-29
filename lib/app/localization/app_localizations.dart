@@ -1841,8 +1841,26 @@ abstract class AppLocalizations {
   /// No description provided for @signOutHint.
   ///
   /// In tr, this message translates to:
-  /// **'Çıkış yapınca verilerin bu cihazda kalır.'**
+  /// **'Verilerin hesabında durur; tekrar giriş yapınca geri gelir.'**
   String get signOutHint;
+
+  /// No description provided for @signOutUnsentTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Gönderilmemiş değişiklikler var'**
+  String get signOutUnsentTitle;
+
+  /// No description provided for @signOutUnsentBody.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bu cihazdaki son değişikliklerin henüz hesabına ulaşmadı (bağlantı yok). Çıkış yaparsan, aynı hesapla yeniden girdiğinde gönderilirler; başka bir hesapla girilirse bu değişiklikler kaybolur.'**
+  String get signOutUnsentBody;
+
+  /// No description provided for @signOutAnyway.
+  ///
+  /// In tr, this message translates to:
+  /// **'Yine de çıkış yap'**
+  String get signOutAnyway;
 
   /// No description provided for @deleteAccount.
   ///

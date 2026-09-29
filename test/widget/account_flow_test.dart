@@ -183,6 +183,33 @@ void main() {
     sync.dispose();
   });
 
+  testWidgets('signing out with unsent changes asks first', (tester) async {
+    final server = FakeServer()..passwords[_email] = _password;
+    final (controller, sync, _) = await _pump(
+      tester,
+      server: server,
+      signedIn: true,
+    );
+    server.offline = true;
+    final category = controller.addCategory('Proje');
+    controller.createWeeklyDurationGoal(
+      categoryId: category.id,
+      title: 'Proje',
+      targetMinutes: 600,
+      dailyPlan: {monday: 120},
+    );
+
+    await tester.tap(find.text('Ayarlar'));
+    await tester.pumpAndSettle();
+    await scrollAndTap(tester, find.text('Çıkış yap'));
+    expect(find.text('Gönderilmemiş değişiklikler var'), findsOneWidget);
+
+    await tester.tap(find.text('Vazgeç'));
+    await tester.pumpAndSettle();
+    expect(sync.isSignedIn, isTrue);
+    sync.dispose();
+  });
+
   testWidgets('a conflict shows on Today and is resolved by choice', (
     tester,
   ) async {

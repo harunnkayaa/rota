@@ -189,7 +189,8 @@ class SyncService extends ChangeNotifier {
     _setStatus(SyncStatus.syncing);
     final changesBefore = _localChanges;
     try {
-      if (_state.userId != userId) {
+      final previousUser = _state.userId;
+      if (previousUser != userId) {
         // Another account on this device: treat as a first sync.
         _state
           ..userId = userId
@@ -197,6 +198,15 @@ class SyncService extends ChangeNotifier {
           ..lastSyncedAt = null;
       }
       final server = await remote!.fetch();
+      if (previousUser != null && previousUser != userId) {
+        // What is on this device belongs to the previous account (it is on
+        // that account's server copy). Never hand it to this one: show this
+        // account's own data instead.
+        _adopt(server.data);
+        await _markSynced(server.marker);
+        _setStatus(SyncStatus.synced);
+        return;
+      }
       final local = controller.snapshotData();
       final action = decideSync(
         localDirty: _state.dirty,
