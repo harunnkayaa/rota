@@ -41,7 +41,10 @@ migration uygulandı, 25 güvenlik testi bulutta da geçti, girişsiz istekler
 
 | Giriş ekranı (28.09) | ✅ | Sunucu tanımlı derlemede ilk ekran giriş / hesap oluşturma; oturum saklıysa doğrudan uygulama açılır; çıkış yapınca giriş ekranına dönülür, veriler cihazda kalır. Sunucusuz derleme eskisi gibi doğrudan açılır. |
 
-Doğrulama: 235 uygulama testi + 25 veritabanı testi geçiyor, `flutter analyze` temiz.
+| Derin test ve iyileştirmeler (29.09) | ✅ | Ekranlar gerçek fontlarla tek tek çizilip incelendi. "Hedef ekle" başlığa taşındı (günlük butonları kapatmıyordu); kart altında yan yana "İlerleme ekle / Odaklan"; geniş ekranda başlık içerikle hizalı; büyük yazıda başlık kesilmiyor. Yeniden dağıtma 5 dk adımlarla (+10/+10/+5/+5, 8/8/7/7 değil). "Günlük yük" grafiği plan / kapasite gösteriyor. Yanlış girilen ilerleme geri alınabiliyor (silinmez; eksi düzeltme kaydı). Hedef adı ve hedef süresi değiştirilebiliyor. |
+| Eşitleme düzeltmeleri (29.09) | ✅ | **Gizlilik:** aynı cihazda başka hesapla girilince önceki hesabın verisi yeni hesaba yüklenmiyor. Çıkışta gönderilmemiş değişiklik varsa uyarı. **Pazartesi çakışması:** yeni hafta her cihazda aynı kimliklerle açılıyor ve kullanıcı değişikliği sayılmıyor. **Otomatik birleştirme:** iki cihaz farklı şeyleri değiştirdiyse sormadan birleşiyor (ortak sürüm saklanıyor); yalnızca aynı kayıt iki tarafta farklı değiştiyse soruluyor. Açık uygulama dakikada bir küçük bir sorguyla diğer cihazın değişikliğini çekiyor. "Tüm verileri sil" hesaba bağlıyken hesaptan da siliyor ve bunu açıkça söylüyor. |
+
+Doğrulama: 262 uygulama testi (gerçek yerel Supabase'e karşı 4 uçtan uca test dahil) + 25 veritabanı testi geçiyor, `flutter analyze` temiz.
 
 ### Yerel çalıştırma
 
@@ -58,9 +61,11 @@ yeniden üretmek için `supabase projects api-keys --project-ref <ref>`).
 
 ## Sıradaki adımlar (öncelik sırasıyla)
 
-1. **Auth yönlendirme adresi** — web adresi belli olunca Supabase
-   panelinde Authentication → URL Configuration → Site URL ayarlanmalı
-   (şimdilik onay bağlantısı localhost'a gider; hesap yine onaylanır).
+1. **Web yayını + Auth yönlendirme adresi + şifre sıfırlama** — web
+   adresi olmadan onay/sıfırlama bağlantıları localhost'a gider. Öneri:
+   GitHub Pages (yeni hesap gerekmez; kullanıcı repoda Pages'i açar).
+   Adres belli olunca Supabase Site URL ayarlanır ve "Şifremi unuttum"
+   eklenir.
 2. **iPhone 15 fiziksel test** — hatırlatma teslimatı, odak sayacı, gerçek
    cihazdan buluta eşitleme (CLAUDE.md §20.4).
 3. **Yayın** — web hosting seçimi ve iOS TestFlight (Apple Developer hesabı).
