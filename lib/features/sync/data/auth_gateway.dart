@@ -64,6 +64,12 @@ class SupabaseAuthGateway implements AuthGateway {
       () async =>
           response = await _auth.signUp(email: email, password: password),
     );
+    // For an email that already has an account, Supabase answers like a
+    // normal sign-up (so outsiders cannot probe which emails exist) but
+    // sends nothing; the returned user then has no identities.
+    if (response?.user?.identities?.isEmpty ?? false) {
+      throw const SignInException(AuthFailure.emailTaken);
+    }
     return response?.session != null;
   }
 

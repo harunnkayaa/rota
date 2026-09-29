@@ -112,6 +112,26 @@ void main() {
     sync.dispose();
   });
 
+  testWidgets('sign-up with a taken email says so and switches to sign-in', (
+    tester,
+  ) async {
+    final server = FakeServer()..passwords[_email] = _password;
+    final (_, sync, _) = await _pump(tester, server: server);
+
+    await tester.tap(_signInScreen);
+    await tester.pumpAndSettle();
+    await _fill(tester);
+    await _submit(tester, 'Hesap oluştur');
+
+    expect(
+      find.text('Bu e-postayla zaten bir hesap var; giriş yapmayı dene.'),
+      findsOneWidget,
+    );
+    expect(find.textContaining('onay bağlantısı'), findsNothing);
+    expect(find.widgetWithText(FilledButton, 'Giriş yap'), findsOneWidget);
+    sync.dispose();
+  });
+
   testWidgets('wrong password is explained, no stack trace', (tester) async {
     final server = FakeServer()..passwords[_email] = 'something-else';
     final (_, sync, _) = await _pump(tester, server: server);

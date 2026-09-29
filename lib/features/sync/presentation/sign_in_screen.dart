@@ -73,16 +73,18 @@ class _SignInScreenState extends State<SignInScreen> {
       _password.clear();
     } on SignInException catch (e) {
       if (!mounted) return;
-      setState(
-        () => _error = switch (e.failure) {
+      setState(() {
+        // An existing account: offer signing in with the same email.
+        if (e.failure == AuthFailure.emailTaken) _createAccount = false;
+        _error = switch (e.failure) {
           AuthFailure.invalidCredentials => l.authInvalidCredentials,
           AuthFailure.emailTaken => l.authEmailTaken,
           AuthFailure.weakPassword => l.authWeakPassword,
           AuthFailure.emailNotConfirmed => l.authEmailNotConfirmed,
           AuthFailure.network => l.authNetwork,
           AuthFailure.unknown => l.authUnknown,
-        },
-      );
+        };
+      });
     } finally {
       if (mounted) setState(() => _busy = false);
     }
