@@ -164,6 +164,7 @@ RedistributionResult proposeRedistribution({
   required List<DayCapacity> candidateDays,
   RedistributionStrategy strategy = RedistributionStrategy.even,
   int? maxDailyAddition,
+  int block = 1,
 }) {
   if (!goal.goalType.isRedistributable) {
     return const RedistributionNotAllowed(NotAllowedReason.goalNotFlexible);
@@ -199,7 +200,7 @@ RedistributionResult proposeRedistribution({
         (final free!, final limit!) => min(free, limit),
       },
   ];
-  final shares = splitWithCaps(deficit, weights, caps);
+  final shares = splitWithCaps(deficit, weights, caps, block: block);
 
   return RedistributionProposal(
     deficit: deficit,

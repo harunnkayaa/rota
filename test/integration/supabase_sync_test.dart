@@ -154,5 +154,40 @@ void main() {
       await web.dispose();
       await stranger.dispose();
     });
+
+    test('"delete all data" while signed in empties the account too', () async {
+      if (!up) {
+        markTestSkipped('local Supabase is not running');
+        return;
+      }
+      final email = 'rota-${Random().nextInt(1 << 32)}@example.test';
+      const password = 'integration-test-1';
+      final phone = _Device(config!);
+      await phone.start();
+      final category = phone.controller.addCategory('Proje');
+      final periodId = phone.controller
+          .createWeeklyDurationGoal(
+            categoryId: category.id,
+            title: 'Rota MVP',
+            targetMinutes: 600,
+            dailyPlan: {monday: 120},
+          )
+          .id;
+      phone.controller.addProgress(periodId, 45);
+      await phone.sync.signUp(email: email, password: password);
+      await phone.sync.sync();
+
+      phone.controller.deleteAllData();
+      await phone.sync.sync();
+      expect(phone.sync.status, SyncStatus.synced);
+
+      final server = await SupabaseRemotePlannerStore(phone.client).fetch();
+      expect(server.data.goals, isEmpty);
+      expect(server.data.periods, isEmpty);
+      expect(server.data.entries, isEmpty);
+
+      await phone.sync.deleteAccount();
+      await phone.dispose();
+    });
   });
 }

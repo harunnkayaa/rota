@@ -48,12 +48,50 @@ void main() {
     });
   });
 
+  group('splitWithCaps in 5-minute blocks', () {
+    test('30 minutes over four days: readable steps, not 8/8/7/7', () {
+      expect(splitWithCaps(30, [1, 1, 1, 1], List.filled(4, null), block: 5), [
+        10,
+        10,
+        5,
+        5,
+      ]);
+    });
+
+    test('a remainder under one block goes to a single day', () {
+      expect(splitWithCaps(32, [1, 1, 1, 1], List.filled(4, null), block: 5), [
+        12,
+        10,
+        5,
+        5,
+      ]);
+    });
+
+    test('blocks never make a plan less feasible', () {
+      // 7 free minutes on each of two days: no 15-minute block fits, but
+      // all 14 minutes still find a place.
+      expect(splitWithCaps(14, [1, 1], [7, 7], block: 15), [7, 7]);
+    });
+
+    test('capacity weighting and caps still apply', () {
+      expect(splitWithCaps(90, [30, 60], [30, 60], block: 5), [30, 60]);
+    });
+  });
+
   group('distributeEvenly', () {
     test('maps each chosen day to its share', () {
       expect(
         distributeEvenly(600, [monday, tuesday, wednesday, thursday, friday]),
         {monday: 120, tuesday: 120, wednesday: 120, thursday: 120, friday: 120},
       );
+    });
+
+    test('a week split in blocks keeps the total and 5-minute steps', () {
+      final days = [for (var i = 0; i < 7; i++) monday.addDays(i)];
+      final plan = distributeEvenly(600, days, block: 5);
+      expect(plan.values.fold(0, (a, b) => a + b), 600);
+      expect(plan.values.every((v) => v % 5 == 0), isTrue);
+      expect(plan.values.toList(), [90, 85, 85, 85, 85, 85, 85]);
     });
   });
 }

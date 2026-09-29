@@ -4,9 +4,11 @@ import '../../../app/localization/app_localizations.dart';
 import '../../../app/localization/formatters.dart';
 import '../../../app/theme/app_theme.dart';
 import '../../../shared/widgets/content_width.dart';
+import '../../../shared/widgets/page_app_bar.dart';
 import '../../../shared/widgets/progress_ring.dart';
 import '../../categories/domain/category.dart';
 import '../../focus/presentation/focus_screen.dart';
+import '../../goals/presentation/add_goal_button.dart';
 import '../../goals/presentation/create_goal_screen.dart';
 import '../../planning/presentation/planner_controller.dart';
 import '../../sync/presentation/account_section.dart';
@@ -27,7 +29,10 @@ class TodayScreen extends StatelessWidget {
     return Scaffold(
       body: CustomScrollView(
         slivers: [
-          SliverAppBar.large(title: Text(l.navToday)),
+          PageAppBar(
+            title: l.navToday,
+            actions: [if (goals.isNotEmpty) const AddGoalButton()],
+          ),
           SliverToBoxAdapter(
             child: ContentWidth(
               child: Padding(
@@ -95,7 +100,7 @@ class TodayScreen extends StatelessWidget {
                     AppSpacing.m,
                     AppSpacing.m,
                     AppSpacing.m,
-                    AppLayout.fabClearance,
+                    AppSpacing.xl,
                   ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,

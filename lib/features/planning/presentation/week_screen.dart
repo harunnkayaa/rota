@@ -6,8 +6,10 @@ import '../../../app/theme/app_theme.dart';
 import '../../../core/time/local_date.dart';
 import '../../../shared/widgets/content_width.dart';
 import '../../../shared/widgets/debt_notice.dart';
+import '../../../shared/widgets/page_app_bar.dart';
 import '../../../shared/widgets/progress_line.dart';
 import '../../categories/presentation/category_style.dart';
+import '../../goals/presentation/add_goal_button.dart';
 import '../domain/capacity.dart';
 import 'deadline_pace_section.dart';
 import 'goal_actions_menu.dart';
@@ -31,7 +33,7 @@ class WeekScreen extends StatelessWidget {
     return Scaffold(
       body: CustomScrollView(
         slivers: [
-          SliverAppBar.large(title: Text(l.weekTitle)),
+          PageAppBar(title: l.weekTitle, actions: const [AddGoalButton()]),
           SliverToBoxAdapter(
             child: ContentWidth(
               child: Padding(
@@ -39,7 +41,7 @@ class WeekScreen extends StatelessWidget {
                   AppSpacing.m,
                   0,
                   AppSpacing.m,
-                  AppLayout.fabClearance,
+                  AppSpacing.xl,
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -93,6 +95,12 @@ class _CapacityCard extends StatelessWidget {
             Text(
               l.capacityTitle,
               style: Theme.of(context).textTheme.titleMedium,
+            ),
+            Text(
+              l.capacitySubtitle,
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
+              ),
             ),
             const SizedBox(height: AppSpacing.m),
             Row(
@@ -195,6 +203,16 @@ class _CapacityBar extends StatelessWidget {
             child: Text(
               formatCompactMinutes(context, planned),
               style: theme.textTheme.labelSmall,
+            ),
+          ),
+          FittedBox(
+            fit: BoxFit.scaleDown,
+            child: Text(
+              '/ ${formatCompactMinutes(context, capacity)}',
+              style: theme.textTheme.labelSmall?.copyWith(
+                color: scheme.onSurfaceVariant,
+                fontWeight: FontWeight.w400,
+              ),
             ),
           ),
         ],

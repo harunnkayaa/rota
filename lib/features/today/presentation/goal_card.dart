@@ -20,6 +20,11 @@ class GoalCard extends StatelessWidget {
 
   final GoalProgressView view;
 
+  static final _actionStyle = FilledButton.styleFrom(
+    minimumSize: const Size.fromHeight(48),
+    padding: const EdgeInsets.symmetric(horizontal: AppSpacing.m),
+  );
+
   @override
   Widget build(BuildContext context) {
     final l = AppLocalizations.of(context);
@@ -59,6 +64,15 @@ class GoalCard extends StatelessWidget {
                     ],
                   ),
                 ),
+                IconButton.filledTonal(
+                  tooltip: l.editTodayPlan,
+                  onPressed: () => showPlanEditorSheet(
+                    context,
+                    periodId: view.period.id,
+                    onlyDate: today,
+                  ),
+                  icon: const Icon(Icons.edit_calendar_outlined),
+                ),
                 GoalActionsMenu(view: view),
               ],
             ),
@@ -87,35 +101,25 @@ class GoalCard extends StatelessWidget {
               ),
             ],
             const SizedBox(height: AppSpacing.m),
-            Wrap(
-              alignment: WrapAlignment.end,
-              spacing: AppSpacing.s,
-              runSpacing: AppSpacing.s,
+            // The two daily actions, side by side and easy to reach.
+            Row(
               children: [
-                OutlinedButton.icon(
-                  onPressed: () => showPlanEditorSheet(
-                    context,
-                    periodId: view.period.id,
-                    onlyDate: today,
+                Expanded(
+                  child: FilledButton.tonalIcon(
+                    style: _actionStyle,
+                    onPressed: () => showAddProgressSheet(context, view),
+                    icon: const Icon(Icons.add),
+                    label: Text(l.addProgress, overflow: TextOverflow.ellipsis),
                   ),
-                  icon: const Icon(Icons.edit_calendar_outlined),
-                  label: Text(l.editTodayPlan),
                 ),
-                FilledButton.tonalIcon(
-                  style: FilledButton.styleFrom(
-                    minimumSize: const Size(64, 44),
+                const SizedBox(width: AppSpacing.s),
+                Expanded(
+                  child: FilledButton.icon(
+                    style: _actionStyle,
+                    onPressed: () => openFocus(context, view.period.id),
+                    icon: const Icon(Icons.timer_outlined),
+                    label: Text(l.focusStart, overflow: TextOverflow.ellipsis),
                   ),
-                  onPressed: () => showAddProgressSheet(context, view),
-                  icon: const Icon(Icons.add),
-                  label: Text(l.addProgress),
-                ),
-                FilledButton.icon(
-                  style: FilledButton.styleFrom(
-                    minimumSize: const Size(64, 44),
-                  ),
-                  onPressed: () => openFocus(context, view.period.id),
-                  icon: const Icon(Icons.timer_outlined),
-                  label: Text(l.focusStart),
                 ),
               ],
             ),

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-import '../features/goals/presentation/create_goal_screen.dart';
 import '../features/planning/presentation/planner_controller.dart';
 import '../features/planning/presentation/week_screen.dart';
 import '../features/reports/presentation/reports_screen.dart';
@@ -26,9 +25,6 @@ class _HomeShellState extends State<HomeShell> {
     ReportsScreen(),
     SettingsScreen(),
   ];
-
-  /// "Add goal" belongs to the planning screens only.
-  bool get _showAddGoal => _index <= 1;
 
   @override
   Widget build(BuildContext context) {
@@ -56,14 +52,6 @@ class _HomeShellState extends State<HomeShell> {
               selectedIndex: _index,
               onDestinationSelected: (i) => setState(() => _index = i),
               labelType: NavigationRailLabelType.all,
-              leading: Padding(
-                padding: const EdgeInsets.symmetric(vertical: AppSpacing.m),
-                child: FloatingActionButton(
-                  tooltip: l.addGoal,
-                  onPressed: () => openCreateGoal(context),
-                  child: const Icon(Icons.add),
-                ),
-              ),
               destinations: [
                 for (final (icon, selected, label) in destinations)
                   NavigationRailDestination(
@@ -82,13 +70,6 @@ class _HomeShellState extends State<HomeShell> {
 
     return Scaffold(
       body: page,
-      floatingActionButton: _showAddGoal
-          ? FloatingActionButton.extended(
-              onPressed: () => openCreateGoal(context),
-              icon: const Icon(Icons.add),
-              label: Text(l.addGoal),
-            )
-          : null,
       bottomNavigationBar: NavigationBar(
         selectedIndex: _index,
         onDestinationSelected: (i) => setState(() => _index = i),

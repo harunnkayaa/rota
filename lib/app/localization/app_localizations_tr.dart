@@ -171,7 +171,10 @@ class AppLocalizationsTr extends AppLocalizations {
   String get weekNoGoals => 'Bu hafta için hedef yok.';
 
   @override
-  String get capacityTitle => 'Günlük kapasite';
+  String get capacityTitle => 'Günlük yük';
+
+  @override
+  String get capacitySubtitle => 'Her gün planlanan süre ve o günkü kapasiten.';
 
   @override
   String capacityOfDay(String planned, String capacity) {
@@ -741,8 +744,11 @@ class AppLocalizationsTr extends AppLocalizations {
   String get settingsDataTitle => 'Verilerin';
 
   @override
-  String get settingsDataBody =>
-      'Veriler şu an yalnızca bu cihazda saklanıyor. Cihazlar arası senkronizasyon bir sonraki aşamada gelecek.';
+  String get settingsDataBody => 'Verilerin yalnızca bu cihazda saklanıyor.';
+
+  @override
+  String get settingsDataBodySynced =>
+      'Verilerin bu cihazda ve hesabında saklanıyor; giriş yaptığın her cihazda aynı görünür.';
 
   @override
   String get focusStart => 'Odaklan';
@@ -937,6 +943,10 @@ class AppLocalizationsTr extends AppLocalizations {
   String get deleteConfirmTitle => 'Tüm veriler silinsin mi?';
 
   @override
+  String get deleteConfirmBodySynced =>
+      'Hedeflerin, planların, ilerleme kayıtların, sonuçların ve ayarların bu cihazdan ve hesabından (yani diğer cihazlarından da) kalıcı olarak silinir. Hesabın açık kalır. Bu işlem geri alınamaz. İstersen önce verilerini dışa aktar.';
+
+  @override
   String get deleteConfirmBody =>
       'Hedeflerin, planların, ilerleme kayıtların, sonuçların ve ayarların bu cihazdan kalıcı olarak silinir. Bu işlem geri alınamaz. İstersen önce verilerini dışa aktar.';
 
@@ -951,7 +961,7 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get accountHint =>
-      'Giriş yaparsan hedeflerin telefonunda ve web\'de aynı olur. Hesap olmadan da her şey bu cihazda çalışır.';
+      'Hedeflerin hesabında saklanır; telefonunda ve web\'de aynı görünür. İnternet yokken de çalışır, bağlantı gelince eşitlenir.';
 
   @override
   String get accountDisabled =>

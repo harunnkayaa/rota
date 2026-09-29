@@ -371,8 +371,14 @@ abstract class AppLocalizations {
   /// No description provided for @capacityTitle.
   ///
   /// In tr, this message translates to:
-  /// **'Günlük kapasite'**
+  /// **'Günlük yük'**
   String get capacityTitle;
+
+  /// No description provided for @capacitySubtitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Her gün planlanan süre ve o günkü kapasiten.'**
+  String get capacitySubtitle;
 
   /// No description provided for @capacityOfDay.
   ///
@@ -1301,8 +1307,14 @@ abstract class AppLocalizations {
   /// No description provided for @settingsDataBody.
   ///
   /// In tr, this message translates to:
-  /// **'Veriler şu an yalnızca bu cihazda saklanıyor. Cihazlar arası senkronizasyon bir sonraki aşamada gelecek.'**
+  /// **'Verilerin yalnızca bu cihazda saklanıyor.'**
   String get settingsDataBody;
+
+  /// No description provided for @settingsDataBodySynced.
+  ///
+  /// In tr, this message translates to:
+  /// **'Verilerin bu cihazda ve hesabında saklanıyor; giriş yaptığın her cihazda aynı görünür.'**
+  String get settingsDataBodySynced;
 
   /// No description provided for @focusStart.
   ///
@@ -1640,6 +1652,12 @@ abstract class AppLocalizations {
   /// **'Tüm veriler silinsin mi?'**
   String get deleteConfirmTitle;
 
+  /// No description provided for @deleteConfirmBodySynced.
+  ///
+  /// In tr, this message translates to:
+  /// **'Hedeflerin, planların, ilerleme kayıtların, sonuçların ve ayarların bu cihazdan ve hesabından (yani diğer cihazlarından da) kalıcı olarak silinir. Hesabın açık kalır. Bu işlem geri alınamaz. İstersen önce verilerini dışa aktar.'**
+  String get deleteConfirmBodySynced;
+
   /// No description provided for @deleteConfirmBody.
   ///
   /// In tr, this message translates to:
@@ -1667,7 +1685,7 @@ abstract class AppLocalizations {
   /// No description provided for @accountHint.
   ///
   /// In tr, this message translates to:
-  /// **'Giriş yaparsan hedeflerin telefonunda ve web\'de aynı olur. Hesap olmadan da her şey bu cihazda çalışır.'**
+  /// **'Hedeflerin hesabında saklanır; telefonunda ve web\'de aynı görünür. İnternet yokken de çalışır, bağlantı gelince eşitlenir.'**
   String get accountHint;
 
   /// No description provided for @accountDisabled.

@@ -142,7 +142,13 @@ class _CreateGoalScreenState extends State<CreateGoalScreen> {
     setState(() {
       _plan
         ..clear()
-        ..addAll(distributeEvenly(amount, _planDays(controller)));
+        ..addAll(
+          distributeEvenly(
+            amount,
+            _planDays(controller),
+            block: minutePlanBlock,
+          ),
+        );
     });
   }
 

@@ -131,7 +131,7 @@ void main() {
     );
 
     // Raise today's plan from 2 h to 3 h on the Today screen.
-    await tapVisible(tester, find.text('Bugünün planı'));
+    await tapVisible(tester, find.byTooltip('Bugünün planı'));
     expect(
       find.text('Plan, kalan hedefin 1 sa kısmını karşılamıyor.'),
       findsOneWidget,
@@ -181,7 +181,7 @@ void main() {
     await tester.tap(find.text('Hafta'));
     await tester.pumpAndSettle();
 
-    expect(find.text('Günlük kapasite'), findsOneWidget);
+    expect(find.text('Günlük yük'), findsOneWidget);
     // Wednesday on the project goal: 45 of 120 done.
     expect(
       semanticsLabel(RegExp(r'^Çar 30 Eyl: 45 dk / 2 sa, 1 sa 15 dk eksik$')),

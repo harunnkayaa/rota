@@ -6,10 +6,12 @@ import '../../../app/localization/formatters.dart';
 import '../../../app/theme/app_theme.dart';
 import '../../../shared/widgets/content_width.dart';
 import '../../../shared/widgets/duration_stepper.dart';
+import '../../../shared/widgets/page_app_bar.dart';
 import '../../planning/presentation/planner_controller.dart';
 import '../../reminders/domain/reminder_planner.dart';
 import '../../reminders/presentation/reminder_sync.dart';
 import '../../sync/presentation/account_section.dart';
+import '../../sync/presentation/sync_service.dart';
 
 /// Capacity and calendar preferences (CLAUDE.md §13.7). Every change is
 /// saved immediately; there is no separate "save" step.
@@ -63,7 +65,7 @@ class SettingsScreen extends StatelessWidget {
     return Scaffold(
       body: CustomScrollView(
         slivers: [
-          SliverAppBar.large(title: Text(l.settingsTitle)),
+          PageAppBar(title: l.settingsTitle),
           SliverToBoxAdapter(
             child: ContentWidth(
               child: Padding(
@@ -76,9 +78,13 @@ class SettingsScreen extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    card(l.settingsAccount, l.accountHint, [
-                      const AccountSection(),
-                    ]),
+                    card(
+                      l.settingsAccount,
+                      SyncScope.maybeOf(context)?.status == SyncStatus.disabled
+                          ? null
+                          : l.accountHint,
+                      [const AccountSection()],
+                    ),
                     card(l.settingsCapacity, l.settingsCapacityHint, [
                       Wrap(
                         alignment: WrapAlignment.spaceBetween,
@@ -147,7 +153,11 @@ class SettingsScreen extends StatelessWidget {
                       const _ReminderSection(),
                     ]),
                     card(l.settingsDataTitle, null, [
-                      Text(l.settingsDataBody),
+                      Text(
+                        SyncScope.maybeOf(context)?.isSignedIn ?? false
+                            ? l.settingsDataBodySynced
+                            : l.settingsDataBody,
+                      ),
                       const SizedBox(height: AppSpacing.m),
                       const _DataActions(),
                     ]),
@@ -374,7 +384,11 @@ class _DataActions extends StatelessWidget {
       context: context,
       builder: (context) => AlertDialog(
         title: Text(l.deleteConfirmTitle),
-        content: Text(l.deleteConfirmBody),
+        content: Text(
+          SyncScope.maybeOf(context)?.isSignedIn ?? false
+              ? l.deleteConfirmBodySynced
+              : l.deleteConfirmBody,
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(false),

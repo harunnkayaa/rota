@@ -4,6 +4,7 @@ import '../../../app/localization/app_localizations.dart';
 import '../../../app/localization/formatters.dart';
 import '../../../app/theme/app_theme.dart';
 import '../../../shared/widgets/content_width.dart';
+import '../../../shared/widgets/page_app_bar.dart';
 import '../../../shared/widgets/progress_line.dart';
 import '../../../shared/widgets/progress_ring.dart';
 import '../../categories/presentation/category_style.dart';
@@ -27,7 +28,7 @@ class ReportsScreen extends StatelessWidget {
     return Scaffold(
       body: CustomScrollView(
         slivers: [
-          SliverAppBar.large(title: Text(l.reportsTitle)),
+          PageAppBar(title: l.reportsTitle),
           SliverToBoxAdapter(
             child: ContentWidth(
               child: Padding(

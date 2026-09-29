@@ -21,6 +21,7 @@ import '../data/planner_json.dart';
 import '../data/planner_storage.dart';
 import '../domain/capacity.dart';
 import '../domain/deadline_pace.dart';
+import '../domain/distribution.dart';
 import '../domain/period_closing.dart';
 import '../domain/plan_editing.dart';
 import '../domain/progress_calculator.dart';
@@ -732,8 +733,9 @@ class PlannerController extends ChangeNotifier {
     bool includeToday = false,
   }) {
     final period = _period(periodId);
+    final goal = _goal(period.goalId);
     return proposeRedistribution(
-      goal: _goal(period.goalId),
+      goal: goal,
       period: period,
       deficit: _debt(period),
       candidateDays: [
@@ -745,6 +747,9 @@ class PlannerController extends ChangeNotifier {
           DayCapacity(d, capacityOn(d).free),
       ],
       strategy: strategy,
+      block: goal.measurementType == MeasurementType.durationMinutes
+          ? minutePlanBlock
+          : 1,
     );
   }
 

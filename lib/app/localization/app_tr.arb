@@ -127,7 +127,8 @@
     }
   },
   "weekNoGoals": "Bu hafta için hedef yok.",
-  "capacityTitle": "Günlük kapasite",
+  "capacityTitle": "Günlük yük",
+  "capacitySubtitle": "Her gün planlanan süre ve o günkü kapasiten.",
   "capacityOfDay": "{planned} / {capacity}",
   "@capacityOfDay": {
     "placeholders": {
@@ -639,7 +640,8 @@
   "settingsWeekStart": "Hafta başlangıcı",
   "settingsWeekStartHint": "Değişiklik bir sonraki haftadan itibaren geçerli olur.",
   "settingsDataTitle": "Verilerin",
-  "settingsDataBody": "Veriler şu an yalnızca bu cihazda saklanıyor. Cihazlar arası senkronizasyon bir sonraki aşamada gelecek.",
+  "settingsDataBody": "Verilerin yalnızca bu cihazda saklanıyor.",
+  "settingsDataBodySynced": "Verilerin bu cihazda ve hesabında saklanıyor; giriş yaptığın her cihazda aynı görünür.",
   "focusStart": "Odaklan",
   "focusTitle": "Odak",
   "focusPause": "Duraklat",
@@ -751,11 +753,12 @@
   "close": "Kapat",
   "settingsDelete": "Tüm verileri sil",
   "deleteConfirmTitle": "Tüm veriler silinsin mi?",
+  "deleteConfirmBodySynced": "Hedeflerin, planların, ilerleme kayıtların, sonuçların ve ayarların bu cihazdan ve hesabından (yani diğer cihazlarından da) kalıcı olarak silinir. Hesabın açık kalır. Bu işlem geri alınamaz. İstersen önce verilerini dışa aktar.",
   "deleteConfirmBody": "Hedeflerin, planların, ilerleme kayıtların, sonuçların ve ayarların bu cihazdan kalıcı olarak silinir. Bu işlem geri alınamaz. İstersen önce verilerini dışa aktar.",
   "deleteConfirm": "Kalıcı olarak sil",
   "dataDeleted": "Tüm veriler silindi",
   "settingsAccount": "Hesap ve eşitleme",
-  "accountHint": "Giriş yaparsan hedeflerin telefonunda ve web'de aynı olur. Hesap olmadan da her şey bu cihazda çalışır.",
+  "accountHint": "Hedeflerin hesabında saklanır; telefonunda ve web'de aynı görünür. İnternet yokken de çalışır, bağlantı gelince eşitlenir.",
   "accountDisabled": "Bu sürümde hesap ve eşitleme kapalı; veriler yalnızca bu cihazda.",
   "emailLabel": "E-posta",
   "passwordLabel": "Şifre (en az 8 karakter)",

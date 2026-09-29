@@ -17,9 +17,6 @@ abstract final class AppLayout {
   static const double maxContentWidth = 720;
   static const double cardRadius = 24;
   static const double controlRadius = 14;
-
-  /// Space kept free under lists so the floating button never hides content.
-  static const double fabClearance = 104;
 }
 
 /// Calm "command center" look: layered navy surfaces in dark mode, a teal

@@ -201,7 +201,7 @@ CatchUpProposal proposeCatchUp({
   final sortedDays = [...days]..sort();
   final fromFree = splitWithCaps(gap, List.filled(sortedDays.length, 1), [
     for (final d in sortedDays) freeCapacityOn(d),
-  ]);
+  ], block: minutePlanBlock);
   final additions = <LocalDate, int>{
     for (var i = 0; i < sortedDays.length; i++)
       if (fromFree[i] > 0) sortedDays[i]: fromFree[i],
