@@ -44,7 +44,10 @@ migration uygulandı, 25 güvenlik testi bulutta da geçti, girişsiz istekler
 | Derin test ve iyileştirmeler (29.09) | ✅ | Ekranlar gerçek fontlarla tek tek çizilip incelendi. "Hedef ekle" başlığa taşındı (günlük butonları kapatmıyordu); kart altında yan yana "İlerleme ekle / Odaklan"; geniş ekranda başlık içerikle hizalı; büyük yazıda başlık kesilmiyor. Yeniden dağıtma 5 dk adımlarla (+10/+10/+5/+5, 8/8/7/7 değil). "Günlük yük" grafiği plan / kapasite gösteriyor. Yanlış girilen ilerleme geri alınabiliyor (silinmez; eksi düzeltme kaydı). Hedef adı ve hedef süresi değiştirilebiliyor. |
 | Eşitleme düzeltmeleri (29.09) | ✅ | **Gizlilik:** aynı cihazda başka hesapla girilince önceki hesabın verisi yeni hesaba yüklenmiyor. Çıkışta gönderilmemiş değişiklik varsa uyarı. **Pazartesi çakışması:** yeni hafta her cihazda aynı kimliklerle açılıyor ve kullanıcı değişikliği sayılmıyor. **Otomatik birleştirme:** iki cihaz farklı şeyleri değiştirdiyse sormadan birleşiyor (ortak sürüm saklanıyor); yalnızca aynı kayıt iki tarafta farklı değiştiyse soruluyor. Açık uygulama dakikada bir küçük bir sorguyla diğer cihazın değişikliğini çekiyor. "Tüm verileri sil" hesaba bağlıyken hesaptan da siliyor ve bunu açıkça söylüyor. |
 
-Doğrulama: 262 uygulama testi (gerçek yerel Supabase'e karşı 4 uçtan uca test dahil) + 25 veritabanı testi geçiyor, `flutter analyze` temiz.
+| Web yayını (29.09) | ✅ | Cloudflare Pages: **https://rota-3t6.pages.dev** (proje `rota`). Supabase Site URL ve Redirect URL bu adrese ayarlı (kullanıcı panelden yaptı). |
+| Şifremi unuttum (29.09) | ✅ | Bağlantı yerine e-postayla 6 haneli kod (iPhone'da bağlantı Safari'de açılırdı): kod + yeni şifre → giriş. Supabase'in "Reset Password" e-posta şablonunda `{{ .Token }}` olmalı (kullanıcı panelden düzenler). Gerçek yerel Supabase'te kod doğrulama yolu denendi. |
+
+Doğrulama: 263 uygulama testi (gerçek yerel Supabase'e karşı 4 uçtan uca test dahil) + 25 veritabanı testi geçiyor, `flutter analyze` temiz.
 
 ### Yerel çalıştırma
 
@@ -57,16 +60,23 @@ Buluta bağlı çalıştırma: `flutter run --dart-define-from-file=env/prod.jso
 (`env/prod.json` yalnızca URL ve publishable key içerir, git'e girmez;
 yeniden üretmek için `supabase projects api-keys --project-ref <ref>`).
 
+Yayın komutları:
+
+```bash
+# Web (Cloudflare Pages; `npx wrangler login` bir kez yapıldı)
+flutter build web --release --pwa-strategy=none --dart-define-from-file=env/prod.json
+npx wrangler pages deploy build/web --project-name rota --branch main
+
+# iPhone (ücretsiz Apple hesabı: 7 günde bir yeniden kur)
+flutter build ios --release --dart-define-from-file=env/prod.json
+xcrun devicectl device install app --device <cihaz-id> build/ios/iphoneos/Runner.app
+```
+
 `env/local.json` git'e girmez; yerel test hesabının bilgileri de oradadır.
 
 ## Sıradaki adımlar (öncelik sırasıyla)
 
-1. **Web yayını + Auth yönlendirme adresi + şifre sıfırlama** — web
-   adresi olmadan onay/sıfırlama bağlantıları localhost'a gider. Öneri:
-   GitHub Pages (yeni hesap gerekmez; kullanıcı repoda Pages'i açar).
-   Adres belli olunca Supabase Site URL ayarlanır ve "Şifremi unuttum"
-   eklenir.
-2. **iPhone 15 fiziksel test** — hatırlatma teslimatı, odak sayacı, gerçek
+1. **iPhone 15 fiziksel test** — hatırlatma teslimatı, odak sayacı, gerçek
    cihazdan buluta eşitleme (CLAUDE.md §20.4).
 3. **Yayın** — web hosting seçimi ve iOS TestFlight (Apple Developer hesabı).
 4. İsteğe bağlı: sunucu tarafı hatırlatmalar (Edge Function + Cron), hassas
