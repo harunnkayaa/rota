@@ -168,6 +168,7 @@ class FakeRemote implements RemotePlannerStore {
             reviewedPeriodIds: data.reviewedPeriodIds,
             settings: data.settings,
             activeFocus: data.activeFocus,
+            blocks: data.blocks,
           ),
         ),
       ),

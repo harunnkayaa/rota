@@ -2077,6 +2077,270 @@ abstract class AppLocalizations {
   /// In tr, this message translates to:
   /// **'Seç'**
   String get chooseAction;
+
+  /// No description provided for @blockRestTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Mola'**
+  String get blockRestTitle;
+
+  /// No description provided for @reminderBlockBody.
+  ///
+  /// In tr, this message translates to:
+  /// **'{time} · {label} başlıyor.'**
+  String reminderBlockBody(String time, String label);
+
+  /// No description provided for @scheduleTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Günün akışı'**
+  String get scheduleTitle;
+
+  /// No description provided for @scheduleEmpty.
+  ///
+  /// In tr, this message translates to:
+  /// **'Günün saatlerini planla: 09:00–11:00 proje, sonra kısa bir mola…'**
+  String get scheduleEmpty;
+
+  /// No description provided for @scheduleAddBlock.
+  ///
+  /// In tr, this message translates to:
+  /// **'Blok ekle'**
+  String get scheduleAddBlock;
+
+  /// No description provided for @scheduleCopyPrevious.
+  ///
+  /// In tr, this message translates to:
+  /// **'Önceki günü kopyala'**
+  String get scheduleCopyPrevious;
+
+  /// No description provided for @scheduleCopyLastWeek.
+  ///
+  /// In tr, this message translates to:
+  /// **'Geçen haftanın aynı gününü kopyala'**
+  String get scheduleCopyLastWeek;
+
+  /// No description provided for @scheduleMore.
+  ///
+  /// In tr, this message translates to:
+  /// **'Günün akışı işlemleri'**
+  String get scheduleMore;
+
+  /// No description provided for @scheduleCopied.
+  ///
+  /// In tr, this message translates to:
+  /// **'{count} blok kopyalandı.'**
+  String scheduleCopied(String count);
+
+  /// No description provided for @scheduleCopySkipped.
+  ///
+  /// In tr, this message translates to:
+  /// **'{copied} blok kopyalandı; {skipped} blok çakıştığı ya da hedefin o gün açık haftası olmadığı için eklenmedi.'**
+  String scheduleCopySkipped(String copied, String skipped);
+
+  /// No description provided for @scheduleNothingToCopy.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kopyalanacak blok yok.'**
+  String get scheduleNothingToCopy;
+
+  /// No description provided for @scheduleToday.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bugün'**
+  String get scheduleToday;
+
+  /// No description provided for @scheduleTomorrow.
+  ///
+  /// In tr, this message translates to:
+  /// **'Yarın'**
+  String get scheduleTomorrow;
+
+  /// No description provided for @schedulePrevDay.
+  ///
+  /// In tr, this message translates to:
+  /// **'Önceki gün'**
+  String get schedulePrevDay;
+
+  /// No description provided for @scheduleNextDay.
+  ///
+  /// In tr, this message translates to:
+  /// **'Sonraki gün'**
+  String get scheduleNextDay;
+
+  /// No description provided for @scheduleNow.
+  ///
+  /// In tr, this message translates to:
+  /// **'Şimdi'**
+  String get scheduleNow;
+
+  /// No description provided for @blockSemantics.
+  ///
+  /// In tr, this message translates to:
+  /// **'{time}, {label}, {duration}'**
+  String blockSemantics(String time, String label, String duration);
+
+  /// No description provided for @blockEditorNewTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Yeni blok'**
+  String get blockEditorNewTitle;
+
+  /// No description provided for @blockEditorEditTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bloğu düzenle'**
+  String get blockEditorEditTitle;
+
+  /// No description provided for @blockKindGoal.
+  ///
+  /// In tr, this message translates to:
+  /// **'Hedef'**
+  String get blockKindGoal;
+
+  /// No description provided for @blockKindRest.
+  ///
+  /// In tr, this message translates to:
+  /// **'Mola'**
+  String get blockKindRest;
+
+  /// No description provided for @blockKindOther.
+  ///
+  /// In tr, this message translates to:
+  /// **'Diğer'**
+  String get blockKindOther;
+
+  /// No description provided for @blockGoalLabel.
+  ///
+  /// In tr, this message translates to:
+  /// **'Hangi hedef?'**
+  String get blockGoalLabel;
+
+  /// No description provided for @blockNoGoals.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bu gün için açık bir hedefin yok. Mola ya da serbest bir blok ekleyebilirsin.'**
+  String get blockNoGoals;
+
+  /// No description provided for @blockTitleLabel.
+  ///
+  /// In tr, this message translates to:
+  /// **'Ne yapacaksın?'**
+  String get blockTitleLabel;
+
+  /// No description provided for @blockTitleHint.
+  ///
+  /// In tr, this message translates to:
+  /// **'Örn. Ders, yemek, spor salonu'**
+  String get blockTitleHint;
+
+  /// No description provided for @blockStartLabel.
+  ///
+  /// In tr, this message translates to:
+  /// **'Başlangıç'**
+  String get blockStartLabel;
+
+  /// No description provided for @blockEndLabel.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bitiş'**
+  String get blockEndLabel;
+
+  /// No description provided for @blockRemind.
+  ///
+  /// In tr, this message translates to:
+  /// **'Başlarken hatırlat'**
+  String get blockRemind;
+
+  /// No description provided for @blockRemindOff.
+  ///
+  /// In tr, this message translates to:
+  /// **'Hatırlatmalar Ayarlar\'da kapalı; açtığında bu blok da hatırlatılır.'**
+  String get blockRemindOff;
+
+  /// No description provided for @blockRemindBudget.
+  ///
+  /// In tr, this message translates to:
+  /// **'Sessiz saatler ve günlük bildirim sınırı bu hatırlatmalar için de geçerli.'**
+  String get blockRemindBudget;
+
+  /// No description provided for @blockDelete.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bloğu sil'**
+  String get blockDelete;
+
+  /// No description provided for @blockDeleted.
+  ///
+  /// In tr, this message translates to:
+  /// **'Blok silindi'**
+  String get blockDeleted;
+
+  /// No description provided for @blockErrorOverlap.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bu saatler {start}–{end} bloğuyla çakışıyor.'**
+  String blockErrorOverlap(String start, String end);
+
+  /// No description provided for @blockErrorPast.
+  ///
+  /// In tr, this message translates to:
+  /// **'Geçmiş bir güne blok eklenemez.'**
+  String get blockErrorPast;
+
+  /// No description provided for @blockErrorOutside.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bu hedefin o gün açık bir haftası yok.'**
+  String get blockErrorOutside;
+
+  /// No description provided for @blockErrorTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bloğa bir ad ver.'**
+  String get blockErrorTitle;
+
+  /// No description provided for @blockErrorGoal.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bir hedef seç.'**
+  String get blockErrorGoal;
+
+  /// No description provided for @blockErrorTime.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bitiş saati başlangıçtan sonra olmalı.'**
+  String get blockErrorTime;
+
+  /// No description provided for @blockRaisePlan.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bu gün {goal} için plan {planned}, bloklar {scheduled}. Planı {scheduled} yapayım mı?'**
+  String blockRaisePlan(String goal, String planned, String scheduled);
+
+  /// No description provided for @blockRaisePlanAction.
+  ///
+  /// In tr, this message translates to:
+  /// **'Planı güncelle'**
+  String get blockRaisePlanAction;
+
+  /// No description provided for @blockPlanRaised.
+  ///
+  /// In tr, this message translates to:
+  /// **'Plan güncellendi'**
+  String get blockPlanRaised;
+
+  /// No description provided for @goalScheduledToday.
+  ///
+  /// In tr, this message translates to:
+  /// **'Saatte: {ranges}'**
+  String goalScheduledToday(String ranges);
+
+  /// No description provided for @goalUnscheduled.
+  ///
+  /// In tr, this message translates to:
+  /// **'{amount} henüz saate yerleşmedi'**
+  String goalUnscheduled(String amount);
 }
 
 class _AppLocalizationsDelegate

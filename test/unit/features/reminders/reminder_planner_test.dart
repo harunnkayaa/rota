@@ -130,4 +130,43 @@ void main() {
     expect(a, isNot(tomorrow));
     expect(a, greaterThan(0));
   });
+
+  group('block starts', () {
+    ReminderCandidate block(String title, int at, {LocalDate? date}) =>
+        ReminderCandidate(
+          kind: ReminderKind.blockStart,
+          periodId: 'block-$title',
+          date: date ?? monday,
+          goalTitle: title,
+          minutes: 60,
+          atMinute: at,
+        );
+
+    test('fire at their own time, not at the daily time', () {
+      final planned = _plan([block('Proje', 14 * 60)]);
+      expect(planned.single.minuteOfDay, 14 * 60);
+    });
+
+    test('quiet hours and the past still apply, one by one', () {
+      expect(_plan([block('Gece', 23 * 60 + 30)]), isEmpty);
+      expect(_plan([block('Sabah', 9 * 60)]), isEmpty, reason: 'already past');
+      expect(_plan([block('Yarın', 9 * 60, date: tuesday)]), hasLength(1));
+    });
+
+    test('share the daily budget, and come before the daily summary', () {
+      final planned = _plan([
+        _left('Proje', 90),
+        block('B', 16 * 60),
+        block('A', 14 * 60),
+      ], settings: const ReminderSettings(enabled: true, dailyBudget: 2));
+      expect(planned.map((p) => p.candidate.goalTitle), ['A', 'B']);
+    });
+
+    test('moving a block gives a new reminder id', () {
+      expect(
+        block('Proje', 14 * 60).dedupeKey,
+        isNot(block('Proje', 15 * 60).dedupeKey),
+      );
+    });
+  });
 }

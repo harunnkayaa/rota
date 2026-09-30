@@ -860,5 +860,96 @@
   },
   "conflictResolved": "Eşitleme tamamlandı",
   "syncConflictBanner": "Eşitleme çakışması: hangi sürümün kullanılacağını seç.",
-  "chooseAction": "Seç"
+  "chooseAction": "Seç",
+  "blockRestTitle": "Mola",
+  "reminderBlockBody": "{time} · {label} başlıyor.",
+  "@reminderBlockBody": {
+    "placeholders": {
+      "time": { "type": "String" },
+      "label": { "type": "String" }
+    }
+  },
+  "scheduleTitle": "Günün akışı",
+  "scheduleEmpty": "Günün saatlerini planla: 09:00–11:00 proje, sonra kısa bir mola…",
+  "scheduleAddBlock": "Blok ekle",
+  "scheduleCopyPrevious": "Önceki günü kopyala",
+  "scheduleCopyLastWeek": "Geçen haftanın aynı gününü kopyala",
+  "scheduleMore": "Günün akışı işlemleri",
+  "scheduleCopied": "{count} blok kopyalandı.",
+  "@scheduleCopied": {
+    "placeholders": {
+      "count": { "type": "String" }
+    }
+  },
+  "scheduleCopySkipped": "{copied} blok kopyalandı; {skipped} blok çakıştığı ya da hedefin o gün açık haftası olmadığı için eklenmedi.",
+  "@scheduleCopySkipped": {
+    "placeholders": {
+      "copied": { "type": "String" },
+      "skipped": { "type": "String" }
+    }
+  },
+  "scheduleNothingToCopy": "Kopyalanacak blok yok.",
+  "scheduleToday": "Bugün",
+  "scheduleTomorrow": "Yarın",
+  "schedulePrevDay": "Önceki gün",
+  "scheduleNextDay": "Sonraki gün",
+  "scheduleNow": "Şimdi",
+  "blockSemantics": "{time}, {label}, {duration}",
+  "@blockSemantics": {
+    "placeholders": {
+      "time": { "type": "String" },
+      "label": { "type": "String" },
+      "duration": { "type": "String" }
+    }
+  },
+  "blockEditorNewTitle": "Yeni blok",
+  "blockEditorEditTitle": "Bloğu düzenle",
+  "blockKindGoal": "Hedef",
+  "blockKindRest": "Mola",
+  "blockKindOther": "Diğer",
+  "blockGoalLabel": "Hangi hedef?",
+  "blockNoGoals": "Bu gün için açık bir hedefin yok. Mola ya da serbest bir blok ekleyebilirsin.",
+  "blockTitleLabel": "Ne yapacaksın?",
+  "blockTitleHint": "Örn. Ders, yemek, spor salonu",
+  "blockStartLabel": "Başlangıç",
+  "blockEndLabel": "Bitiş",
+  "blockRemind": "Başlarken hatırlat",
+  "blockRemindOff": "Hatırlatmalar Ayarlar'da kapalı; açtığında bu blok da hatırlatılır.",
+  "blockRemindBudget": "Sessiz saatler ve günlük bildirim sınırı bu hatırlatmalar için de geçerli.",
+  "blockDelete": "Bloğu sil",
+  "blockDeleted": "Blok silindi",
+  "blockErrorOverlap": "Bu saatler {start}–{end} bloğuyla çakışıyor.",
+  "@blockErrorOverlap": {
+    "placeholders": {
+      "start": { "type": "String" },
+      "end": { "type": "String" }
+    }
+  },
+  "blockErrorPast": "Geçmiş bir güne blok eklenemez.",
+  "blockErrorOutside": "Bu hedefin o gün açık bir haftası yok.",
+  "blockErrorTitle": "Bloğa bir ad ver.",
+  "blockErrorGoal": "Bir hedef seç.",
+  "blockErrorTime": "Bitiş saati başlangıçtan sonra olmalı.",
+  "blockRaisePlan": "Bu gün {goal} için plan {planned}, bloklar {scheduled}. Planı {scheduled} yapayım mı?",
+  "@blockRaisePlan": {
+    "placeholders": {
+      "goal": { "type": "String" },
+      "planned": { "type": "String" },
+      "scheduled": { "type": "String" }
+    }
+  },
+  "blockRaisePlanAction": "Planı güncelle",
+  "blockPlanRaised": "Plan güncellendi",
+  "goalScheduledToday": "Saatte: {ranges}",
+  "@goalScheduledToday": {
+    "placeholders": {
+      "ranges": { "type": "String" }
+    }
+  },
+  "goalUnscheduled": "{amount} henüz saate yerleşmedi",
+  "@goalUnscheduled": {
+    "placeholders": {
+      "amount": { "type": "String" }
+    }
+  }
 }

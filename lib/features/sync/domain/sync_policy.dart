@@ -89,6 +89,8 @@ ConflictResolution resolveConflict({
       reviewedPeriodIds: winner.reviewedPeriodIds,
       settings: winner.settings,
       activeFocus: winner.activeFocus,
+      // The day's schedule is part of the plan: the chosen side's.
+      blocks: winner.blocks,
     ),
     unmatchedEntries: unmatched,
   );
@@ -146,6 +148,13 @@ PlannerData? mergeThreeWay({
     row: (x) => x.toJson(),
     bothChanged: (l, s) => s,
   );
+  final blocks = _mergeRecords(
+    base.blocks,
+    local.blocks,
+    server.blocks,
+    id: (b) => b.id,
+    row: blockToRow,
+  );
   final settings = _mergeValue(
     base.settings,
     local.settings,
@@ -163,6 +172,7 @@ PlannerData? mergeThreeWay({
       periods == null ||
       allocations == null ||
       snapshots == null ||
+      blocks == null ||
       settings == null ||
       focus == null) {
     return null;
@@ -184,6 +194,9 @@ PlannerData? mergeThreeWay({
       periods.every((p) => goalIds.contains(p.goalId)) &&
       allocations.every((a) => periodIds.contains(a.goalPeriodId)) &&
       entries.every((e) => periodIds.contains(e.goalPeriodId)) &&
+      blocks.every(
+        (b) => b.goalPeriodId == null || periodIds.contains(b.goalPeriodId),
+      ) &&
       (focus.value == null || periodIds.contains(focus.value!.goalPeriodId));
   if (!consistent) return null;
 
@@ -200,6 +213,7 @@ PlannerData? mergeThreeWay({
     },
     settings: settings.value,
     activeFocus: focus.value,
+    blocks: blocks,
   );
 }
 

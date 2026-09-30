@@ -41,6 +41,13 @@ String formatCompactMinutes(BuildContext context, int minutes) {
   return l.hoursCompact(hours.format(minutes / Duration.minutesPerHour));
 }
 
+/// Clock time for minutes since midnight: 540 → "09:00", 1440 → "24:00".
+String formatMinuteOfDay(int minuteOfDay) {
+  String two(int n) => n.toString().padLeft(2, '0');
+  return '${two(minuteOfDay ~/ Duration.minutesPerHour)}:'
+      '${two(minuteOfDay % Duration.minutesPerHour)}';
+}
+
 /// Stopwatch style: "25:09", or "1:05:09" after an hour.
 String formatTimer(Duration duration) {
   String two(int n) => n.toString().padLeft(2, '0');

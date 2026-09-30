@@ -1189,4 +1189,156 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get chooseAction => 'Seç';
+
+  @override
+  String get blockRestTitle => 'Mola';
+
+  @override
+  String reminderBlockBody(String time, String label) {
+    return '$time · $label başlıyor.';
+  }
+
+  @override
+  String get scheduleTitle => 'Günün akışı';
+
+  @override
+  String get scheduleEmpty =>
+      'Günün saatlerini planla: 09:00–11:00 proje, sonra kısa bir mola…';
+
+  @override
+  String get scheduleAddBlock => 'Blok ekle';
+
+  @override
+  String get scheduleCopyPrevious => 'Önceki günü kopyala';
+
+  @override
+  String get scheduleCopyLastWeek => 'Geçen haftanın aynı gününü kopyala';
+
+  @override
+  String get scheduleMore => 'Günün akışı işlemleri';
+
+  @override
+  String scheduleCopied(String count) {
+    return '$count blok kopyalandı.';
+  }
+
+  @override
+  String scheduleCopySkipped(String copied, String skipped) {
+    return '$copied blok kopyalandı; $skipped blok çakıştığı ya da hedefin o gün açık haftası olmadığı için eklenmedi.';
+  }
+
+  @override
+  String get scheduleNothingToCopy => 'Kopyalanacak blok yok.';
+
+  @override
+  String get scheduleToday => 'Bugün';
+
+  @override
+  String get scheduleTomorrow => 'Yarın';
+
+  @override
+  String get schedulePrevDay => 'Önceki gün';
+
+  @override
+  String get scheduleNextDay => 'Sonraki gün';
+
+  @override
+  String get scheduleNow => 'Şimdi';
+
+  @override
+  String blockSemantics(String time, String label, String duration) {
+    return '$time, $label, $duration';
+  }
+
+  @override
+  String get blockEditorNewTitle => 'Yeni blok';
+
+  @override
+  String get blockEditorEditTitle => 'Bloğu düzenle';
+
+  @override
+  String get blockKindGoal => 'Hedef';
+
+  @override
+  String get blockKindRest => 'Mola';
+
+  @override
+  String get blockKindOther => 'Diğer';
+
+  @override
+  String get blockGoalLabel => 'Hangi hedef?';
+
+  @override
+  String get blockNoGoals =>
+      'Bu gün için açık bir hedefin yok. Mola ya da serbest bir blok ekleyebilirsin.';
+
+  @override
+  String get blockTitleLabel => 'Ne yapacaksın?';
+
+  @override
+  String get blockTitleHint => 'Örn. Ders, yemek, spor salonu';
+
+  @override
+  String get blockStartLabel => 'Başlangıç';
+
+  @override
+  String get blockEndLabel => 'Bitiş';
+
+  @override
+  String get blockRemind => 'Başlarken hatırlat';
+
+  @override
+  String get blockRemindOff =>
+      'Hatırlatmalar Ayarlar\'da kapalı; açtığında bu blok da hatırlatılır.';
+
+  @override
+  String get blockRemindBudget =>
+      'Sessiz saatler ve günlük bildirim sınırı bu hatırlatmalar için de geçerli.';
+
+  @override
+  String get blockDelete => 'Bloğu sil';
+
+  @override
+  String get blockDeleted => 'Blok silindi';
+
+  @override
+  String blockErrorOverlap(String start, String end) {
+    return 'Bu saatler $start–$end bloğuyla çakışıyor.';
+  }
+
+  @override
+  String get blockErrorPast => 'Geçmiş bir güne blok eklenemez.';
+
+  @override
+  String get blockErrorOutside => 'Bu hedefin o gün açık bir haftası yok.';
+
+  @override
+  String get blockErrorTitle => 'Bloğa bir ad ver.';
+
+  @override
+  String get blockErrorGoal => 'Bir hedef seç.';
+
+  @override
+  String get blockErrorTime => 'Bitiş saati başlangıçtan sonra olmalı.';
+
+  @override
+  String blockRaisePlan(String goal, String planned, String scheduled) {
+    return 'Bu gün $goal için plan $planned, bloklar $scheduled. Planı $scheduled yapayım mı?';
+  }
+
+  @override
+  String get blockRaisePlanAction => 'Planı güncelle';
+
+  @override
+  String get blockPlanRaised => 'Plan güncellendi';
+
+  @override
+  String goalScheduledToday(String ranges) {
+    return 'Saatte: $ranges';
+  }
+
+  @override
+  String goalUnscheduled(String amount) {
+    return '$amount henüz saate yerleşmedi';
+  }
 }

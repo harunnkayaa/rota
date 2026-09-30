@@ -68,6 +68,7 @@ class SupabaseRemotePlannerStore implements RemotePlannerStore {
         'paused',
       ]),
       _client.from('profiles').select().eq('user_id', userId),
+      _client.from('time_blocks').select(),
     ]);
     final [
       categories,
@@ -78,6 +79,7 @@ class SupabaseRemotePlannerStore implements RemotePlannerStore {
       snapshots,
       focus,
       profiles,
+      blocks,
     ] = results;
     final profile = profiles.isEmpty ? null : profiles.single;
 
@@ -101,6 +103,7 @@ class SupabaseRemotePlannerStore implements RemotePlannerStore {
         },
         settings: profile == null ? null : settingsFromRow(profile),
         activeFocus: focus.isEmpty ? null : focusFromRow(focus.first),
+        blocks: [for (final r in blocks) blockFromRow(r)],
       ),
     );
   }
@@ -121,6 +124,7 @@ class SupabaseRemotePlannerStore implements RemotePlannerStore {
     await _upsert('daily_allocations', [
       for (final a in data.allocations) allocationToRow(a),
     ]);
+    await _upsert('time_blocks', [for (final b in data.blocks) blockToRow(b)]);
 
     // Progress is append-only; a retry with the same key is ignored.
     if (data.entries.isNotEmpty) {
@@ -157,6 +161,7 @@ class SupabaseRemotePlannerStore implements RemotePlannerStore {
     }
 
     // Removed here → removed there. Children first.
+    await _deleteMissing('time_blocks', {for (final b in data.blocks) b.id});
     await _deleteMissing('daily_allocations', {
       for (final a in data.allocations) a.id,
     });

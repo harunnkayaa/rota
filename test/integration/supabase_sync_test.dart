@@ -13,6 +13,7 @@ import 'dart:math';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:rota/features/planning/data/planner_storage.dart';
 import 'package:rota/features/planning/presentation/planner_controller.dart';
+import 'package:rota/features/schedule/domain/time_block.dart';
 import 'package:rota/features/sync/data/auth_gateway.dart';
 import 'package:rota/features/sync/data/remote_planner_store.dart';
 import 'package:rota/features/sync/presentation/sync_service.dart';
@@ -195,6 +196,83 @@ void main() {
         final view = phone.controller.activeGoals().single;
         expect(view.todayDone, 45);
         expect(view.days.firstWhere((d) => d.date == tuesday).allocated, 90);
+
+        await phone.sync.deleteAccount();
+        await phone.dispose();
+        await web.dispose();
+      },
+    );
+
+    test(
+      'the day\'s schedule syncs, moves and disappears everywhere',
+      () async {
+        if (!up) {
+          markTestSkipped('local Supabase is not running');
+          return;
+        }
+        final email = 'rota-${Random().nextInt(1 << 32)}@example.test';
+        const password = 'integration-test-1';
+        final phone = _Device(config!);
+        await phone.start();
+        final category = phone.controller.addCategory('Proje');
+        final periodId = phone.controller
+            .createWeeklyDurationGoal(
+              categoryId: category.id,
+              title: 'Rota MVP',
+              targetMinutes: 600,
+              dailyPlan: {monday: 120},
+            )
+            .id;
+        final morning = TimeBlock(
+          id: '6a000000-0000-4000-8000-000000000001',
+          date: monday,
+          startMinute: 9 * 60,
+          endMinute: 11 * 60,
+          kind: TimeBlockKind.goal,
+          goalPeriodId: periodId,
+          remind: true,
+        );
+        phone.controller
+          ..saveBlock(morning)
+          ..saveBlock(
+            TimeBlock(
+              id: '6a000000-0000-4000-8000-000000000002',
+              date: monday,
+              startMinute: 14 * 60,
+              endMinute: 16 * 60,
+              kind: TimeBlockKind.other,
+              title: 'Ders',
+            ),
+          );
+        await phone.sync.signUp(email: email, password: password);
+        await phone.sync.sync();
+
+        final web = _Device(config);
+        await web.start();
+        await web.sync.signIn(email: email, password: password);
+        await web.sync.sync();
+        final onWeb = web.controller.blocksOn(monday);
+        expect(onWeb.map((b) => b.kind), [
+          TimeBlockKind.goal,
+          TimeBlockKind.other,
+        ]);
+        expect(onWeb.first.remind, isTrue);
+        expect(onWeb.last.title, 'Ders');
+
+        // Moved on the web, the lesson removed on the phone.
+        web.controller.saveBlock(
+          morning.copyWith(startMinute: 10 * 60, endMinute: 12 * 60),
+        );
+        await web.sync.sync();
+        await phone.sync.sync();
+        phone.controller.deleteBlock('6a000000-0000-4000-8000-000000000002');
+        await phone.sync.sync();
+        await web.sync.sync();
+
+        for (final device in [phone, web]) {
+          final block = device.controller.blocksOn(monday).single;
+          expect(block.startMinute, 10 * 60);
+        }
 
         await phone.sync.deleteAccount();
         await phone.dispose();

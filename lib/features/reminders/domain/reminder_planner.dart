@@ -56,6 +56,9 @@ enum ReminderKind {
 
   /// "PTE sınavı: tempo için bu hafta 2 sa daha gerekiyor."
   paceBehind,
+
+  /// "09:00 · Rota MVP başlıyor." At the block's own start time.
+  blockStart,
 }
 
 /// Something worth reminding about on [date]. [minutes] is always time not
@@ -68,6 +71,7 @@ class ReminderCandidate {
     required this.goalTitle,
     required this.minutes,
     this.isSensitive = false,
+    this.atMinute,
   });
 
   final ReminderKind kind;
@@ -77,8 +81,14 @@ class ReminderCandidate {
   final int minutes;
   final bool isSensitive;
 
+  /// A fixed time (a block's start); null: the user's daily reminder time.
+  /// For [ReminderKind.blockStart], [periodId] holds the block id.
+  final int? atMinute;
+
   /// Same situation → same key → never two notifications for it.
-  String get dedupeKey => '${kind.name}:$periodId:$date';
+  String get dedupeKey => atMinute == null
+      ? '${kind.name}:$periodId:$date'
+      : '${kind.name}:$periodId:$date:$atMinute';
 }
 
 class PlannedReminder {
@@ -104,9 +114,11 @@ class PlannedReminder {
 /// Chooses which reminders to schedule.
 ///
 /// - Nothing when reminders are off, or nothing is left to do.
-/// - Nothing in quiet hours, and nothing already in the past.
-/// - Per day at most [ReminderSettings.dailyBudget], largest amount first
-///   (ties by title, so the result is deterministic).
+/// - Nothing in quiet hours, and nothing already in the past — checked for
+///   each reminder at its own time (a block start or the daily time).
+/// - Per day at most [ReminderSettings.dailyBudget]. Block starts the user
+///   asked for come first (earliest first), then the largest amounts (ties
+///   by title, so the result is deterministic).
 List<PlannedReminder> planReminders({
   required ReminderSettings settings,
   required List<ReminderCandidate> candidates,
@@ -114,15 +126,15 @@ List<PlannedReminder> planReminders({
   required int nowMinuteOfDay,
 }) {
   if (!settings.enabled || settings.dailyBudget <= 0) return const [];
-  final time = settings.dailyTimeMinutes;
-  if (settings.isQuiet(time)) return const [];
+  int timeOf(ReminderCandidate c) => c.atMinute ?? settings.dailyTimeMinutes;
 
   final byDate = <LocalDate, List<ReminderCandidate>>{};
   final seen = <String>{};
   for (final c in candidates) {
     if (c.minutes <= 0 || !seen.add(c.dedupeKey)) continue;
     if (c.date.isBefore(today)) continue;
-    if (c.date == today && time <= nowMinuteOfDay) continue;
+    if (settings.isQuiet(timeOf(c))) continue;
+    if (c.date == today && timeOf(c) <= nowMinuteOfDay) continue;
     (byDate[c.date] ??= []).add(c);
   }
 
@@ -131,6 +143,11 @@ List<PlannedReminder> planReminders({
   for (final date in dates) {
     final ranked = byDate[date]!
       ..sort((a, b) {
+        final byFixed = (a.atMinute == null ? 1 : 0).compareTo(
+          b.atMinute == null ? 1 : 0,
+        );
+        if (byFixed != 0) return byFixed;
+        if (a.atMinute != null) return a.atMinute!.compareTo(b.atMinute!);
         final byAmount = b.minutes.compareTo(a.minutes);
         return byAmount != 0 ? byAmount : a.goalTitle.compareTo(b.goalTitle);
       });
@@ -139,7 +156,7 @@ List<PlannedReminder> planReminders({
         PlannedReminder(
           candidate: c,
           date: date,
-          minuteOfDay: time,
+          minuteOfDay: timeOf(c),
           hideDetails: c.isSensitive && !settings.showSensitiveDetails,
         ),
       );

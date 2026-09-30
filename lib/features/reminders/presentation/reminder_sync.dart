@@ -83,6 +83,10 @@ class ReminderSync {
               c.goalTitle,
               amount,
             ),
+            ReminderKind.blockStart => texts.reminderBlockBody(
+              formatMinuteOfDay(r.minuteOfDay),
+              c.goalTitle.isEmpty ? texts.blockRestTitle : c.goalTitle,
+            ),
           };
     final localTime = DateTime(
       r.date.year,

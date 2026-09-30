@@ -4,6 +4,7 @@ import '../../goals/domain/daily_allocation.dart';
 import '../../goals/domain/goal.dart';
 import '../../goals/domain/goal_period.dart';
 import '../../goals/domain/progress_entry.dart';
+import '../../schedule/domain/time_block.dart';
 import '../../settings/domain/planner_settings.dart';
 import '../domain/period_closing.dart';
 
@@ -19,6 +20,7 @@ class PlannerData {
     this.reviewedPeriodIds = const {},
     PlannerSettings? settings,
     this.activeFocus,
+    this.blocks = const [],
   }) : settings = settings ?? PlannerSettings();
 
   final List<GoalCategory> categories;
@@ -36,4 +38,7 @@ class PlannerData {
 
   /// A focus timer that was running when the app was last closed.
   final FocusSession? activeFocus;
+
+  /// The day's time slots ("09:00–11:00 Proje", "Mola").
+  final List<TimeBlock> blocks;
 }

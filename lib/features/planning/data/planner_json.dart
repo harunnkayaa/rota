@@ -9,6 +9,7 @@ import '../../goals/domain/goal.dart';
 import '../../goals/domain/goal_period.dart';
 import '../../goals/domain/progress_entry.dart';
 import '../../reminders/domain/reminder_planner.dart';
+import '../../schedule/domain/time_block.dart';
 import '../../settings/domain/planner_settings.dart';
 import '../domain/period_closing.dart';
 import 'planner_data.dart';
@@ -18,7 +19,8 @@ import 'planner_data.dart';
 ///
 /// v1 → v2: goals got `default_target_value`; period snapshots, reviewed
 /// periods, settings and the active focus session were added.
-const plannerSchemaVersion = 2;
+/// v2 → v3: time blocks (the day's schedule) were added.
+const plannerSchemaVersion = 3;
 
 // ---------------------------------------------------------------------------
 // Row mappers. Keys are the SQL column names (supabase/migrations), so the
@@ -110,6 +112,28 @@ DailyAllocation allocationFromRow(Row m) => DailyAllocation(
   goalPeriodId: m['goal_period_id']! as String,
   date: LocalDate.parse(m['target_date']! as String),
   allocatedValue: m['allocated_value']! as int,
+);
+
+Row blockToRow(TimeBlock b) => {
+  'id': b.id,
+  'block_date': b.date.toString(),
+  'start_minute': b.startMinute,
+  'end_minute': b.endMinute,
+  'kind': b.kind.name,
+  'goal_period_id': b.goalPeriodId,
+  'title': b.title,
+  'remind': b.remind,
+};
+
+TimeBlock blockFromRow(Row m) => TimeBlock(
+  id: m['id']! as String,
+  date: LocalDate.parse(m['block_date']! as String),
+  startMinute: m['start_minute']! as int,
+  endMinute: m['end_minute']! as int,
+  kind: TimeBlockKind.values.byName(m['kind']! as String),
+  goalPeriodId: m['goal_period_id'] as String?,
+  title: m['title'] as String?,
+  remind: m['remind']! as bool,
 );
 
 Row entryToRow(ProgressEntry e) => {
@@ -215,6 +239,7 @@ String encodePlannerData(PlannerData data) => jsonEncode({
     null => null,
     final f => focusToRow(f),
   },
+  'time_blocks': [for (final b in data.blocks) blockToRow(b)],
 });
 
 /// Throws [FormatException] for anything that isn't a valid save file.
@@ -265,6 +290,9 @@ PlannerData decodePlannerData(String source) {
         final Map<String, Object?> m => focusFromRow(m),
         _ => throw const FormatException('active_focus'),
       },
+      blocks: version < 3
+          ? const []
+          : [for (final m in _list(root, 'time_blocks')) blockFromRow(m)],
     );
   } on FormatException {
     rethrow;

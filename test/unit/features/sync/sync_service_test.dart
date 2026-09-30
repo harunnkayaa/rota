@@ -1,6 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:rota/features/planning/data/planner_storage.dart';
 import 'package:rota/features/planning/presentation/planner_controller.dart';
+import 'package:rota/features/schedule/domain/time_block.dart';
 import 'package:rota/features/sync/presentation/sync_service.dart';
 
 import '../../../helpers/builders.dart';
@@ -301,6 +302,47 @@ void main() {
     await web.sync.checkForChanges();
 
     expect(web.controller.activeGoals().single.todayDone, 25);
+  });
+
+  test('blocks added on phone and web both end up everywhere', () async {
+    final phone = _Device(server);
+    await phone.start();
+    final periodId = phone.addGoal('Rota MVP');
+    await phone.signIn();
+    final web = _Device(server);
+    await web.start();
+    await web.signIn();
+
+    phone.controller.saveBlock(
+      TimeBlock(
+        id: 'morning',
+        date: monday,
+        startMinute: 9 * 60,
+        endMinute: 11 * 60,
+        kind: TimeBlockKind.goal,
+        goalPeriodId: periodId,
+      ),
+    );
+    await phone.sync.sync();
+    web.controller.saveBlock(
+      TimeBlock(
+        id: 'break',
+        date: monday,
+        startMinute: 11 * 60,
+        endMinute: 11 * 60 + 15,
+        kind: TimeBlockKind.rest,
+      ),
+    );
+    await web.sync.sync();
+    await phone.sync.sync();
+
+    expect(web.sync.status, SyncStatus.synced);
+    for (final device in [phone, web]) {
+      expect(device.controller.blocksOn(monday).map((b) => b.id), [
+        'morning',
+        'break',
+      ]);
+    }
   });
 
   test('a build without a server stays local only', () async {

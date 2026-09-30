@@ -15,6 +15,8 @@ import '../../goals/domain/goal_period.dart';
 import '../../goals/domain/progress_entry.dart';
 import '../../reminders/domain/reminder_planner.dart';
 import '../../reports/domain/weekly_report.dart';
+import '../../schedule/domain/schedule_rules.dart';
+import '../../schedule/domain/time_block.dart';
 import '../../settings/domain/planner_settings.dart';
 import '../data/planner_data.dart';
 import '../data/planner_json.dart';
@@ -93,6 +95,9 @@ class PlannerController extends ChangeNotifier {
         ..addAll(data.reviewedPeriodIds);
       _settings = data.settings;
       _activeFocus = data.activeFocus;
+      _blocks
+        ..clear()
+        ..addAll(data.blocks);
       _loadStatus = LoadStatus.ready;
     } on Object catch (e) {
       // Type only: the saved content may contain personal goal titles.
@@ -186,6 +191,9 @@ class PlannerController extends ChangeNotifier {
       ..addAll(data.reviewedPeriodIds);
     _settings = data.settings;
     _activeFocus = data.activeFocus;
+    _blocks
+      ..clear()
+      ..addAll(data.blocks);
     _commit(byUser: false);
     refreshDay();
   }
@@ -211,6 +219,7 @@ class PlannerController extends ChangeNotifier {
     reviewedPeriodIds: Set.of(_reviewed),
     settings: _settings,
     activeFocus: _activeFocus,
+    blocks: List.of(_blocks),
   );
 
   Future<void> _write(String snapshot) async {
@@ -232,6 +241,7 @@ class PlannerController extends ChangeNotifier {
   final _entries = <ProgressEntry>[];
   final _snapshots = <PeriodSnapshot>[];
   final _reviewed = <String>{};
+  final _blocks = <TimeBlock>[];
   FocusSession? _activeFocus;
 
   LocalDate get today => clock.today();
@@ -501,7 +511,98 @@ class PlannerController extends ChangeNotifier {
     _reviewed.clear();
     _settings = PlannerSettings();
     _activeFocus = null;
+    _blocks.clear();
     _commit();
+  }
+
+  // -------------------------------------------------------------------------
+  // The day's schedule (time blocks)
+  // -------------------------------------------------------------------------
+
+  /// Blocks of [date], earliest first.
+  List<TimeBlock> blocksOn(LocalDate date) => blocksOnDay(_blocks, date);
+
+  /// Goals that can get a block on [date]: their open period contains it.
+  List<GoalProgressView> goalsOn(LocalDate date) => [
+    for (final p in _periods)
+      if (!p.isClosed && p.range.contains(date) && _goal(p.goalId).isActive)
+        _view(p),
+  ];
+
+  /// Minutes of [periodId] placed on the clock on [date].
+  int scheduledFor(String periodId, LocalDate date) =>
+      scheduledMinutes(_blocks, periodId: periodId, date: date);
+
+  /// The day's plan for [periodId] (0 when nothing is planned).
+  int allocatedOn(String periodId, LocalDate date) {
+    for (final a in _allocations) {
+      if (a.goalPeriodId == periodId && a.date == date) return a.allocatedValue;
+    }
+    return 0;
+  }
+
+  /// Adds [block], or replaces the block with the same id. Throws
+  /// [BlockRejectedException] for past days, a goal without an open week
+  /// on that day, or a clash with another block.
+  void saveBlock(TimeBlock block) {
+    _checkBlock(block);
+    final index = _blocks.indexWhere((b) => b.id == block.id);
+    if (index == -1) {
+      _blocks.add(block);
+    } else {
+      _blocks[index] = block;
+    }
+    _commit();
+  }
+
+  void deleteBlock(String blockId) {
+    _blocks.removeWhere((b) => b.id == blockId);
+    _commit();
+  }
+
+  /// Copies [from]'s blocks onto [to] ("same as yesterday"); blocks already
+  /// on [to] stay, clashing copies are left out and counted.
+  DayCopy copyBlocks({required LocalDate from, required LocalDate to}) {
+    if (to.isBefore(today)) {
+      throw const BlockRejectedException(BlockRejection.pastDay);
+    }
+    final result = copyDay(
+      blocks: _blocks,
+      from: from,
+      to: to,
+      newId: generateUuidV4,
+      periodOnTarget: (periodId) {
+        final goalId = _period(periodId).goalId;
+        for (final p in _periods) {
+          if (p.goalId == goalId && !p.isClosed && p.range.contains(to)) {
+            return p.id;
+          }
+        }
+        return null;
+      },
+    );
+    if (result.added.isNotEmpty) {
+      _blocks.addAll(result.added);
+      _commit();
+    }
+    return result;
+  }
+
+  void _checkBlock(TimeBlock block) {
+    if (block.date.isBefore(today)) {
+      throw const BlockRejectedException(BlockRejection.pastDay);
+    }
+    if (block.goalPeriodId case final periodId?) {
+      final period = _periods.where((p) => p.id == periodId).firstOrNull;
+      if (period == null ||
+          period.isClosed ||
+          !period.range.contains(block.date)) {
+        throw const BlockRejectedException(BlockRejection.outsidePeriod);
+      }
+    }
+    if (firstOverlap(_blocks, block) case final other?) {
+      throw BlockRejectedException(BlockRejection.overlaps, other: other);
+    }
   }
 
   /// New capacity or week start. Existing weeks keep their dates; a new
@@ -784,6 +885,24 @@ class PlannerController extends ChangeNotifier {
               isSensitive: v.goal.isSensitive,
             ),
       ],
+      for (final b in _blocks)
+        if (b.remind && (b.date == today || b.date == tomorrow))
+          ReminderCandidate(
+            kind: ReminderKind.blockStart,
+            periodId: b.id,
+            date: b.date,
+            // Empty for a break: the notification text says "Mola".
+            goalTitle: switch (b.goalPeriodId) {
+              final id? => _goal(_period(id).goalId).title,
+              null => b.title ?? '',
+            },
+            minutes: b.minutes,
+            isSensitive: switch (b.goalPeriodId) {
+              final id? => _goal(_period(id).goalId).isSensitive,
+              null => false,
+            },
+            atMinute: b.startMinute,
+          ),
     ];
   }
 
@@ -1169,4 +1288,18 @@ class PlannerScope extends InheritedNotifier<PlannerController> {
     assert(scope != null, 'No PlannerScope above this widget.');
     return scope!.notifier!;
   }
+}
+
+enum BlockRejection { pastDay, outsidePeriod, overlaps }
+
+class BlockRejectedException implements Exception {
+  const BlockRejectedException(this.reason, {this.other});
+
+  final BlockRejection reason;
+
+  /// The block it would clash with ([BlockRejection.overlaps]).
+  final TimeBlock? other;
+
+  @override
+  String toString() => 'BlockRejectedException($reason)';
 }
