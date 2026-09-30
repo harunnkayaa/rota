@@ -43,7 +43,7 @@ void main() {
 
     await scrollAndTap(tester, find.text('Verilerini dışa aktar'));
     expect(find.text('Dışa aktarılan veri'), findsOneWidget);
-    expect(find.textContaining('"schema_version": 2'), findsOneWidget);
+    expect(find.textContaining('"schema_version": 3'), findsOneWidget);
     expect(find.text('Panoya kopyala'), findsOneWidget);
   });
 }

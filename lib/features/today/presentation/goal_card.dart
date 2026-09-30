@@ -12,6 +12,7 @@ import '../../planning/presentation/goal_actions_menu.dart';
 import '../../planning/presentation/plan_editor_sheet.dart';
 import '../../planning/presentation/planner_controller.dart';
 import '../../planning/presentation/redistribution_sheet.dart';
+import '../../schedule/presentation/goal_schedule_line.dart';
 import 'add_progress_sheet.dart';
 
 /// One goal on the Today screen: today's part and the week it feeds.
@@ -83,6 +84,7 @@ class GoalCard extends StatelessWidget {
               target: view.todayAllocated,
               emptyText: l.todayNoPlan,
             ),
+            GoalScheduleLine(view: view),
             const SizedBox(height: AppSpacing.m),
             if (view.isDeadline)
               DeadlinePaceSection(view: view)

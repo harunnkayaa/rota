@@ -54,8 +54,7 @@ void main() {
   testWidgets('archiving asks first, then removes the goal', (tester) async {
     await _nextWeek(tester);
 
-    await tester.tap(find.byTooltip('Diğer işlemler'));
-    await tester.pumpAndSettle();
+    await tapVisible(tester, find.byTooltip('Diğer işlemler'));
     await tester.tap(find.text('Hedefi arşivle'));
     await tester.pumpAndSettle();
     expect(find.text('Hedef arşivlensin mi?'), findsOneWidget);

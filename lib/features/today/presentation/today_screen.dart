@@ -11,6 +11,7 @@ import '../../focus/presentation/focus_screen.dart';
 import '../../goals/presentation/add_goal_button.dart';
 import '../../goals/presentation/create_goal_screen.dart';
 import '../../planning/presentation/planner_controller.dart';
+import '../../schedule/presentation/day_schedule_card.dart';
 import '../../sync/presentation/account_section.dart';
 import '../../sync/presentation/sync_service.dart';
 import 'goal_card.dart';
@@ -106,6 +107,8 @@ class TodayScreen extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
                       _TodayHero(summary: controller.todaySummary()),
+                      const SizedBox(height: AppSpacing.m),
+                      const DayScheduleCard(),
                       for (final goal in goals) ...[
                         const SizedBox(height: AppSpacing.m),
                         GoalCard(view: goal),

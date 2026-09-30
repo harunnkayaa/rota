@@ -47,7 +47,8 @@ migration uygulandı, 25 güvenlik testi bulutta da geçti, girişsiz istekler
 | Web yayını (29.09) | ✅ | Cloudflare Pages: **https://rota-3t6.pages.dev** (proje `rota`). Supabase Site URL ve Redirect URL bu adrese ayarlı (kullanıcı panelden yaptı). |
 | Şifremi unuttum (29.09) | ✅ | E-postayla sıfırlama bağlantısı → Rota web sayfası açılır, "Yeni şifreni belirle" → telefonda da o şifreyle girilir. Supabase ücretsiz planda e-posta şablonu özel SMTP olmadan düzenlenemediği için kod yerine varsayılan bağlantı kullanılıyor. Bağlantı başka cihazda açılabildiği için auth akışı `implicit` (yalnızca e-posta/şifre var, OAuth yok). Gerçek yerel Supabase'te bağlantı → kurtarma oturumu → yeni şifre → giriş zinciri denendi. |
 
-Doğrulama: 263 uygulama testi (gerçek yerel Supabase'e karşı 4 uçtan uca test dahil) + 25 veritabanı testi geçiyor, `flutter analyze` temiz.
+| Günün akışı / saat blokları (30.09) | ✅ | Bugün ekranında gün saat saat planlanır: hedef bloğu (09:00–11:00 Rota MVP), mola, serbest blok (Ders). Kullanıcı kararları: **plan ile blok ayrı ama uyumlu** (blok planı değiştirmez; bloklar planı aşarsa "Planı güncelle" önerilir), **blok başlarken hatırlatma** (bloğa özel; sessiz saat ve günlük sınır geçerli), **tek günlük bloklar + kopyala** (önceki gün / geçen haftanın aynı günü). Çakışan blok, geçmiş gün, hedefin haftası dışı reddedilir. Hedef kartında "Saatte: 09:00–11:00 · 15 dk henüz saate yerleşmedi". Kayıt formatı v3; Supabase `time_blocks` (RLS, IDOR korumalı FK); üç yönlü birleştirmeye dahil. |
+Doğrulama: 292 uygulama testi (gerçek yerel Supabase'e karşı 4 uçtan uca test dahil) + 37 veritabanı testi geçiyor, `flutter analyze` temiz.
 
 ### Yerel çalıştırma
 

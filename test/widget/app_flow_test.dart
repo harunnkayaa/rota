@@ -241,8 +241,7 @@ void main() {
     await tester.tap(find.text('Örnek haftayı yükle'));
     await tester.pumpAndSettle();
 
-    await tester.tap(find.byTooltip('Diğer işlemler').first);
-    await tester.pumpAndSettle();
+    await tapVisible(tester, find.byTooltip('Diğer işlemler').first);
     await tester.tap(find.text('Hedefi düzenle'));
     await tester.pumpAndSettle();
     await tester.enterText(find.byType(TextField), 'Rota v1');
