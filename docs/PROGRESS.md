@@ -33,21 +33,16 @@ migration uygulandı, 25 güvenlik testi bulutta da geçti, girişsiz istekler
 | Kayıt şeması v2 | ✅ | v1 dosyaları otomatik taşınır (varsayılan haftalık hedef son haftadan alınır). Simülatördeki gerçek v1 verisiyle doğrulandı. |
 | iOS hatırlatmaları (28.09) | ✅ | Kurallar [notification-rules.md](product/notification-rules.md): her zaman henüz çalışılmamış süre, sessiz saatler, günlük bütçe, hassas hedeflerde gizli metin, sabit id ile tekrar yok. Her değişiklikte yeniden planlanır. İzin yalnızca kullanıcı hatırlatmaları açınca istenir (simülatörde gerçek iOS izin penceresiyle doğrulandı). Web'de bildirim yok. Bildirimin gerçek teslimatı otomasyonla doğrulanamadı; iPhone 15'te elle denenmeli. |
 | Veri sahipliği (28.09) | ✅ | Ayarlar'dan tüm verileri JSON olarak görüp panoya kopyalama; onaylı "tüm verileri sil" (CLAUDE.md §4.6). |
-
 | Supabase veritabanı (28.09) | ✅ | 3 migration: tablolar, her tabloda RLS, `(id, user_id)` bağlantılarıyla IDOR koruması, sadece eklenebilir ilerleme, kapanıştan önceki işin geç eşitlemesi, hesap silme fonksiyonu. 25 pgTAP testi. |
 | Hesap ve eşitleme (28.09) | ✅ | E-posta/şifre ile hesap; önce-yerel eşitleme (itme / çekme / çakışmada kullanıcı seçer, iki taraftaki ilerleme korunur); çevrimdışı değişiklikler bekler; çıkış, hesap silme. Gerçek yerel Supabase'e karşı uçtan uca test. |
-
 | Bulut Supabase (28.09) | ✅ | `supabase link` + `db push`; `supabase test db --linked` 25/25. Kayıtta e-posta onayı açık; uygulama "onay bağlantısı gönderdik" der. |
-
 | Giriş ekranı (28.09) | ✅ | Sunucu tanımlı derlemede ilk ekran giriş / hesap oluşturma; oturum saklıysa doğrudan uygulama açılır; çıkış yapınca giriş ekranına dönülür, veriler cihazda kalır. Sunucusuz derleme eskisi gibi doğrudan açılır. |
-
 | Derin test ve iyileştirmeler (29.09) | ✅ | Ekranlar gerçek fontlarla tek tek çizilip incelendi. "Hedef ekle" başlığa taşındı (günlük butonları kapatmıyordu); kart altında yan yana "İlerleme ekle / Odaklan"; geniş ekranda başlık içerikle hizalı; büyük yazıda başlık kesilmiyor. Yeniden dağıtma 5 dk adımlarla (+10/+10/+5/+5, 8/8/7/7 değil). "Günlük yük" grafiği plan / kapasite gösteriyor. Yanlış girilen ilerleme geri alınabiliyor (silinmez; eksi düzeltme kaydı). Hedef adı ve hedef süresi değiştirilebiliyor. |
 | Eşitleme düzeltmeleri (29.09) | ✅ | **Gizlilik:** aynı cihazda başka hesapla girilince önceki hesabın verisi yeni hesaba yüklenmiyor. Çıkışta gönderilmemiş değişiklik varsa uyarı. **Pazartesi çakışması:** yeni hafta her cihazda aynı kimliklerle açılıyor ve kullanıcı değişikliği sayılmıyor. **Otomatik birleştirme:** iki cihaz farklı şeyleri değiştirdiyse sormadan birleşiyor (ortak sürüm saklanıyor); yalnızca aynı kayıt iki tarafta farklı değiştiyse soruluyor. Açık uygulama dakikada bir küçük bir sorguyla diğer cihazın değişikliğini çekiyor. "Tüm verileri sil" hesaba bağlıyken hesaptan da siliyor ve bunu açıkça söylüyor. |
-
 | Web yayını (29.09) | ✅ | Cloudflare Pages: **https://rota-3t6.pages.dev** (proje `rota`). Supabase Site URL ve Redirect URL bu adrese ayarlı (kullanıcı panelden yaptı). |
 | Şifremi unuttum (29.09) | ✅ | E-postayla sıfırlama bağlantısı → Rota web sayfası açılır, "Yeni şifreni belirle" → telefonda da o şifreyle girilir. Supabase ücretsiz planda e-posta şablonu özel SMTP olmadan düzenlenemediği için kod yerine varsayılan bağlantı kullanılıyor. Bağlantı başka cihazda açılabildiği için auth akışı `implicit` (yalnızca e-posta/şifre var, OAuth yok). Gerçek yerel Supabase'te bağlantı → kurtarma oturumu → yeni şifre → giriş zinciri denendi. |
-
 | Günün akışı / saat blokları (30.09) | ✅ | Bugün ekranında gün saat saat planlanır: hedef bloğu (09:00–11:00 Rota MVP), mola, serbest blok (Ders). Kullanıcı kararları: **plan ile blok ayrı ama uyumlu** (blok planı değiştirmez; bloklar planı aşarsa "Planı güncelle" önerilir), **blok başlarken hatırlatma** (bloğa özel; sessiz saat ve günlük sınır geçerli), **tek günlük bloklar + kopyala** (önceki gün / geçen haftanın aynı günü). Çakışan blok, geçmiş gün, hedefin haftası dışı reddedilir. Hedef kartında "Saatte: 09:00–11:00 · 15 dk henüz saate yerleşmedi". Kayıt formatı v3; Supabase `time_blocks` (RLS, IDOR korumalı FK); üç yönlü birleştirmeye dahil. |
+
 Doğrulama: 292 uygulama testi (gerçek yerel Supabase'e karşı 4 uçtan uca test dahil) + 37 veritabanı testi geçiyor, `flutter analyze` temiz.
 
 ### Yerel çalıştırma
